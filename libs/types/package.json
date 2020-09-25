@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "lint": "eslint lib --ext .ts",
+    "lint": "eslint src --ext .ts",
     "build": "tsc"
   },
   "repository": {

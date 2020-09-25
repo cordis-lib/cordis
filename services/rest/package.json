@@ -6,7 +6,7 @@
   "types": "./types/index.d.ts",
   "version": "0.1.0",
   "scripts": {
-    "lint": "eslint lib --ext .ts",
+    "lint": "eslint src --ext .ts",
     "build": "tsc"
   },
   "repository": {
