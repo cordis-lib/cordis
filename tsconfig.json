@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "alwaysStrict": true,
+    "moduleResolution": "node",
+    "removeComments": true,
+    "pretty": true,
+    "module": "CommonJS",
+    "target": "ES2019",
+    "lib": ["ESNext"],
+    "sourceMap": true,
+    "incremental": true,
+    "skipLibCheck": true,
+    "noEmitHelpers": true,
+    "importHelpers": true,
+    "declaration": true
+  }
+}

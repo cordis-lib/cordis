@@ -1,0 +1,19 @@
+{
+  "name": "Cordis",
+  "mode": "modules",
+  "out": "doc",
+  "theme": "default",
+  "ignoreCompilerErrors": "false",
+  "preserveConstEnums": "true",
+  "exclude": ["services/**", "packages/!(types|gateway-consumer|rest-consumer)*/*/index.ts"],
+  "external-modulemap": ".*packages\/([^\/]+)\/.*",
+  "stripInternal": "false",
+  "excludeExternals": "true",
+  "media": "media",
+  "readme": "README.md",
+  "plugin": [
+    "typedoc-plugin-as-member-of",
+    "@strictsoftware/typedoc-plugin-monorepo",
+    "typedoc-plugin-no-inherit"
+  ]
+}

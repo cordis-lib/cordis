@@ -1,0 +1,26 @@
+name: Lint
+on: [push, pull_request]
+jobs:
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Node v14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Install pnpm
+        run: curl -L https://unpkg.com/@pnpm/self-installer | node
+
+      - name: Install deps
+        run: pnpm i
+
+      - name: Build the code
+        run: pnpm run build
+
+      - name: Run ESLint
+        run: pnpm run lint
