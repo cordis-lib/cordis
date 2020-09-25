@@ -16,7 +16,7 @@ export class RpcClient<S, C> extends Broker {
     const replyQueue = this.replyQueue = await channel.assertQueue('', { exclusive: true }).then(d => d.queue);
 
     await this._consumeQueue(replyQueue, (content: { res: S | null; error: string | null }, properties) => {
-      if (properties.correlationId) this.emit(`__${properties.correlationId}`, content.res ?? content.error, content.res !== null);
+      if (properties.correlationId) this.emit(`__${properties.correlationId}`, content.res ?? content.error, content.res === null);
     }, true);
   }
 
@@ -25,10 +25,6 @@ export class RpcClient<S, C> extends Broker {
       if (!this.serverQueue) return reject(new CordisBrokerError('brokerNotInit'));
 
       const correlationId = this._generateCorrelation();
-      this._sendToQueue(this.serverQueue, packet, {
-        replyTo: this.replyQueue,
-        correlationId
-      });
 
       const cb = (res: S | string, isError: boolean) => {
         clearTimeout(timeout);
@@ -38,13 +34,18 @@ export class RpcClient<S, C> extends Broker {
 
       const timeout = setTimeout(
         () => {
-          reject(`Did not recieve a response in time, waited for ${RpcClient.timeoutAfter}`);
+          reject(new CordisBrokerError('noResponseInTime', RpcClient.timeoutAfter));
           this.off(`__${correlationId}`, cb);
         },
         RpcClient.timeoutAfter
       );
 
       this.once(`__${correlationId}`, cb);
+
+      this._sendToQueue(this.serverQueue, packet, {
+        replyTo: this.replyQueue,
+        correlationId
+      });
     });
   }
 }

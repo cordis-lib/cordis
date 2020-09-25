@@ -69,12 +69,7 @@ const main = async () => {
       abortIn: argv['rest-retries'],
       apiVersion: argv['rest-version']
     }
-  );
-
-  service
-    .on('error', e => console.error(e));
-
-  rest
+  )
     .on('request', request => console.log(`Making request ${request.method?.toUpperCase() ?? 'GET'} ${request.path}...`))
     .on(
       'response',
@@ -88,6 +83,8 @@ const main = async () => {
       (bucket, endpoint, prevented, waiting) =>
         console.log(`[${endpoint}]: bucket ${bucket} ${prevented ? 'prevented' : 'hit'} a ratelimit, waiting for ${waiting}ms`)
     );
+
+  service.on('error', e => console.error(e));
 
   await service.init(
     'rest',

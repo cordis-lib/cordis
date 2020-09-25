@@ -4,7 +4,8 @@ import { makeCordisError } from '@cordis/util';
 export const CordisBrokerError = makeCordisError(
   Error,
   {
-    brokerNotInit: 'Failed to complete operation, broker has not yet been initalized'
+    brokerNotInit: 'Failed to complete operation, broker has not yet been initalized',
+    noResponseInTime: waitingFor => `Did not recieve a response in time, waited for ${waitingFor}`
   }
 );
 

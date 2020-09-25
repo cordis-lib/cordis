@@ -108,7 +108,7 @@ const main = async () => {
     })
     .help();
 
-  const redisClient = redis({
+  const redisClient = new redis({
     host: argv['redis-host'],
     port: argv['redis-port'],
     password: argv['redis-auth'],
@@ -150,7 +150,7 @@ const main = async () => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
-          if (handle) handle(data, service, redisClient, rest, [botUser, updateBotUser]);
+          if (handle) handle(data.d, service, redisClient, rest, [botUser, updateBotUser]);
         } catch {}
       }
     );
@@ -160,7 +160,8 @@ const main = async () => {
   await service.init('gateway', false)
     .then(() => console.log('Service is live, waiting for the gateway to sign in...'))
     .catch(console.error);
-  await ws.connect();
+  await ws.connect()
+    .catch(console.error);
 };
 
 void main();
