@@ -48,14 +48,14 @@ const main = async () => {
       required: false
     })
     .option('rest-abortin', {
-      global: true,
-      description: 'How long to wait before failing a request',
-      type: 'number',
-      required: false
+      'global': true,
+      'description': 'How long to wait before failing a request',
+      'type': 'number',
+      'default': 6e4
     })
     .option('rest-version', {
       global: true,
-      description: 'What version of the api to use; 6 or 7',
+      description: 'What version of the api to use',
       type: 'number',
       required: false
     })
@@ -69,12 +69,7 @@ const main = async () => {
       abortIn: argv['rest-retries'],
       apiVersion: argv['rest-version']
     }
-  );
-
-  service
-    .on('error', e => console.error(e));
-
-  rest
+  )
     .on('request', request => console.log(`Making request ${request.method?.toUpperCase() ?? 'GET'} ${request.path}...`))
     .on(
       'response',
@@ -88,6 +83,8 @@ const main = async () => {
       (bucket, endpoint, prevented, waiting) =>
         console.log(`[${endpoint}]: bucket ${bucket} ${prevented ? 'prevented' : 'hit'} a ratelimit, waiting for ${waiting}ms`)
     );
+
+  service.on('error', e => console.error(e));
 
   await service.init(
     'rest',

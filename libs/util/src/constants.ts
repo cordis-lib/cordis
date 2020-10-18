@@ -12,7 +12,7 @@ export const CORDIS_META: {
 };
 
 export const ENDPOINTS = {
-  api: 'https://discord.com/api/v7',
+  api: 'https://discord.com/api',
   cdn: 'https://cdn.discordapp.com',
   invite: 'https://discord.gg'
 };

@@ -1,13 +1,15 @@
-import { Guild, GuildMemberRemoveData } from '@cordis/types';
+import { Patcher } from '@cordis/util';
+import { GatewayGuildMemberRemoveDispatch, APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const guildMemberRemove: Handler<GuildMemberRemoveData> = async (data, service, redis) => {
+const guildMemberRemove: Handler<GatewayGuildMemberRemoveDispatch['d']> = async (data, service, redis) => {
   const rawGuild = await redis.hget('guilds', data.guild_id);
   if (rawGuild) {
-    const guild = JSON.parse(rawGuild) as Guild;
-    const index = (guild.members ??= []).findIndex(e => e.user.id === data.user.id);
+    const guild = JSON.parse(rawGuild) as APIGuild;
+    const index = (guild.members ??= []).findIndex(e => e.user!.id === data.user.id);
     if (index !== -1) guild.members.splice(0, 1);
-    service.publish(data, 'guildMemberRemove');
+    const { data: member } = Patcher.patchGuildMember(data);
+    service.publish({ guild, member }, 'guildMemberRemove');
     await redis.hset('guilds', guild.id, JSON.stringify(guild));
   }
 

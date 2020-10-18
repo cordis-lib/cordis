@@ -1,14 +1,14 @@
-import { MessageBulkDeleteData } from '@cordis/types';
+import { Patcher } from '@cordis/util';
+import { GatewayMessageDeleteBulkDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const messageDeleteBulk: Handler<MessageBulkDeleteData> = async (data, service, redis) => {
+const messageDeleteBulk: Handler<GatewayMessageDeleteBulkDispatch['d']> = async (data, service, redis) => {
   const rawMessages = await redis.hmget(`${data.channel_id}_messages`, ...data.ids);
-  service.publish(
-    rawMessages
-      .filter(e => e !== null)
-      .map(e => JSON.parse(e as string)),
-    'bulkMessageDelete'
-  );
+  const messages = rawMessages
+    .filter(e => e !== null)
+    .map(e => Patcher.patchMessage(JSON.parse(e as string)).data);
+
+  service.publish(messages, 'bulkMessageDelete');
   await redis.hdel(`${data.channel_id}_messages`, ...data.ids);
 };
 

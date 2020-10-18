@@ -9,7 +9,10 @@ export * from './functions/tryImport';
 export * from './resolvers/resolveColor';
 
 export * from './struct/AsyncQueue';
+export * from './struct/Bag';
 export * from './struct/BitField';
+export { default as Patcher } from './struct/Discord';
+export * from './struct/Intents';
 export * from './struct/Snowflake';
 
 export * from './types/Events';

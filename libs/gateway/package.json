@@ -22,11 +22,11 @@
   },
   "homepage": "https://github.com/cordisjs/cordis#readme",
   "devDependencies": {
-    "@cordis/types": "0.1.0",
     "@types/common-tags": "^1.8.0",
     "@types/node": "^14.0.13",
     "@types/node-fetch": "^2.5.7",
     "@types/ws": "^7.2.5",
+    "discord-api-types": "^0.7.0",
     "erlpack": "discordapp/erlpack",
     "typescript": "^4.0.3",
     "zlib-sync": "^0.1.7"

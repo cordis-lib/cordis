@@ -8,7 +8,7 @@ import {
   WebsocketShardOptions,
   WebsocketShardDestroyOptions
 } from './WebsocketShard';
-import { User, DispatchEvent } from '@cordis/types';
+import { APIUser, GatewayDispatchPayload } from 'discord-api-types';
 import { CORDIS_META } from '@cordis/util';
 import { stripIndent } from 'common-tags';
 
@@ -61,7 +61,7 @@ declare function ready(shardOptions: number | 'auto', shards: number): any;
  * @asMemberOf WebsocketManager
  * @event WebsocketManager#dispatch
  */
-declare function dispatch(data: DispatchEvent, id: number): any;
+declare function dispatch(data: GatewayDispatchPayload, id: number): any;
 
 /* eslint-enable @typescript-eslint/no-unused-vars */
 
@@ -79,7 +79,7 @@ export interface WebsocketManager {
   emit(event: 'open' | 'ready' | 'reconecting' | 'disconnecting', id: number): boolean;
   emit(event: 'debug' | 'error', info: any, id: number): boolean;
   emit(event: 'ready', shardOptions: number | 'auto', shards: number): boolean;
-  emit(event: 'dispatch', data: DispatchEvent, id: number): this;
+  emit(event: 'dispatch', data: GatewayDispatchPayload, id: number): this;
 }
 
 /**
@@ -101,7 +101,7 @@ export class WebsocketManager extends EventEmitter {
   /**
    * Client user given in the Discord ready event
    */
-  public user: User | null = null;
+  public user: APIUser | null = null;
 
   /**
    * @param auth The Discord token for your bot

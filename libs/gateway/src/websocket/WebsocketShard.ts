@@ -4,8 +4,8 @@ import { CordisGatewayError, CordisGatewayTypeError } from '../error';
 import * as Util from '../util';
 // Need to ensure that the zlib namespace is only being used as a type so it is NOT required in the transpiled javascript
 import * as zlib from 'zlib-sync';
-import { DiscordCommand, DispatchEvent, DiscordEvent, OpCodes } from '@cordis/types';
-import { AsyncQueue, halt } from '@cordis/util';
+import { GatewaySendPayload, GatewayReceivePayload, GatewayDispatchPayload, GatewayOPCodes, GatewayCloseCodes } from 'discord-api-types';
+import { AsyncQueue, Intents, INTENTS, IntentKeys, halt } from '@cordis/util';
 import { stripIndent } from 'common-tags';
 
 /**
@@ -83,6 +83,10 @@ export interface WebsocketShardOptions {
    * (https://discord.com/developers/docs/topics/gateway#identify-identify-structure)
    */
   largeThreshold: number;
+  /**
+   * The intents to use
+   */
+  intents: Intents | IntentKeys | IntentKeys[] | number | bigint;
 }
 
 export interface WebsocketShardDestroyOptions {
@@ -129,6 +133,7 @@ export class WebsocketShard implements WebsocketShardOptions {
   public readonly encoding: Util.Encoding;
   public readonly compress: boolean;
   public readonly largeThreshold: number;
+  public readonly intents: number;
 
   // State
   public connection?: WS;
@@ -181,7 +186,8 @@ export class WebsocketShard implements WebsocketShardOptions {
       guildTimeout = 10000,
       encoding = Util.defaultEncoding,
       compress = Util.defaultCompress,
-      largeThreshold = 250
+      largeThreshold = 250,
+      intents = INTENTS.all
     } = options;
 
     this.openTimeout = openTimeout;
@@ -190,6 +196,8 @@ export class WebsocketShard implements WebsocketShardOptions {
     this.discordReadyTimeout = discordReadyTimeout;
     this.guildTimeout = guildTimeout;
     this.largeThreshold = largeThreshold;
+    if (typeof intents === 'number') intents = BigInt(intents);
+    this.intents = new Intents(intents).valueOf(true);
 
     // If the latter is JSON it means erlpack is not present
     if (encoding === 'etf' && Util.defaultEncoding === 'json') {
@@ -243,7 +251,7 @@ export class WebsocketShard implements WebsocketShardOptions {
       this.debug(stripIndent`
         [CONNECT]
           Gateway    : ${this._url}
-          Version    : 6
+          Version    : 8
           Encoding   : ${this.encoding}
           Compression: ${this.compress ? 'zlib-stream' : 'none'}
       `);
@@ -254,7 +262,7 @@ export class WebsocketShard implements WebsocketShardOptions {
 
       this._connectedAt = Date.now();
 
-      this.connection = new WS(`${this._url}?v=6&encoding=${this.encoding}${this.compress ? '&compress=zlib-stream' : ''}`);
+      this.connection = new WS(`${this._url}?v=8&encoding=${this.encoding}${this.compress ? '&compress=zlib-stream' : ''}`);
       this.connection.onopen = this._onOpen;
       this.connection.onclose = this._onClose;
       this.connection.onerror = ({ error }) => this.manager.emit('error', error, this.id);
@@ -290,7 +298,7 @@ export class WebsocketShard implements WebsocketShardOptions {
       if (requested) reason = 'User requested termination.';
     }
 
-    if (!code) code = Util.CloseCodes.normal;
+    if (!code) code = Util.normalCloseCode;
 
     for (const timeout of Object.keys(this._timeouts)) this._clearTimeout(timeout);
     for (const interval of Object.keys(this._intervals)) this._clearInterval(interval);
@@ -327,7 +335,7 @@ export class WebsocketShard implements WebsocketShardOptions {
    * @param payload The packet to send
    * @param urgent whether or not the packet needs to be put at the top of the queue
    */
-  public send(payload: DiscordCommand, urgent = false) {
+  public send(payload: GatewaySendPayload, urgent = false) {
     return this._commandQueue.run(() => this._send(payload), urgent);
   }
 
@@ -343,7 +351,7 @@ export class WebsocketShard implements WebsocketShardOptions {
    * Does the actual payload sending
    * @param payload
    */
-  private _send(payload: DiscordCommand): Promise<void> {
+  private _send(payload: GatewaySendPayload): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return new Promise(async (resolve, reject) => {
       if (this._firstRequst === -1 || this._requests === 0) this._firstRequst = Date.now();
@@ -474,77 +482,77 @@ export class WebsocketShard implements WebsocketShardOptions {
     `);
 
     switch (code) {
-      case Util.CloseCodes.normal: break;
+      case Util.normalCloseCode: break;
 
-      case Util.CloseCodes.unknown: {
+      case GatewayCloseCodes.UnknownError: {
         this.debug(`An unknown error occured: ${code} ${reason}`);
         return destroy({ code, reason, reconnect: true });
       }
 
-      case Util.CloseCodes.unknownOpcode: {
+      case GatewayCloseCodes.UnknownOpCode: {
         this.debug('An invalid opcode was sent to Discord.');
         return destroy({ code, reason, reconnect: true });
       }
 
-      case Util.CloseCodes.decode: {
+      case GatewayCloseCodes.DecodeError: {
         this.debug('An invalid payload was sent to Discord.');
         return destroy({ code, reason, reconnect: true });
       }
 
-      case Util.CloseCodes.notAuthenticated: {
+      case GatewayCloseCodes.NotAuthenticated: {
         this.debug('A request was somehow sent before the identify payload.');
         return destroy({ code, reason, reconnect: true, fatal: true });
       }
 
-      case Util.CloseCodes.authFail: {
+      case GatewayCloseCodes.AuthenticationFailed: {
         await destroy({ code, reason, fatal: true });
         return this._connectReject?.(new CordisGatewayError('tokenInvalid'));
       }
 
-      case Util.CloseCodes.alreadyAuth: {
+      case GatewayCloseCodes.AlreadyAuthenticated: {
         this.debug('More than one auth payload was sent.');
         return destroy({ code, reason, fatal: true });
       }
 
-      case Util.CloseCodes.invalidSeq: {
+      case GatewayCloseCodes.InvalidSeq: {
         this.debug('An invalid sequence was sent.');
         return destroy({ code, reason, reconnect: true, fatal: true });
       }
 
-      case Util.CloseCodes.rateLimited: {
+      case GatewayCloseCodes.RateLimited: {
         this.debug('Somehow hit the rate limit, are you messing with any of the internal methods or state?');
         return destroy({ code, reason, fatal: true });
       }
 
-      case Util.CloseCodes.sessionTimeout: {
+      case GatewayCloseCodes.SessionTimedOut: {
         this.debug('Session timed out.');
         return destroy({ code, reason, reconnect: true });
       }
 
-      case Util.CloseCodes.invalidShard: {
+      case GatewayCloseCodes.InvalidShard: {
         await destroy({ code, reason, fatal: true });
         return this._connectReject?.(new CordisGatewayError('invalidShard'));
       }
 
-      case Util.CloseCodes.shardingRequired: {
+      case GatewayCloseCodes.ShardingRequired: {
         await destroy({ code, reason, reconnect: true });
         return this._connectReject?.(new CordisGatewayError('shardingRequired'));
       }
     }
   };
 
-  private readonly _onMessage = async (packet: DiscordEvent) => {
+  private readonly _onMessage = async (packet: GatewayReceivePayload) => {
     switch (packet.op) {
-      case OpCodes.dispatch: return this._handleDispatch(packet);
-      case OpCodes.heartbeat: return this._heartbeat(true);
-      case OpCodes.reconnect:
-        return this.destroy({ reason: 'Told to reconnect by Discord', code: Util.CloseCodes.restarting, reconnect: true });
-      case OpCodes.invalidSession: {
+      case GatewayOPCodes.Dispatch: return this._handleDispatch(packet);
+      case GatewayOPCodes.Heartbeat: return this._heartbeat(true);
+      case GatewayOPCodes.Reconnect:
+        return this.destroy({ reason: 'Told to reconnect by Discord', code: Util.restartingCloseCode, reconnect: true });
+      case GatewayOPCodes.InvalidSession: {
         this.debug(`Invalid session; should resume: ${packet.d}`);
         return this.destroy({ reason: 'The session has become invalid', reconnect: true, fatal: !packet.d });
       }
 
-      case OpCodes.hello: {
+      case GatewayOPCodes.Hello: {
         this._clearTimeout('hello');
         this.debug('Clearing HELLO timeout');
 
@@ -566,7 +574,7 @@ export class WebsocketShard implements WebsocketShardOptions {
 
         if (reconnecting && necessary) {
           await this.send({
-            op: OpCodes.resume,
+            op: GatewayOPCodes.Resume,
             d: {
               token: this.manager.auth,
               // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -600,7 +608,7 @@ export class WebsocketShard implements WebsocketShardOptions {
         break;
       }
 
-      case OpCodes.heartbeatAck: {
+      case GatewayOPCodes.HeartbeatAck: {
         this._ack = true;
         this._lastAck = Date.now();
         this.debug(`Recieved ACK with a latency of ${this.ping}`);
@@ -609,7 +617,7 @@ export class WebsocketShard implements WebsocketShardOptions {
     }
   };
 
-  private _handleDispatch(payload: DispatchEvent): void {
+  private _handleDispatch(payload: GatewayDispatchPayload): void {
     if (this._sequence == null || payload.s > this._sequence) this._sequence = payload.s;
 
     switch (payload.t) {
@@ -684,7 +692,7 @@ export class WebsocketShard implements WebsocketShardOptions {
   private readonly _heartbeat = async (force = false) => {
     if (!this._ack && !force) return this.destroy({ reason: 'Zombie connection', reconnect: true });
 
-    await this.send({ op: OpCodes.heartbeat, d: this._sequence }, true);
+    await this.send({ op: GatewayOPCodes.Heartbeat, d: this._sequence }, true);
     this._lastBeat = Date.now();
     this._ack = false;
 
@@ -713,17 +721,19 @@ export class WebsocketShard implements WebsocketShardOptions {
           },
           shard: [${this.id}, ${this.manager.shardsSpawned}],
           large_threshold: ${this.largeThreshold}
+          intents: ${this.intents}
         }
     `);
 
     return this.send({
-      op: OpCodes.identify,
+      op: GatewayOPCodes.Identify,
       d: {
         token: this.manager.auth,
         properties: Util.CONSTANTS.properties,
         shard: [this.id, this.manager.shardsSpawned],
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        large_threshold: this.largeThreshold
+        large_threshold: this.largeThreshold,
+        intents: this.intents
       }
     }, true);
   }

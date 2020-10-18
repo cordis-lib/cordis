@@ -1,14 +1,11 @@
-import { BaseReactionData, Message } from '@cordis/types';
+import { APIMessage, GatewayMessageReactionRemoveDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const messageReactionRemove: Handler<BaseReactionData> = async (data, service, redis, rest, [botUser]) => {
+const messageReactionRemove: Handler<GatewayMessageReactionRemoveDispatch['d']> = async (data, service, redis, rest, [botUser]) => {
   const rawMessage = await redis.hget(`${data.channel_id}_messages`, data.message_id);
-  const message: Message | null = rawMessage
+  const message: APIMessage | null = rawMessage
     ? JSON.parse(rawMessage)
-    : await rest
-      .post({ path: `/channels/${data.channel_id}/messages/${data.message_id}` })
-      .catch(() => null);
-  const user = await rest.post({ path: `/users/${data.user_id}` });
+    : null;
 
   if (message) {
     const existingIndex = (message.reactions ??= [])
@@ -20,7 +17,7 @@ const messageReactionRemove: Handler<BaseReactionData> = async (data, service, r
       else message.reactions.splice(existingIndex, 0, reaction);
     }
 
-    service.publish({ emoji: data.emoji, message, user }, 'messsageReactionRemove');
+    service.publish({ emoji: data.emoji, message }, 'messsageReactionRemove');
     await redis.hset(`${data.channel_id}_messages`, data.message_id, JSON.stringify(message));
   }
 };

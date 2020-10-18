@@ -2,10 +2,10 @@ import * as yargs from 'yargs';
 import * as redis from 'ioredis';
 import { RoutingServer, RpcClient } from '@cordis/brokers';
 import { WebsocketManager } from '@cordis/gateway';
-import { Events } from '@cordis/util';
+import { Events, IntentKeys } from '@cordis/util';
 import { RequestBuilderOptions } from '@cordis/rest';
 import { Handler } from './Handler';
-import { User } from '@cordis/types';
+import { APIUser } from 'discord-api-types';
 
 const main = async () => {
   const { argv } = yargs
@@ -106,9 +106,18 @@ const main = async () => {
       type: 'number',
       required: false
     })
+    .option('ws-intents', {
+      'global': true,
+      'description': 'The intents to use for the gateway connection(s)',
+      'type': 'string',
+      'array': true,
+      'default': ['all']
+    })
     .help();
 
-  const redisClient = redis({
+  process.env.DEBUG = String(argv.debug);
+
+  const redisClient = new redis({
     host: argv['redis-host'],
     port: argv['redis-port'],
     password: argv['redis-auth'],
@@ -130,12 +139,13 @@ const main = async () => {
       discordReadyTimeout: argv['ws-ready-timeout'],
       guildTimeout: argv['ws-guild-timeout'],
       reconnectTimeout: argv['ws-reconnect-timeout'],
-      largeThreshold: argv['ws-large-threshold']
+      largeThreshold: argv['ws-large-threshold'],
+      intents: argv['ws-intents'] as IntentKeys[]
     }
   );
 
-  let botUser: User = await rest.post({ path: '/users/@me' });
-  const updateBotUser = (data: User) => botUser = data;
+  let botUser: APIUser = await rest.post({ path: '/users/@me' });
+  const updateBotUser = (data: APIUser) => botUser = data;
 
   const log = (label: string) => (data: any, shard: any) => console.log(`[${label.toUpperCase()} -> ${shard}]: ${data}`);
   ws
@@ -146,12 +156,14 @@ const main = async () => {
     .on('ready', (options, shards) => log('ready')(`Spawned ${shards} shards from config ${options}`, 'MANAGER'))
     .on(
       'dispatch',
-      data => {
+      async (data, shard) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
-          if (handle) handle(data, service, redisClient, rest, [botUser, updateBotUser]);
-        } catch {}
+          await handle?.(data.d, service, redisClient, rest, [botUser, updateBotUser]);
+        } catch (e) {
+          log('packet error')(e.stack ?? e.toString(), `${shard} -> ${data.t}`);
+        }
       }
     );
 
@@ -160,7 +172,8 @@ const main = async () => {
   await service.init('gateway', false)
     .then(() => console.log('Service is live, waiting for the gateway to sign in...'))
     .catch(console.error);
-  await ws.connect();
+  await ws.connect()
+    .catch(console.error);
 };
 
 void main();

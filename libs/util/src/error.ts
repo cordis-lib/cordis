@@ -35,6 +35,6 @@ export const CordisUtilRangeError = makeCordisError(
     badImageSize: (size: number) => `Bad image size given ${size}`,
     badColorRange: 'Was given a bad color range, expected > 0 & < 0xffffff',
     badRgbArrayLength: (size: number) => `Expexted a length of 3, but got ${size}`,
-    bitfieldInvalid: 'Failed to resolve bits; expected a number, string, a Bitfield, or an array of any of the previous'
+    bitfieldInvalid: 'Failed to resolve bits; expected a bigint, string, a Bitfield, or an array of any of the previous'
   }
 );

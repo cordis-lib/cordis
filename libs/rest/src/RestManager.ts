@@ -67,7 +67,7 @@ export class RestManager extends EventEmitter implements RestManagerOptions {
     const {
       retries = 3,
       abortIn = 60 * 1000,
-      apiVersion = 7
+      apiVersion = 8
     } = options;
 
     this.retries = retries;
@@ -162,7 +162,6 @@ export class RestManager extends EventEmitter implements RestManagerOptions {
 
     options.headers.set('Authorization', `Bot ${this.auth}`);
     options.headers.set('User-Agent', userAgent);
-    options.headers.set('X-RateLimit-Preceision', 'milisecond');
 
     return bucket.make(options as RequestBuilderOptions);
   }

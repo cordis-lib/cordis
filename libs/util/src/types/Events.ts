@@ -1,24 +1,22 @@
 import {
-  Channel,
-  ChannelPinsUpdateData,
-  Guild,
-  BanData,
-  Emoji,
-  ReadyData,
-  GuildMemberAddData,
-  GuildMemberRemoveData,
-  Member,
-  GuildIntegrationsUpdateData,
-  RoleData,
-  Message,
-  User,
-  Reaction,
-  PresenceUpdateData,
-  TypingStartData,
-  VoiceServerUpdateData,
-  VoiceState,
-  WebhookUpdateData
-} from '@cordis/types';
+  APIChannel,
+  APIGuild,
+  APIEmoji,
+  APIReaction,
+  APIGuildMember,
+  APIUser,
+  APIMessage,
+  APIRole,
+  GatewayGuildRoleUpdateDispatch,
+  GatewayPresenceUpdateData,
+  GatewayReadyDispatch,
+  GatewayTypingStartDispatch,
+  GatewayVoiceServerUpdateDispatch,
+  GatewayVoiceStateUpdateDispatch,
+  GatewayWebhooksUpdateDispatch,
+  GatewayInviteCreateDispatch,
+  GatewayInviteDeleteDispatch
+} from 'discord-api-types';
 
 interface Updated<T> {
   o: T;
@@ -26,47 +24,50 @@ interface Updated<T> {
 }
 
 export interface Events {
-  channelCreate: Channel;
-  channelDelete: Channel;
-  channelPinsUpdate: ChannelPinsUpdateData;
-  channelUpdate: Updated<Channel>;
+  channelCreate: { guild?: APIGuild; channel: APIChannel };
+  channelDelete: { guild?: APIGuild; channel: APIChannel };
+  channelPinsUpdate: { guild?: APIGuild; channel: APIChannel; lastPinTimestamp?: string };
+  channelUpdate: Updated<APIChannel> & { guild?: APIGuild };
 
-  emojiCreate: Emoji;
-  emojiDelete: Emoji;
-  emojiUpdate: Updated<Emoji>;
+  emojiCreate: { guild: APIGuild; emoji: APIEmoji };
+  emojiDelete: { guild: APIGuild; emoji: APIEmoji };
+  emojiUpdate: Updated<APIEmoji> & { guild: APIGuild };
 
-  guildIntegrationsUpdate: GuildIntegrationsUpdateData;
-  guildBanAdd: BanData;
-  guildBanRemove: BanData;
-  guildCreate: Guild;
-  guildDelete: Guild;
-  guildUpdate: Updated<Guild>;
+  guildIntegrationsUpdate: APIGuild;
+  guildBanAdd: { guild: APIGuild; user: APIUser };
+  guildBanRemove: { guild: APIGuild; user: APIUser };
+  guildCreate: APIGuild;
+  guildDelete: APIGuild;
+  guildUpdate: Updated<APIGuild>;
 
-  guildMemberAdd: GuildMemberAddData;
-  guildMemberRemove: GuildMemberRemoveData;
-  guildMemberUpdate: Updated<Member>;
+  guildMemberAdd: { guild: APIGuild; member: APIGuildMember };
+  guildMemberRemove: { guild: APIGuild; member: APIGuildMember };
+  guildMemberUpdate: Updated<APIGuildMember> & { guild: APIGuild };
 
-  roleCreate: RoleData;
-  roleDelete: RoleData;
-  roleUpdate: Updated<RoleData>;
+  roleCreate: { guild: APIGuild; role: APIRole };
+  roleDelete: { guild: APIGuild; role: APIRole };
+  roleUpdate: Updated<GatewayGuildRoleUpdateDispatch['d']> & { guild: APIGuild };
 
-  messageCreate: Message;
-  bulkMessageDelete: Message[];
-  messageDelete: Message;
-  messageUpdate: { o: Message; n: Partial<Message> };
+  messageCreate: APIMessage;
+  bulkMessageDelete: APIMessage[];
+  messageDelete: APIMessage;
+  messageUpdate: { o: APIMessage; n: Partial<APIMessage> };
 
-  messageReactionAdd: { emoji: Emoji; message: Message; user: User | null };
-  messageReactionRemove: { emoji: Emoji; message: Message; user: User | null };
-  messageReactionRemoveEmoji: { emoji: Emoji; message: Message };
-  messageReactionRemoveAll: { reactions: Reaction[]; message: Message };
+  messageReactionAdd: { emoji: APIEmoji; message: APIMessage | null };
+  messageReactionRemove: { emoji: APIEmoji; message: APIMessage | null };
+  messageReactionRemoveEmoji: { emoji: APIEmoji; message: APIMessage | null };
+  messageReactionRemoveAll: { reactions: APIReaction[]; message: APIMessage | null };
 
-  presenceUpdate: PresenceUpdateData;
-  ready: ReadyData;
-  typingStart: TypingStartData;
-  userUpdate: Updated<User>;
-  voiceServerUpdate: VoiceServerUpdateData;
-  voiceStateUpdate: VoiceState;
-  webhooksUpdate: WebhookUpdateData;
+  inviteCreate: { guild: APIGuild; invite: GatewayInviteCreateDispatch['d'] };
+  inviteDelete: { guild: APIGuild; invite: GatewayInviteDeleteDispatch['d'] };
 
-  botUserUpdate: Updated<User>;
+  presenceUpdate: GatewayPresenceUpdateData;
+  ready: GatewayReadyDispatch['d'];
+  typingStart: GatewayTypingStartDispatch['d'];
+  userUpdate: Updated<APIUser>;
+  voiceServerUpdate: GatewayVoiceServerUpdateDispatch['d'];
+  voiceStateUpdate: GatewayVoiceStateUpdateDispatch['d'];
+  webhooksUpdate: GatewayWebhooksUpdateDispatch['d'];
+
+  botUserUpdate: Updated<APIUser>;
 }
