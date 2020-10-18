@@ -55,7 +55,7 @@ const main = async () => {
     })
     .option('rest-version', {
       global: true,
-      description: 'What version of the api to use; 6 or 7',
+      description: 'What version of the api to use',
       type: 'number',
       required: false
     })
