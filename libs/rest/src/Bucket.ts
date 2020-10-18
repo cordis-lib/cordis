@@ -86,7 +86,7 @@ export class Bucket {
       const period = Number(res.headers.get('retry-after') ?? 0);
       this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, false, period);
 
-      await halt(period);
+      await halt(period * 1000);
       return this._retry(req, res);
     } else if (res.status >= 500 && res.status < 600) {
       return this._retry(req, res);
@@ -94,7 +94,7 @@ export class Bucket {
 
     if (!res.ok) throw new HTTPError(res.clone(), await res.text());
 
-    let final;
+    let final: any = res;
 
     if (res.headers.get('content-type') === 'application/json') final = await res.json();
     else final = await res.blob();
