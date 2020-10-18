@@ -1,14 +1,11 @@
 import { Patcher } from '@cordis/util';
 import { GatewayGuildMemberUpdateDispatch, APIGuild } from 'discord-api-types';
-import { makeDebugLog } from '../debugLog';
 import { Handler } from '../Handler';
 
 const guildMemberUpdate: Handler<GatewayGuildMemberUpdateDispatch['d']> = async (data, service, redis) => {
   const rawGuild = await redis.hget('guilds', data.guild_id);
   if (rawGuild) {
     const guild = JSON.parse(rawGuild) as APIGuild;
-    const debug = makeDebugLog(`GUILD_MEMBER_UPDATE_${guild.id}`, 2);
-    debug(guild);
     const oldIndex = (guild.members ??= []).findIndex(e => e.user!.id === data.user!.id);
     if (oldIndex !== -1) {
       const old = guild.members[oldIndex];
@@ -31,8 +28,6 @@ const guildMemberUpdate: Handler<GatewayGuildMemberUpdateDispatch['d']> = async 
       guild.members.splice(oldIndex, 1, n);
       await redis.hset('guilds', guild.id, JSON.stringify(guild));
     }
-
-    debug(guild);
   }
 };
 

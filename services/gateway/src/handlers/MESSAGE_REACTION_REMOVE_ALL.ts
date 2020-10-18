@@ -1,13 +1,11 @@
 import { APIMessage, GatewayMessageReactionRemoveAllDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const messageReactionRemoveAll: Handler<GatewayMessageReactionRemoveAllDispatch['d']> = async (data, service, redis, rest) => {
+const messageReactionRemoveAll: Handler<GatewayMessageReactionRemoveAllDispatch['d']> = async (data, service, redis) => {
   const rawMessage = await redis.hget(`${data.channel_id}_messages`, data.message_id);
   const message: APIMessage | null = rawMessage
     ? JSON.parse(rawMessage)
-    : await rest
-      .post({ path: `/channels/${data.channel_id}/messages/${data.message_id}` })
-      .catch(() => null);
+    : null;
 
   if (message) {
     const reactions = message.reactions ?? [];

@@ -251,7 +251,7 @@ export class WebsocketShard implements WebsocketShardOptions {
       this.debug(stripIndent`
         [CONNECT]
           Gateway    : ${this._url}
-          Version    : 6
+          Version    : 8
           Encoding   : ${this.encoding}
           Compression: ${this.compress ? 'zlib-stream' : 'none'}
       `);
@@ -721,6 +721,7 @@ export class WebsocketShard implements WebsocketShardOptions {
           },
           shard: [${this.id}, ${this.manager.shardsSpawned}],
           large_threshold: ${this.largeThreshold}
+          intents: ${this.intents}
         }
     `);
 

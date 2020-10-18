@@ -2,7 +2,7 @@ import * as yargs from 'yargs';
 import * as redis from 'ioredis';
 import { RoutingServer, RpcClient } from '@cordis/brokers';
 import { WebsocketManager } from '@cordis/gateway';
-import { Events } from '@cordis/util';
+import { Events, IntentKeys } from '@cordis/util';
 import { RequestBuilderOptions } from '@cordis/rest';
 import { Handler } from './Handler';
 import { APIUser } from 'discord-api-types';
@@ -106,6 +106,13 @@ const main = async () => {
       type: 'number',
       required: false
     })
+    .option('ws-intents', {
+      'global': true,
+      'description': 'The intents to use for the gateway connection(s)',
+      'type': 'string',
+      'array': true,
+      'default': ['all']
+    })
     .help();
 
   process.env.DEBUG = String(argv.debug);
@@ -132,7 +139,8 @@ const main = async () => {
       discordReadyTimeout: argv['ws-ready-timeout'],
       guildTimeout: argv['ws-guild-timeout'],
       reconnectTimeout: argv['ws-reconnect-timeout'],
-      largeThreshold: argv['ws-large-threshold']
+      largeThreshold: argv['ws-large-threshold'],
+      intents: argv['ws-intents'] as IntentKeys[]
     }
   );
 
@@ -154,7 +162,7 @@ const main = async () => {
           const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
           await handle?.(data.d, service, redisClient, rest, [botUser, updateBotUser]);
         } catch (e) {
-          log('packet error')(e, `${shard} -> ${data.t}`);
+          log('packet error')(e.stack ?? e.toString(), `${shard} -> ${data.t}`);
         }
       }
     );

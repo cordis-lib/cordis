@@ -22,7 +22,10 @@ export const INTENTS = {
 };
 
 INTENTS.privileged = INTENTS.guildMembers | INTENTS.guildPresences;
-INTENTS.all = Object.values(INTENTS).reduce((acc, p) => acc | p, 0n);
+INTENTS.all = Object
+  .values(INTENTS)
+  .filter(v => v !== -1n)
+  .reduce((acc, p) => acc | p, 0n);
 INTENTS.nonPrivileged = INTENTS.all & ~INTENTS.privileged;
 
 export type IntentKeys = keyof(typeof INTENTS);

@@ -18,7 +18,7 @@ export default {
   patchChannel: (n: Partial<APIChannel>, o?: APIChannel) => {
     let patch!: typeof patchGuildChannel;
 
-    switch (n) {
+    switch (n.type) {
       case ChannelType.GUILD_TEXT:
         patch = patchTextChannel;
         break;

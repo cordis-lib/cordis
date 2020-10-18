@@ -13,7 +13,9 @@ import {
   GatewayTypingStartDispatch,
   GatewayVoiceServerUpdateDispatch,
   GatewayVoiceStateUpdateDispatch,
-  GatewayWebhooksUpdateDispatch
+  GatewayWebhooksUpdateDispatch,
+  GatewayInviteCreateDispatch,
+  GatewayInviteDeleteDispatch
 } from 'discord-api-types';
 
 interface Updated<T> {
@@ -51,10 +53,13 @@ export interface Events {
   messageDelete: APIMessage;
   messageUpdate: { o: APIMessage; n: Partial<APIMessage> };
 
-  messageReactionAdd: { emoji: APIEmoji; message: APIMessage; user: APIUser | null };
-  messageReactionRemove: { emoji: APIEmoji; message: APIMessage; user: APIUser | null };
-  messageReactionRemoveEmoji: { emoji: APIEmoji; message: APIMessage };
-  messageReactionRemoveAll: { reactions: APIReaction[]; message: APIMessage };
+  messageReactionAdd: { emoji: APIEmoji; message: APIMessage | null };
+  messageReactionRemove: { emoji: APIEmoji; message: APIMessage | null };
+  messageReactionRemoveEmoji: { emoji: APIEmoji; message: APIMessage | null };
+  messageReactionRemoveAll: { reactions: APIReaction[]; message: APIMessage | null };
+
+  inviteCreate: { guild: APIGuild; invite: GatewayInviteCreateDispatch['d'] };
+  inviteDelete: { guild: APIGuild; invite: GatewayInviteDeleteDispatch['d'] };
 
   presenceUpdate: GatewayPresenceUpdateData;
   ready: GatewayReadyDispatch['d'];

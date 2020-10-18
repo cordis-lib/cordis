@@ -39,7 +39,7 @@ export class BitField<T extends string> {
   }
 
   public resolve(bit: BitFieldResolvable<T> = 0n): bigint {
-    if (typeof bit === 'number' && bit >= 0) return bit;
+    if (typeof bit === 'bigint' && bit >= 0n) return bit;
     if (bit instanceof BitField) return bit.bits;
 
     if (typeof bit === 'string') {
@@ -67,7 +67,7 @@ export class BitField<T extends string> {
   public valueOf(asNumber: true): number;
   public valueOf(asNumber: false): bigint;
   public valueOf(asNumber = false) {
-    return asNumber ? Number(asNumber) : this.bits;
+    return asNumber ? Number(this.bits) : this.bits;
   }
 
   public any(bit: BitFieldResolvable<T>) {

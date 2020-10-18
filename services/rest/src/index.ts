@@ -48,10 +48,10 @@ const main = async () => {
       required: false
     })
     .option('rest-abortin', {
-      global: true,
-      description: 'How long to wait before failing a request',
-      type: 'number',
-      required: false
+      'global': true,
+      'description': 'How long to wait before failing a request',
+      'type': 'number',
+      'default': 6e4
     })
     .option('rest-version', {
       global: true,
