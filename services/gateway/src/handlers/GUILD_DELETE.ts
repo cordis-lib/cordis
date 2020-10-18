@@ -1,10 +1,10 @@
-import { Guild } from '@cordis/types';
+import { APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const guildDelete: Handler<Guild> = async (data, service, redis) => {
+const guildDelete: Handler<APIGuild> = async (data, service, redis) => {
   if (data.unavailable) {
     const rawExisting = await redis.hget('guilds', data.id);
-    const existing = rawExisting ? JSON.parse(rawExisting) as Guild : data;
+    const existing = rawExisting ? JSON.parse(rawExisting) as APIGuild : data;
     existing.unavailable = true;
 
     service.publish(existing, 'guildUnavailable');

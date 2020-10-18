@@ -1,6 +1,6 @@
-import { VoiceState } from '@cordis/types';
+import { GatewayVoiceStateUpdateDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const voiceStateUpdate: Handler<VoiceState> = (data, service) => service.publish(data, 'voiceStateUpdate');
+const voiceStateUpdate: Handler<GatewayVoiceStateUpdateDispatch['d']> = (data, service) => service.publish(data, 'voiceStateUpdate');
 
 export default voiceStateUpdate;

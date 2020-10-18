@@ -1,9 +1,11 @@
-import { Message } from '@cordis/types';
+import { APIMessage } from 'discord-api-types';
+import { Patcher } from '@cordis/util';
 import { Handler } from '../Handler';
 
-const messageCreate: Handler<Message> = async (data, service, redis) => {
+const messageCreate: Handler<APIMessage> = async (data, service, redis) => {
   service.publish(data, 'messageCreate');
-  await redis.hset(`${data.channel_id}_messages`, data.id, JSON.stringify(data));
+  const { data: message } = Patcher.patchMessage(data);
+  await redis.hset(`${message.channel_id}_messages`, message.id, JSON.stringify(message));
 };
 
 export default messageCreate;

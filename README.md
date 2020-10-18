@@ -9,7 +9,6 @@ cordis is a fully modular, micro-service based [Node.js](https://nodejs.org/) wr
 
 It is cut up in multiple packages/libraries:
 
-- `@cordis/types`, containing types for the Discord API
 - `@cordis/rest`, containing a REST manager for the Discord API, including a rate limiting system and various utilities
 - `@cordis/gateway`, containing a very flexible way of connecting to Discord's gateway
 

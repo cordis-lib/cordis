@@ -1,9 +1,9 @@
-import { BaseReactionData, Message } from '@cordis/types';
+import { APIMessage, GatewayMessageReactionRemoveDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const messageReactionRemove: Handler<BaseReactionData> = async (data, service, redis, rest, [botUser]) => {
+const messageReactionRemove: Handler<GatewayMessageReactionRemoveDispatch['d']> = async (data, service, redis, rest, [botUser]) => {
   const rawMessage = await redis.hget(`${data.channel_id}_messages`, data.message_id);
-  const message: Message | null = rawMessage
+  const message: APIMessage | null = rawMessage
     ? JSON.parse(rawMessage)
     : await rest
       .post({ path: `/channels/${data.channel_id}/messages/${data.message_id}` })

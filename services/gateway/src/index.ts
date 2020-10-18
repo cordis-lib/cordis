@@ -5,7 +5,7 @@ import { WebsocketManager } from '@cordis/gateway';
 import { Events } from '@cordis/util';
 import { RequestBuilderOptions } from '@cordis/rest';
 import { Handler } from './Handler';
-import { User } from '@cordis/types';
+import { APIUser } from 'discord-api-types';
 
 const main = async () => {
   const { argv } = yargs
@@ -108,6 +108,8 @@ const main = async () => {
     })
     .help();
 
+  process.env.DEBUG = String(argv.debug);
+
   const redisClient = new redis({
     host: argv['redis-host'],
     port: argv['redis-port'],
@@ -134,8 +136,8 @@ const main = async () => {
     }
   );
 
-  let botUser: User = await rest.post({ path: '/users/@me' });
-  const updateBotUser = (data: User) => botUser = data;
+  let botUser: APIUser = await rest.post({ path: '/users/@me' });
+  const updateBotUser = (data: APIUser) => botUser = data;
 
   const log = (label: string) => (data: any, shard: any) => console.log(`[${label.toUpperCase()} -> ${shard}]: ${data}`);
   ws
@@ -146,12 +148,14 @@ const main = async () => {
     .on('ready', (options, shards) => log('ready')(`Spawned ${shards} shards from config ${options}`, 'MANAGER'))
     .on(
       'dispatch',
-      data => {
+      async (data, shard) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
-          if (handle) handle(data.d, service, redisClient, rest, [botUser, updateBotUser]);
-        } catch {}
+          await handle?.(data.d, service, redisClient, rest, [botUser, updateBotUser]);
+        } catch (e) {
+          log('packet error')(e, `${shard} -> ${data.t}`);
+        }
       }
     );
 

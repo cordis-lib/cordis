@@ -1,34 +1,38 @@
-import { Guild, GuildMemberUpdateData, Member } from '@cordis/types';
+import { Patcher } from '@cordis/util';
+import { GatewayGuildMemberUpdateDispatch, APIGuild } from 'discord-api-types';
+import { makeDebugLog } from '../debugLog';
 import { Handler } from '../Handler';
 
-const guildMemberUpdate: Handler<GuildMemberUpdateData> = async (data, service, redis) => {
+const guildMemberUpdate: Handler<GatewayGuildMemberUpdateDispatch['d']> = async (data, service, redis) => {
   const rawGuild = await redis.hget('guilds', data.guild_id);
   if (rawGuild) {
-    const guild = JSON.parse(rawGuild) as Guild;
-    const oldIndex = (guild.members ??= []).findIndex(e => e.user.id === data.user.id);
+    const guild = JSON.parse(rawGuild) as APIGuild;
+    const debug = makeDebugLog(`GUILD_MEMBER_UPDATE_${guild.id}`, 2);
+    debug(guild);
+    const oldIndex = (guild.members ??= []).findIndex(e => e.user!.id === data.user!.id);
     if (oldIndex !== -1) {
       const old = guild.members[oldIndex];
-      const n = JSON.parse(JSON.stringify(old)) as Member;
-      n.roles = data.roles;
-      n.nick = data.nick;
-      n.user = data.user;
+      const { data: n, newUser, oldUser, roles: [oldRoles, newRoles] } = Patcher.patchGuildMember(data, old);
 
-      if (n.nick !== old.nick || !n.roles.every((role, i) => role === old.roles[i])) {
-        service.publish({ o: old, n }, 'guildMemberUpdate');
+      if (n.nick !== old.nick || !oldRoles.every((role, i) => role === newRoles[i])) {
+        service.publish({ guild, o: old, n }, 'guildMemberUpdate');
       }
 
       if (
-        n.user.username !== old.user.username ||
-        n.user.discriminator !== old.user.discriminator ||
-        n.user.avatar !== old.user.avatar
+        (newUser && oldUser) &&
+        (newUser.username !== oldUser.username ||
+        newUser.discriminator !== oldUser.discriminator ||
+        newUser.avatar !== oldUser.avatar)
       ) {
-        service.publish({ o: old.user, n: n.user }, 'userUpdate');
-        await redis.hset('users', n.user.id, JSON.stringify(n.user));
+        service.publish({ o: old.user!, n: n.user! }, 'userUpdate');
+        await redis.hset('users', newUser.id, JSON.stringify(n.user));
       }
 
       guild.members.splice(oldIndex, 1, n);
       await redis.hset('guilds', guild.id, JSON.stringify(guild));
     }
+
+    debug(guild);
   }
 };
 
