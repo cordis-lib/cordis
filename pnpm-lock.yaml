@@ -50,6 +50,18 @@ importers:
       ioredis: ^4.17.3
       tslib: ^2.0.1
       typescript: ^4.0.3
+  libs/core:
+    dependencies:
+      '@cordis/brokers': 'link:../brokers'
+      tslib: 2.0.1
+    devDependencies:
+      '@types/node': 14.11.2
+      typescript: 4.0.3
+    specifiers:
+      '@cordis/brokers': ^0.1.0
+      '@types/node': ^14.11.1
+      tslib: ^2.0.1
+      typescript: ^4.0.3
   libs/gateway:
     dependencies:
       '@cordis/util': 'link:../util'
@@ -106,10 +118,12 @@ importers:
     devDependencies:
       '@types/node': 14.11.2
       discord-api-types: 0.7.0
+      ioredis: 4.17.3
       typescript: 4.0.3
     specifiers:
       '@types/node': ^14.11.1
       discord-api-types: ^0.7.0
+      ioredis: ^4.17.3
       tslib: ^2.0.1
       typescript: ^4.0.3
   services/gateway:
@@ -829,7 +843,6 @@ packages:
     resolution:
       integrity: sha512-t6wbgtoCXvAzst7QgXxJYqPt0usEfbgQdftEPbLL/cvv6HPE5VgvqCuAIDR0NgU52ds6rFwqrgakNLrHEjCbrQ==
   /cluster-key-slot/1.1.0:
-    dev: false
     engines:
       node: '>=0.10.0'
     resolution:
@@ -994,7 +1007,6 @@ packages:
     resolution:
       integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=
   /denque/1.4.1:
-    dev: false
     engines:
       node: '>=0.10'
     resolution:
@@ -1568,7 +1580,6 @@ packages:
       redis-errors: 1.2.0
       redis-parser: 3.0.0
       standard-as-callback: 2.0.1
-    dev: false
     engines:
       node: '>=6'
     resolution:
@@ -1774,11 +1785,9 @@ packages:
     resolution:
       integrity: sha1-DM8tiRZq8Ds2Y8eWU4t1rG4RTZ0=
   /lodash.defaults/4.2.0:
-    dev: false
     resolution:
       integrity: sha1-0JF4cW/+pN3p5ft7N/bwgCJ0WAw=
   /lodash.flatten/4.4.0:
-    dev: false
     resolution:
       integrity: sha1-8xwiIlqWMtK7+OSt2+8kCqdlph8=
   /lodash.template/4.5.0:
@@ -2233,11 +2242,9 @@ packages:
     resolution:
       integrity: sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==
   /redis-commands/1.5.0:
-    dev: false
     resolution:
       integrity: sha512-6KxamqpZ468MeQC3bkWmCB1fp56XL64D4Kf0zJSwDZbVLLm7KFkoIcHrgRvQ+sk8dnhySs7+yBg94yIkAK7aJg==
   /redis-errors/1.2.0:
-    dev: false
     engines:
       node: '>=4'
     resolution:
@@ -2245,7 +2252,6 @@ packages:
   /redis-parser/3.0.0:
     dependencies:
       redis-errors: 1.2.0
-    dev: false
     engines:
       node: '>=4'
     resolution:
@@ -2469,7 +2475,6 @@ packages:
     resolution:
       integrity: sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
   /standard-as-callback/2.0.1:
-    dev: false
     resolution:
       integrity: sha512-NQOxSeB8gOI5WjSaxjBgog2QFw55FV8TkS6Y07BiB3VJ8xNTvUYm0wl0s8ObgQ5NhdpnNfigMIKjgPESzgr4tg==
   /string-argv/0.3.1:
