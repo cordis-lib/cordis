@@ -24,7 +24,8 @@ export const CordisUtilTypeError = makeCordisError(
   TypeError,
   {
     badImageFormat: (format: string) => `Recieved a bad image format "${format}"`,
-    badColorType: 'Failed to resolve color, expected a string, a number, or a an array of numbers'
+    badColorType: 'Failed to resolve color, expected a string, a number, or a an array of numbers',
+    noReduceEmptyStore: 'Cannot reduce an empty store without an initial value'
   }
 );
 

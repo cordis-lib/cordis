@@ -9,7 +9,8 @@ export * from './functions/tryImport';
 export * from './resolvers/resolveColor';
 
 export * from './struct/AsyncQueue';
-export * from './struct/Bag';
+export * from './struct/store/Bag';
+export * from './struct/store/Store';
 export * from './struct/BitField';
 export { default as Patcher } from './struct/Discord';
 export * from './struct/Intents';
