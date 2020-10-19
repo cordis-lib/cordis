@@ -121,7 +121,7 @@ export class WebsocketShard implements WebsocketShardOptions {
 
   public static readonly infalteOptions = {
     chunkSize: 65535,
-    flush: zlib.Z_SYNC_FLUSH
+    flush: Util.zlib?.Z_SYNC_FLUSH
   };
 
   // Options
@@ -165,7 +165,7 @@ export class WebsocketShard implements WebsocketShardOptions {
   private _lastBeat = 0;
 
   private _requests = 0;
-  private _firstRequst = -1;
+  private _firstRequest = -1;
 
   private _connectResolve: ((value?: any) => void) | null = null;
   private _connectReject: ((reason: any) => void) | null = null;
@@ -309,7 +309,7 @@ export class WebsocketShard implements WebsocketShardOptions {
     }
 
     this._requests = 0;
-    this._firstRequst = -1;
+    this._firstRequest = -1;
     this._pendingGuilds = null;
     this._ack = true;
     this._lastAck = 0;
@@ -354,11 +354,11 @@ export class WebsocketShard implements WebsocketShardOptions {
   private _send(payload: GatewaySendPayload): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return new Promise(async (resolve, reject) => {
-      if (this._firstRequst === -1 || this._requests === 0) this._firstRequst = Date.now();
-      if (this._firstRequst + 6e4 >= Date.now()) this._requests = 0;
+      if (this._firstRequest === -1 || this._requests === 0) this._firstRequest = Date.now();
+      if (this._firstRequest + 6e4 >= Date.now()) this._requests = 0;
 
       if (++this._requests === 120) {
-        const timeSinceFirst = Date.now() - this._firstRequst;
+        const timeSinceFirst = Date.now() - this._firstRequest;
         if (timeSinceFirst < 6e4) await halt(6e4 - timeSinceFirst);
       }
 
@@ -398,8 +398,7 @@ export class WebsocketShard implements WebsocketShardOptions {
    */
   private _refreshTimeout(name: string) {
     const timeout = this._timeouts[name];
-    if (!timeout) return;
-    timeout.refresh();
+    timeout?.refresh();
   }
 
   /**
@@ -537,6 +536,21 @@ export class WebsocketShard implements WebsocketShardOptions {
       case GatewayCloseCodes.ShardingRequired: {
         await destroy({ code, reason, reconnect: true });
         return this._connectReject?.(new CordisGatewayError('shardingRequired'));
+      }
+
+      case GatewayCloseCodes.InvalidAPIVersion: {
+        await destroy({ code, reason, reconnect: false, fatal: true });
+        return this._connectReject?.(new CordisGatewayError('invalidApiVersion'));
+      }
+
+      case GatewayCloseCodes.InvalidIntents: {
+        await destroy({ code, reason, reconnect: false, fatal: true });
+        return this._connectReject?.(new CordisGatewayError('invalidIntents', this.intents));
+      }
+
+      case GatewayCloseCodes.DisallowedIntents: {
+        await destroy({ code, reason, reconnect: false, fatal: true });
+        return this._connectReject?.(new CordisGatewayError('disallowedIntents', new Intents(BigInt(this.intents)).toArray()));
       }
     }
   };
