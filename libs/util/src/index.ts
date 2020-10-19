@@ -10,6 +10,7 @@ export * from './resolvers/resolveColor';
 
 export * from './struct/AsyncQueue';
 export * from './struct/store/Bag';
+export * from './struct/store/RedisStore';
 export * from './struct/store/Store';
 export * from './struct/BitField';
 export { default as Patcher } from './struct/Discord';

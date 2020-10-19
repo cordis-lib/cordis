@@ -39,6 +39,11 @@ export class RedisStore<T> implements Store<T, false, string> {
     return this.convertorOut(JSON.parse(data));
   }
 
+  public async getM(...keys: string[]) {
+    const data = await this.redis.hmget(this.hash, ...keys);
+    return data.map(e => e ? this.convertorOut(JSON.parse(e)) : null);
+  }
+
   public async set(key: string, value: T) {
     const size = await this.redis.hlen(this.hash);
     if (this.maxSize && size >= this.maxSize) await this.empty();
@@ -50,6 +55,10 @@ export class RedisStore<T> implements Store<T, false, string> {
   public async delete(key: string) {
     const count = await this.redis.hdel(this.hash, key);
     return count > 0;
+  }
+
+  public deleteM(...keys: string[]) {
+    return this.redis.hdel(this.hash, ...keys);
   }
 
   public async findKey(cb: (value: T, key: string) => boolean) {

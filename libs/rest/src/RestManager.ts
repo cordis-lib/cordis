@@ -3,7 +3,7 @@ import { Bucket, RatelimitData } from './Bucket';
 import { userAgent } from './Constants';
 import { EventEmitter } from 'events';
 import { Headers } from 'node-fetch';
-import { ENDPOINTS } from '@cordis/util';
+import { Bag, ENDPOINTS, Store } from '@cordis/util';
 
 export interface RestManagerOptions {
   /**
@@ -18,6 +18,10 @@ export interface RestManagerOptions {
    * What version of the api to use
    */
   apiVersion: number;
+  /**
+   * Method that can be called to get a store to use to keep track of rate limits
+   */
+  store: (name: string) => Store<Partial<RatelimitData>, boolean>;
 }
 
 export interface RestManager {
@@ -45,10 +49,11 @@ export interface RestManager {
   emit(event: 'ratelimit', bucket: string, endpoint: string, prevented: boolean, waitingFor: number): boolean;
 }
 
-export class RestManager extends EventEmitter implements RestManagerOptions {
+export class RestManager extends EventEmitter {
   public readonly retries: number;
   public readonly abortIn: number;
   public readonly apiVersion: number;
+  public readonly store: Store<Partial<RatelimitData>, boolean>;
 
   /**
    * Current active rate limiting Buckets
@@ -67,12 +72,14 @@ export class RestManager extends EventEmitter implements RestManagerOptions {
     const {
       retries = 3,
       abortIn = 60 * 1000,
-      apiVersion = 8
+      apiVersion = 8,
+      store = () => new Bag()
     } = options;
 
     this.retries = retries;
     this.abortIn = abortIn;
     this.apiVersion = apiVersion;
+    this.store = store('cordis_rest_ratelimit');
   }
 
   /**

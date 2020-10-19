@@ -33,11 +33,6 @@ export class Bucket {
   }
 
   /**
-   * The current rate limit state for this endpoint
-   */
-  public state: Partial<RatelimitData> = {};
-
-  /**
    * The request queue
    */
   public queue = new AsyncQueue<unknown>();
@@ -61,11 +56,11 @@ export class Bucket {
   }
 
   /**
-   * Does the actual HTTP magic
+   * Handles rate limiting and responses
    * @param req Reqyest options
    */
   private async _make(req: RequestBuilderOptions): Promise<any> {
-    const { state } = this;
+    const state = await this.manager.store.get(this.route) ?? {};
 
     if (state.remaining === 0 && Date.now() < (state.resetAt ?? 0)) {
       const waitingFor = state.resetAt! - Date.now();
@@ -81,6 +76,8 @@ export class Bucket {
     state.remaining = Number(res.headers.get('x-ratelimit-remaining'));
     state.resetAfter = Number(res.headers.get('x-ratelimit-reset-after')) * 1000;
     state.resetAt = Date.now() + state.resetAfter;
+
+    await this.manager.store.set(this.route, state);
 
     if (res.status === 429) {
       const period = await res.json().then(d => d.retry_after * 1000);
