@@ -4,6 +4,7 @@ import { RoutingServer, RpcClient } from '@cordis/brokers';
 import { WebsocketManager } from '@cordis/gateway';
 import { Events, IntentKeys } from '@cordis/util';
 import { RequestBuilderOptions } from '@cordis/rest';
+import { StoreManager } from './StoreManager';
 import { Handler } from './Handler';
 import { APIUser } from 'discord-api-types';
 
@@ -117,12 +118,14 @@ const main = async () => {
 
   process.env.DEBUG = String(argv.debug);
 
-  const redisClient = new redis({
-    host: argv['redis-host'],
-    port: argv['redis-port'],
-    password: argv['redis-auth'],
-    db: argv['redis-db']
-  });
+  const cache = new StoreManager(
+    new redis({
+      host: argv['redis-host'],
+      port: argv['redis-port'],
+      password: argv['redis-auth'],
+      db: argv['redis-db']
+    })
+  );
 
   const rest = new RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>(argv['amqp-host']);
   await rest.init('rest');
@@ -160,7 +163,7 @@ const main = async () => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
-          await handle?.(data.d, service, redisClient, rest, [botUser, updateBotUser]);
+          await handle?.(data.d, service, cache, rest, [botUser, updateBotUser]);
         } catch (e) {
           log('packet error')(e.stack ?? e.toString(), `${shard} -> ${data.t}`);
         }

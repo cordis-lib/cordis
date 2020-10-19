@@ -2,10 +2,9 @@ import { Patcher } from '@cordis/util';
 import { GatewayGuildEmojisUpdateDispatch, APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const guildEmojisUpdate: Handler<GatewayGuildEmojisUpdateDispatch['d']> = async (data, service, redis) => {
-  const rawGuild = await redis.hget('guilds', data.guild_id);
-  if (rawGuild) {
-    const existing = JSON.parse(rawGuild) as APIGuild;
+const guildEmojisUpdate: Handler<GatewayGuildEmojisUpdateDispatch['d']> = async (data, service, cache) => {
+  const existing = await cache.get<APIGuild>('guilds', data.guild_id);
+  if (existing) {
     const { data: guild, triggerEmojiUpdate, emojiCreations, emojiDeletions, emojiUpdates } = Patcher.patchGuild(data, existing);
 
     if (triggerEmojiUpdate) {
@@ -22,7 +21,7 @@ const guildEmojisUpdate: Handler<GatewayGuildEmojisUpdateDispatch['d']> = async 
       }
     }
 
-    await redis.hset('guilds', guild.id, JSON.stringify(guild));
+    await cache.set('guilds', guild.id, guild);
   }
 };
 

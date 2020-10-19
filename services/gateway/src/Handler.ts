@@ -2,12 +2,12 @@ import { RoutingServer, RpcClient } from '@cordis/brokers';
 import { RequestBuilderOptions } from '@cordis/rest';
 import { APIUser } from 'discord-api-types';
 import { Events } from '@cordis/util';
-import { Redis } from 'ioredis';
+import { StoreManager } from './StoreManager';
 
 export type Handler<T> = (
   data: T,
   service: RoutingServer<Events[keyof Events]>,
-  redis: Redis,
+  cache: StoreManager,
   rest: RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>,
   user: [APIUser, (data: APIUser) => any]
 ) => any;

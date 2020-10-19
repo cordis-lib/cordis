@@ -3,9 +3,8 @@ import { GatewayGuildBanAddDispatch, APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildBanAdd: Handler<GatewayGuildBanAddDispatch['d']> = async (data, service, redis) => {
-  const rawGuild = await redis.hget('guilds', data.guild_id);
-  if (rawGuild) {
-    const guild = JSON.parse(rawGuild) as APIGuild;
+  const guild = await redis.get<APIGuild>('guilds', data.guild_id);
+  if (guild) {
     const { data: user } = Patcher.patchUser(data.user);
     service.publish({ guild, user }, 'guildBanAdd');
   }

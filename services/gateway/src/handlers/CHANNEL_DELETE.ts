@@ -2,12 +2,10 @@ import { Patcher } from '@cordis/util';
 import { APIChannel, APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const channelDelete: Handler<APIChannel> = async (data, service, redis) => {
+const channelDelete: Handler<APIChannel> = async (data, service, cache) => {
   if (data.guild_id) {
-    const rawGuild = await redis.hget('guilds', data.guild_id);
-    if (rawGuild) {
-      const guild = JSON.parse(rawGuild) as APIGuild;
-
+    const guild = await cache.get<APIGuild>('guilds', data.guild_id);
+    if (guild) {
       const index = (guild.channels ??= []).findIndex(e => e.id === data.id);
       let channel = data;
 
@@ -18,15 +16,15 @@ const channelDelete: Handler<APIChannel> = async (data, service, redis) => {
 
       const { data: patchedChannel } = Patcher.patchChannel(channel);
       service.publish({ guild, channel: patchedChannel }, 'channelDelete');
-      await redis.hset('guilds', data.guild_id, JSON.stringify(guild));
+      await cache.set('guilds', guild.id, guild);
     }
   } else {
     const { data: patchedChannel } = Patcher.patchChannel(data);
     service.publish({ channel: patchedChannel }, 'channelDelete');
-    await redis.hdel('dm_channels', data.id);
+    await cache.delete('dm_channels', patchedChannel.id);
   }
 
-  await redis.del(`${data.id}_messages`);
+  await cache.delete(`${data.id}_messages`);
 };
 
 export default channelDelete;

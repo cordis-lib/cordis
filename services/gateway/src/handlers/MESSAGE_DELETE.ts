@@ -1,12 +1,11 @@
 import { APIMessage, GatewayMessageDeleteDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const messageDelete: Handler<GatewayMessageDeleteDispatch['d']> = async (data, service, redis) => {
-  const rawMessage = await redis.hget(`${data.channel_id}_messages`, data.id);
-  if (rawMessage) {
-    const message = JSON.parse(rawMessage) as APIMessage;
+const messageDelete: Handler<GatewayMessageDeleteDispatch['d']> = async (data, service, cache) => {
+  const message = await cache.get<APIMessage>(`${data.channel_id}_messages`, data.id);
+  if (message) {
     service.publish(message, 'messageDelete');
-    await redis.hdel(`${data.channel_id}_messages`, data.id);
+    await cache.delete(`${data.channel_id}_messages`, data.id);
   }
 };
 

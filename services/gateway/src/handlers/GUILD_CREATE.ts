@@ -3,8 +3,7 @@ import { APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildCreate: Handler<APIGuild> = async (data, service, redis) => {
-  const rawExisting = await redis.hget('guilds', data.id);
-  const existing = rawExisting ? JSON.parse(rawExisting) as APIGuild : null;
+  const existing = await redis.get<APIGuild>('guilds', data.id);
 
   if (existing?.unavailable && !data.unavailable) {
     const { data: guild, triggerEmojiUpdate, emojiCreations, emojiDeletions, emojiUpdates } = Patcher.patchGuild(data, existing);
@@ -24,11 +23,11 @@ const guildCreate: Handler<APIGuild> = async (data, service, redis) => {
       }
     }
 
-    await redis.hset('guilds', data.id, JSON.stringify(guild));
+    await redis.set('guilds', guild.id, guild);
   } else {
     const { data: guild } = Patcher.patchGuild(data);
     service.publish(guild, 'guildCreate');
-    await redis.hset('guilds', data.id, JSON.stringify(guild));
+    await redis.set('guilds', guild.id, guild);
   }
 };
 

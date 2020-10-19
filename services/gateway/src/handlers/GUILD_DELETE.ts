@@ -1,17 +1,16 @@
 import { APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const guildDelete: Handler<APIGuild> = async (data, service, redis) => {
+const guildDelete: Handler<APIGuild> = async (data, service, cache) => {
   if (data.unavailable) {
-    const rawExisting = await redis.hget('guilds', data.id);
-    const existing = rawExisting ? JSON.parse(rawExisting) as APIGuild : data;
+    const existing = await cache.get<APIGuild>('guilds', data.id) ?? data;
     existing.unavailable = true;
 
     service.publish(existing, 'guildUnavailable');
-    await redis.hset('guilds', data.id, JSON.stringify(existing));
+    await cache.set('guilds', existing.id, existing);
   } else {
     service.publish(data, 'guildDelete');
-    await redis.hdel('guilds', data.id);
+    await cache.delete('guilds', data.id);
   }
 };
 

@@ -1,25 +1,21 @@
 import { Patcher } from '@cordis/util';
-import { GatewayMessageUpdateDispatch } from 'discord-api-types';
+import { GatewayMessageUpdateDispatch, APIMessage } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const messageUpdate: Handler<GatewayMessageUpdateDispatch['d']> = async (data, service, redis) => {
-  const rawMessage = await redis.hget(`${data.channel_id}_messages`, data.id);
+const messageUpdate: Handler<GatewayMessageUpdateDispatch['d']> = async (data, service, cache) => {
+  let message = await cache.get<APIMessage>(`${data.channel_id}_messages`, data.id);
 
-  let message;
-
-  if (rawMessage) {
-    const { data: patchedMessage, old: o } = Patcher.patchMessage(data, JSON.parse(rawMessage));
+  if (message) {
+    const { data: patchedMessage, old: o } = Patcher.patchMessage(data, message);
     message = patchedMessage;
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     service.publish({ o: o!, n: message }, 'messageUpdate');
-  }
-
-  if (!message) {
+  } else {
     const { data: patchedMessage } = Patcher.patchMessage(data);
     message = patchedMessage;
   }
 
-  await redis.hset(`${data.channel_id}_messages`, message.id, JSON.stringify(message));
+  await cache.set(`${data.channel_id}_messages`, message.id, message);
 };
 
 export default messageUpdate;
