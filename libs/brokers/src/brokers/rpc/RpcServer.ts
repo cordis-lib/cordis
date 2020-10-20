@@ -4,9 +4,7 @@ export class RpcServer<S, C> extends Broker {
   public serverQueue?: string;
 
   public async init(serverQueue: string, cb: (content: C) => S | Promise<S>) {
-    await super.init();
-
-    const channel = this.channel!;
+    const channel = this.channel;
 
     serverQueue = this.serverQueue = await channel.assertQueue(serverQueue, { durable: false }).then(d => d.queue);
 

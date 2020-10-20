@@ -11,11 +11,9 @@ export class PubSubClient<S> extends Broker {
     fanout = false,
     cb: (content?: S, properties?: amqp.MessageProperties, original?: amqp.Message) => any
   ) {
-    await super.init();
-
     if (!this.queueOrExchange) throw new CordisBrokerError('brokerNotInit');
 
-    const channel = this.channel!;
+    const channel = this.channel;
 
     this.queueOrExchange = (
       fanout

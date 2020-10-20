@@ -7,9 +7,7 @@ export class PubSubServer<S> extends Broker {
   public fanout?: boolean;
 
   public async init(name: string, fanout = false) {
-    await super.init();
-
-    const channel = this.channel!;
+    const channel = this.channel;
 
     this.queueOrExchange = (
       fanout
