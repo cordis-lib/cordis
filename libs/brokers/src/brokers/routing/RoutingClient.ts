@@ -14,7 +14,7 @@ export class RoutingClient<S> extends Broker {
 
   public async init(
     exchange: string,
-    key: string,
+    keys: string | string[],
     topicBased = false,
     balance = false
   ) {
@@ -25,13 +25,18 @@ export class RoutingClient<S> extends Broker {
       balance = false;
     }
 
+    keys = [...new Set(Array.isArray(keys) ? keys : [keys])].sort();
+    const identifier = keys.map(e => e.toUpperCase()).join('-');
+
     this.topicBased = topicBased;
     this.exchange = await this.channel!.assertExchange(exchange, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
 
-    const intendedQueueName = balance ? (await this.redis!.hget(`${this.exchange}_queues`, key) ?? '') : '';
+    const intendedQueueName = balance ? (await this.redis!.hget(`${this.exchange}_queues`, identifier) ?? '') : '';
     const { queue } = await this.channel!.assertQueue(intendedQueueName, { durable: true, exclusive: !balance });
 
-    if (balance && intendedQueueName === '') await this.redis!.hset(`${this.exchange}_queues`, key, queue);
+    if (balance && intendedQueueName === '') await this.redis!.hset(`${this.exchange}_queues`, identifier, queue);
+
+    for (const key of keys) await this.channel!.bindExchange(queue, this.exchange, key);
 
     await this._consumeQueue(queue, (content: { type: string; data: S }) => void this.emit(content.type, content.data));
   }
