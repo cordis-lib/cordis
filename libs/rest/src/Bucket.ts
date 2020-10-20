@@ -62,8 +62,11 @@ export class Bucket {
   private async _make(req: RequestBuilderOptions): Promise<any> {
     const state = await this.manager.store.get(this.route) ?? {};
 
-    if (state.remaining === 0 && Date.now() < (state.resetAt ?? 0)) {
-      const waitingFor = state.resetAt! - Date.now();
+    if (
+      (state.remaining === 0 && Date.now() < (state.resetAt ?? 0)) ||
+      state.global
+    ) {
+      const waitingFor = state.resetAt ?? Date.now() - Date.now();
       this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, true, waitingFor);
       await halt(waitingFor);
     }
@@ -82,6 +85,10 @@ export class Bucket {
     if (res.status === 429) {
       const period = await res.json().then(d => d.retry_after * 1000);
       this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, false, period);
+
+      state.resetAfter = period;
+      state.resetAt = Date.now() + period;
+      state.global = false;
 
       await halt(period * 1000);
       return this._retry(req, res);
