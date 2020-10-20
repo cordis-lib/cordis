@@ -13,9 +13,13 @@ export class Broker extends EventEmitter {
   public connection?: amqp.Connection;
   public channel?: amqp.Channel;
 
-  public constructor(host = 'localhost') {
+  public constructor(host: string);
+  public constructor(host: string, connection: amqp.Connection, channel: amqp.Channel);
+  public constructor(host = 'localhost', connection?: amqp.Connection, channel?: amqp.Channel) {
     super();
     this.host = host.replace(/amqp?\:?\/?\//g, '');
+    this.connection = connection;
+    this.channel = channel;
   }
 
   private readonly _onClose = () => {
@@ -94,19 +98,19 @@ export class Broker extends EventEmitter {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async init(..._args: any[]): Promise<void> {
-    try {
-      await this.channel?.close();
-      await this.connection?.close();
-    } catch {}
-
     let connection: amqp.Connection;
 
     try {
-      connection = this.connection = await amqp.connect(`amqp://${this.host}`);
+      connection = this.connection ??= await amqp.connect(`amqp://${this.host}`);
     } catch (e) {
       this.emit('close');
       this.emit('error', e);
       await halt(Broker.reconnectTimeout);
+      try {
+        await this.channel?.close();
+        await this.connection?.close();
+      } catch {}
+
       return this.init();
     }
 
@@ -114,7 +118,7 @@ export class Broker extends EventEmitter {
       .on('close', this._onClose)
       .on('error', this._onError);
 
-    this.channel = await connection.createChannel();
+    this.channel ??= await connection.createChannel();
   }
 
   public async destroy() {
