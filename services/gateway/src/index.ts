@@ -2,7 +2,8 @@ import * as yargs from 'yargs';
 import * as redis from 'ioredis';
 import { RoutingServer, RpcClient } from '@cordis/brokers';
 import { WebsocketManager } from '@cordis/gateway';
-import { Events, IntentKeys } from '@cordis/util';
+import { createAmqp, Events, IntentKeys } from '@cordis/util';
+import { Channel } from 'amqplib';
 import { RequestBuilderOptions } from '@cordis/rest';
 import { StoreManager } from './StoreManager';
 import { Handler } from './Handler';
@@ -127,10 +128,24 @@ const main = async () => {
     })
   );
 
-  const rest = new RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>(argv['amqp-host']);
+  const log = (label: string) => (data: any, shard: any) => console.log(`[${label.toUpperCase()} -> ${shard}]: ${data}`);
+
+  let amqpChannel!: Channel;
+
+  await (async function registerChannel() {
+    const { channel } = (await createAmqp(
+      argv['amqp-host'] ?? 'localhost',
+      () => registerChannel(),
+      e => log('amqp error')(e, 'MANAGER')
+    ))!;
+
+    amqpChannel = channel;
+  })();
+
+  const rest = new RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>(amqpChannel);
   await rest.init('rest');
 
-  const service = new RoutingServer<Events[keyof Events]>(argv['amqp-host']);
+  const service = new RoutingServer<Events[keyof Events]>(amqpChannel);
   const ws = new WebsocketManager(
     argv.auth,
     argv['shard-count'],
@@ -150,7 +165,6 @@ const main = async () => {
   let botUser: APIUser = await rest.post({ path: '/users/@me' });
   const updateBotUser = (data: APIUser) => botUser = data;
 
-  const log = (label: string) => (data: any, shard: any) => console.log(`[${label.toUpperCase()} -> ${shard}]: ${data}`);
   ws
     .on('disconnecting', shard => log('disconnecting')(null, shard))
     .on('reconecting', shard => log('reconecting')(null, shard))

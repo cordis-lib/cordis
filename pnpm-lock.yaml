@@ -33,7 +33,6 @@ importers:
   libs/brokers:
     dependencies:
       '@cordis/util': 'link:../util'
-      amqplib: 0.6.0
       ioredis: 4.17.3
       tslib: 2.0.1
     devDependencies:
@@ -46,26 +45,40 @@ importers:
       '@types/amqplib': ^0.5.13
       '@types/ioredis': ^4.17.3
       '@types/node': ^14.11.1
-      amqplib: ^0.6.0
       ioredis: ^4.17.3
       tslib: ^2.0.1
       typescript: ^4.0.3
   libs/core:
     dependencies:
       '@cordis/brokers': 'link:../brokers'
+      '@cordis/util': 'link:../util'
+      amqplib: 0.6.0
+      discord-api-types: 0.7.0
+      ioredis: 4.17.3
       tslib: 2.0.1
     devDependencies:
+      '@cordis/rest': 'link:../rest'
+      '@types/amqplib': 0.5.14
+      '@types/ioredis': 4.17.6
       '@types/node': 14.11.2
       typescript: 4.0.3
     specifiers:
-      '@cordis/brokers': ^0.1.0
+      '@cordis/brokers': 0.1.0
+      '@cordis/rest': 0.1.0
+      '@cordis/util': 0.1.0
+      '@types/amqplib': ^0.5.14
+      '@types/ioredis': ^4.17.6
       '@types/node': ^14.11.1
+      amqplib: ^0.6.0
+      discord-api-types: ^0.7.0
+      ioredis: ^4.17.3
       tslib: ^2.0.1
       typescript: ^4.0.3
   libs/gateway:
     dependencies:
       '@cordis/util': 'link:../util'
       common-tags: 1.8.0
+      discord-api-types: 0.7.0
       node-fetch: 2.6.1
       tslib: 2.0.1
       ws: 7.3.1
@@ -74,7 +87,6 @@ importers:
       '@types/node': 14.11.2
       '@types/node-fetch': 2.5.7
       '@types/ws': 7.2.6
-      discord-api-types: 0.7.0
       erlpack: github.com/discordapp/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d
       typescript: 4.0.3
       zlib-sync: 0.1.7
@@ -114,13 +126,15 @@ importers:
       typescript: ^4.0.3
   libs/util:
     dependencies:
+      discord-api-types: 0.7.0
       tslib: 2.0.1
     devDependencies:
+      '@types/amqplib': 0.5.14
       '@types/node': 14.11.2
-      discord-api-types: 0.7.0
       ioredis: 4.17.3
       typescript: 4.0.3
     specifiers:
+      '@types/amqplib': ^0.5.14
       '@types/node': ^14.11.1
       discord-api-types: ^0.7.0
       ioredis: ^4.17.3
@@ -130,12 +144,14 @@ importers:
     dependencies:
       '@cordis/brokers': 'link:../../libs/brokers'
       '@cordis/gateway': 'link:../../libs/gateway'
+      amqplib: 0.6.0
       ioredis: 4.17.3
       tslib: 2.0.1
       yargs: 15.4.1
     devDependencies:
       '@cordis/rest': 'link:../../libs/rest'
       '@cordis/util': 'link:../../libs/util'
+      '@types/amqplib': 0.5.14
       '@types/ioredis': 4.17.4
       '@types/node': 14.11.2
       '@types/yargs': 15.0.7
@@ -143,11 +159,13 @@ importers:
     specifiers:
       '@cordis/brokers': 0.1.0
       '@cordis/gateway': 0.1.0
-      '@cordis/rest': ^0.1.0
-      '@cordis/util': ^0.1.0
+      '@cordis/rest': 0.1.0
+      '@cordis/util': 0.1.0
+      '@types/amqplib': ^0.5.14
       '@types/ioredis': ^4.17.4
       '@types/node': ^14.6.0
       '@types/yargs': ^15.0.5
+      amqplib: ^0.6.0
       ioredis: ^4.17.3
       tslib: ^2.0.1
       typescript: ^4.0.3
@@ -156,11 +174,13 @@ importers:
     dependencies:
       '@cordis/brokers': 'link:../../libs/brokers'
       '@cordis/rest': 'link:../../libs/rest'
+      '@cordis/util': 'link:../../libs/util'
+      amqplib: 0.6.0
       ioredis: 4.17.3
       tslib: 2.0.1
       yargs: 15.4.1
     devDependencies:
-      '@cordis/util': 'link:../../libs/util'
+      '@types/amqplib': 0.5.14
       '@types/ioredis': 4.17.4
       '@types/node': 14.11.2
       '@types/yargs': 15.0.7
@@ -168,10 +188,12 @@ importers:
     specifiers:
       '@cordis/brokers': 0.1.0
       '@cordis/rest': 0.1.0
-      '@cordis/util': 'workspace:^0.1.0'
+      '@cordis/util': 0.1.0
+      '@types/amqplib': ^0.5.14
       '@types/ioredis': ^4.17.4
       '@types/node': ^14.6.0
       '@types/yargs': ^15.0.5
+      amqplib: ^0.6.0
       ioredis: ^4.17.3
       tslib: ^2.0.1
       typescript: ^4.0.3
@@ -418,6 +440,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-0r8cJfUajAlcHxlJsZyqRrSAYzv+pJPsaAQjDC6e5rACi3AOIuR0AfevJG7NLvw3Qu4EGhf3KS/ECwd5cUAY2A==
+  /@types/amqplib/0.5.14:
+    dependencies:
+      '@types/bluebird': 3.5.32
+      '@types/node': 14.14.0
+    dev: true
+    resolution:
+      integrity: sha512-KYJjEZhUlDHIgYhm0f+ymt3FLXG22Bjl1DIjO1WkSAYJGLBbK5t2C3TQnEGD1T+hfapR93LTDfAmQMXO5qQM3g==
   /@types/bluebird/3.5.32:
     dev: true
     resolution:
@@ -432,6 +461,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-kb5+thmQJ7HHyOAnCOeqRJlF2fyvadHghnLLLKZzCNyShStJeIQtNGGDjA30gWqj6UFSDAWBfGEMKrFDrGfvzQ==
+  /@types/ioredis/4.17.6:
+    dependencies:
+      '@types/node': 14.14.0
+    dev: true
+    resolution:
+      integrity: sha512-Vg3vuhveOaQeiubzGpVU9Hn3UJCi7rPe2TOphc3m3Y2EniHmytHp/wj5ZtfqDGBhFJGaSwbJvGQhhqd/Nqfy4Q==
   /@types/json-schema/7.0.6:
     dev: true
     resolution:
@@ -451,6 +486,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-jiE3QIxJ8JLNcb1Ps6rDbysDhN4xa8DJJvuC9prr6w+1tIh+QAbYyNF3tyiZNLDBIuBCf4KEcV2UvQm/V60xfA==
+  /@types/node/14.14.0:
+    dev: true
+    resolution:
+      integrity: sha512-BfbIHP9IapdupGhq/hc+jT5dyiBVZ2DdeC5WwJWQWDb0GijQlzUFAeIQn/2GtvZcd2HVUU7An8felIICFTC2qg==
   /@types/normalize-package-data/2.4.0:
     dev: true
     resolution:
@@ -1020,7 +1059,7 @@ packages:
     resolution:
       integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==
   /discord-api-types/0.7.0:
-    dev: true
+    dev: false
     engines:
       node: '>=12'
     resolution:

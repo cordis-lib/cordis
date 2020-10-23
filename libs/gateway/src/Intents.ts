@@ -1,4 +1,4 @@
-import { BitField, BitFieldResolvable } from './BitField';
+import { BitField, BitFieldResolvable } from '@cordis/util';
 
 export const INTENTS = {
   guilds: BitField.bigintify(0),

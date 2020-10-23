@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/cordisjs/cordis#readme",
   "devDependencies": {
-    "@cordis/util": "workspace:^0.1.0",
+    "@cordis/util": "0.1.0",
+    "@types/amqplib": "^0.5.14",
     "@types/ioredis": "^4.17.4",
     "@types/node": "^14.6.0",
     "@types/yargs": "^15.0.5",
@@ -31,6 +32,8 @@
   "dependencies": {
     "@cordis/brokers": "0.1.0",
     "@cordis/rest": "0.1.0",
+    "@cordis/util": "0.1.0",
+    "amqplib": "^0.6.0",
     "ioredis": "^4.17.3",
     "tslib": "^2.0.1",
     "yargs": "^15.4.1"

@@ -83,4 +83,4 @@ export interface StoreOptions<T, I = never> {
   convertorOut?: I extends never ? never : (raw: I) => T;
 }
 
-export type StoreConstructor<T, S extends boolean = false, I = never> = new(options?: StoreOptions<T>) => Store<T, S, I>;
+export type StoreConstructor<T, S extends boolean = false, I = never> = new(options?: StoreOptions<T, I>) => Store<T, S, I>;

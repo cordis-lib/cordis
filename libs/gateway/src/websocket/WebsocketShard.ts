@@ -5,7 +5,8 @@ import * as Util from '../util';
 // Need to ensure that the zlib namespace is only being used as a type so it is NOT required in the transpiled javascript
 import * as zlib from 'zlib-sync';
 import { GatewaySendPayload, GatewayReceivePayload, GatewayDispatchPayload, GatewayOPCodes, GatewayCloseCodes } from 'discord-api-types';
-import { AsyncQueue, Intents, INTENTS, IntentKeys, halt } from '@cordis/util';
+import { AsyncQueue, halt } from '@cordis/util';
+import { Intents, INTENTS, IntentKeys } from '../Intents';
 import { stripIndent } from 'common-tags';
 
 /**

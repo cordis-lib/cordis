@@ -26,7 +26,6 @@
     "@types/node": "^14.0.13",
     "@types/node-fetch": "^2.5.7",
     "@types/ws": "^7.2.5",
-    "discord-api-types": "^0.7.0",
     "erlpack": "discordapp/erlpack",
     "typescript": "^4.0.3",
     "zlib-sync": "^0.1.7"
@@ -34,6 +33,7 @@
   "dependencies": {
     "@cordis/util": "0.1.0",
     "common-tags": "^1.8.0",
+    "discord-api-types": "^0.7.0",
     "node-fetch": "^2.6.0",
     "tslib": "^2.0.0",
     "ws": "^7.3.0"

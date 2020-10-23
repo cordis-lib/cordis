@@ -1,6 +1,8 @@
 import * as yargs from 'yargs';
 import { RpcServer } from '@cordis/brokers';
+import { createAmqp } from '@cordis/util';
 import { RestManager, RequestBuilderOptions } from '@cordis/rest';
+import { Channel } from 'amqplib';
 
 const main = async () => {
   const { argv } = yargs
@@ -61,7 +63,19 @@ const main = async () => {
     })
     .help();
 
-  const service = new RpcServer<any, Partial<RequestBuilderOptions> & { path: string }>(argv['amqp-host']);
+  let amqpChannel!: Channel;
+
+  await (async function registerChannel() {
+    const { channel } = (await createAmqp(
+      argv['amqp-host'] ?? 'localhost',
+      () => registerChannel(),
+      e => console.log('[AMQP ERROR]', e)
+    ))!;
+
+    amqpChannel = channel;
+  })();
+
+  const service = new RpcServer<any, Partial<RequestBuilderOptions> & { path: string }>(amqpChannel);
   const rest = new RestManager(
     argv.auth,
     {

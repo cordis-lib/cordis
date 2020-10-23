@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@cordis/util": "0.1.0",
-    "amqplib": "^0.6.0",
     "ioredis": "^4.17.3",
     "tslib": "^2.0.1"
   }
