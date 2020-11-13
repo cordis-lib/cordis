@@ -1,11 +1,11 @@
 import { APIMessage } from 'discord-api-types';
-import { Patcher } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
 import { Handler } from '../Handler';
 
 const messageCreate: Handler<APIMessage> = async (data, service, cache) => {
-  service.publish(data, 'messageCreate');
   const { data: message } = Patcher.patchMessage(data);
-  await cache.set(`${message.channel_id}_messages`, message.id, message);
+  service.publish(message, CORDIS_AMQP_SYMBOLS.gateway.events.messageCreate);
+  await cache.set(CORDIS_REDIS_SYMBOLS.cache.messages(message.channel_id), message.id, message);
 };
 
 export default messageCreate;

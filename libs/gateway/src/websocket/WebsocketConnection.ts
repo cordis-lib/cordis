@@ -1,10 +1,17 @@
 import WS = require('ws');
-import { WebsocketManager } from './WebsocketManager';
+import { Cluster } from './Cluster';
 import { CordisGatewayError, CordisGatewayTypeError } from '../error';
 import * as Util from '../util';
 // Need to ensure that the zlib namespace is only being used as a type so it is NOT required in the transpiled javascript
 import * as zlib from 'zlib-sync';
-import { GatewaySendPayload, GatewayReceivePayload, GatewayDispatchPayload, GatewayOPCodes, GatewayCloseCodes } from 'discord-api-types';
+import {
+  GatewaySendPayload,
+  GatewayReceivePayload,
+  GatewayDispatchPayload,
+  GatewayOPCodes,
+  GatewayCloseCodes,
+  GatewayDispatchEvents
+} from 'discord-api-types';
 import { AsyncQueue, halt } from '@cordis/util';
 import { Intents, INTENTS, IntentKeys } from '../Intents';
 import { stripIndent } from 'common-tags';
@@ -12,7 +19,7 @@ import { stripIndent } from 'common-tags';
 /**
  * The current status of the shard
  */
-export enum WebsocketShardStatus {
+export enum WebsocketConnectionStatus {
   /**
    * Not really doing anything
    * Is IDLE either before .connect is called or after .destroy resolves.
@@ -46,7 +53,7 @@ export enum WebsocketShardStatus {
   ready
 }
 
-export interface WebsocketShardOptions {
+export interface WebsocketConnectionOptions {
   /**
    * How long to wait for the WebSocket connection to open before giving up
    */
@@ -90,7 +97,7 @@ export interface WebsocketShardOptions {
   intents: Intents | IntentKeys | IntentKeys[] | number | bigint;
 }
 
-export interface WebsocketShardDestroyOptions {
+export interface WebsocketConnectionDestroyOptions {
   /**
    * whether the shard should try to reconnect or not
    */
@@ -117,7 +124,7 @@ export interface WebsocketShardDestroyOptions {
 /**
  * Represents a connection to Discord.
  */
-export class WebsocketShard implements WebsocketShardOptions {
+export class WebsocketConnection implements WebsocketConnectionOptions {
   public static readonly zlibSuffix = new Uint8Array([0x00, 0x00, 0xff, 0xff]);
 
   public static readonly infalteOptions = {
@@ -138,7 +145,7 @@ export class WebsocketShard implements WebsocketShardOptions {
 
   // State
   public connection?: WS;
-  public status = WebsocketShardStatus.idle;
+  public status = WebsocketConnectionStatus.idle;
 
   public inflate: zlib.Inflate | null = null;
   public guilds: Set<string> = new Set();
@@ -174,10 +181,10 @@ export class WebsocketShard implements WebsocketShardOptions {
   private _connectedAt = -1;
 
   public constructor(
-    public readonly manager: WebsocketManager,
+    public readonly cluster: Cluster,
     public readonly id: number,
     private readonly _url: string,
-    options: Partial<WebsocketShardOptions> = {}
+    options: Partial<WebsocketConnectionOptions> = {}
   ) {
     let {
       openTimeout = 60000,
@@ -214,7 +221,7 @@ export class WebsocketShard implements WebsocketShardOptions {
 
     this.encoding = encoding;
     this.compress = compress;
-    if (compress && Util.zlib?.Inflate) this.inflate = new Util.zlib.Inflate(WebsocketShard.infalteOptions);
+    if (compress && Util.zlib?.Inflate) this.inflate = new Util.zlib.Inflate(WebsocketConnection.infalteOptions);
   }
 
   /**
@@ -234,12 +241,12 @@ export class WebsocketShard implements WebsocketShardOptions {
   public connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       switch (this.status) {
-        case WebsocketShardStatus.connecting:
-        case WebsocketShardStatus.disconnecting:
+        case WebsocketConnectionStatus.connecting:
+        case WebsocketConnectionStatus.disconnecting:
           return reject(new CordisGatewayError('notConnectable', this.id, this.status));
-        case WebsocketShardStatus.open:
-        case WebsocketShardStatus.waiting:
-        case WebsocketShardStatus.ready:
+        case WebsocketConnectionStatus.open:
+        case WebsocketConnectionStatus.waiting:
+        case WebsocketConnectionStatus.ready:
           return resolve(this.destroy({ reason: 'User requested reconnect', reconnect: true }));
         default:
           break;
@@ -248,7 +255,7 @@ export class WebsocketShard implements WebsocketShardOptions {
       this._connectResolve = resolve;
       this._connectReject = reject;
 
-      if (this.status !== WebsocketShardStatus.reconnecting) this.status = WebsocketShardStatus.connecting;
+      if (this.status !== WebsocketConnectionStatus.reconnecting) this.status = WebsocketConnectionStatus.connecting;
       this.debug(stripIndent`
         [CONNECT]
           Gateway    : ${this._url}
@@ -266,7 +273,7 @@ export class WebsocketShard implements WebsocketShardOptions {
       this.connection = new WS(`${this._url}?v=8&encoding=${this.encoding}${this.compress ? '&compress=zlib-stream' : ''}`);
       this.connection.onopen = this._onOpen;
       this.connection.onclose = this._onClose;
-      this.connection.onerror = ({ error }) => this.manager.emit('error', error, this.id);
+      this.connection.onerror = ({ error }) => this.cluster.emit('error', error, this.id);
       this.connection.onmessage = ({ data }) => this._onMessage(Util.unpack(this.encoding, this._decompress(data)));
     });
   }
@@ -281,7 +288,7 @@ export class WebsocketShard implements WebsocketShardOptions {
     fatal = false,
     reason,
     code
-  }: WebsocketShardDestroyOptions = {}): Promise<void> {
+  }: WebsocketConnectionDestroyOptions = {}): Promise<void> {
     this.debug(stripIndent`
       [DESTROY]
         reconnect: ${reconnect}
@@ -291,8 +298,8 @@ export class WebsocketShard implements WebsocketShardOptions {
         code     : ${code}
     `);
 
-    this.manager.emit(reconnect ? 'reconecting' : 'disconnecting', this.id);
-    this.status = WebsocketShardStatus.disconnecting;
+    this.cluster.emit(reconnect ? 'reconecting' : 'disconnecting', this.id);
+    this.status = WebsocketConnectionStatus.disconnecting;
 
     if (!reason) {
       if (reconnect) reason = 'Terminating current connection to reconnect.';
@@ -322,9 +329,9 @@ export class WebsocketShard implements WebsocketShardOptions {
       setTimeout(res, 15000);
     });
 
-    if (this.compress && Util.zlib?.Inflate) this.inflate = new Util.zlib.Inflate(WebsocketShard.infalteOptions);
+    if (this.compress && Util.zlib?.Inflate) this.inflate = new Util.zlib.Inflate(WebsocketConnection.infalteOptions);
 
-    this.status = reconnect && !fatal ? WebsocketShardStatus.reconnecting : WebsocketShardStatus.idle;
+    this.status = reconnect && !fatal ? WebsocketConnectionStatus.reconnecting : WebsocketConnectionStatus.idle;
 
     if (!reconnect) return;
 
@@ -345,7 +352,7 @@ export class WebsocketShard implements WebsocketShardOptions {
    * @param log The debug information
    */
   public debug(log: string) {
-    this.manager.emit('debug', log, this.id);
+    this.cluster.emit('debug', log, this.id);
   }
 
   /**
@@ -441,7 +448,7 @@ export class WebsocketShard implements WebsocketShardOptions {
 
     let flush = true;
     for (let i = 0; i < suffix.length; i++) {
-      if (suffix[i] !== WebsocketShard.zlibSuffix[i]) {
+      if (suffix[i] !== WebsocketConnection.zlibSuffix[i]) {
         flush = false;
         break;
       }
@@ -449,7 +456,7 @@ export class WebsocketShard implements WebsocketShardOptions {
 
     this.inflate.push(Buffer.from(decompressable), flush ? Util.zlib!.Z_SYNC_FLUSH : Util.zlib!.Z_NO_FLUSH);
 
-    if (this.inflate.err) this.manager.emit('error', `${this.inflate.err}: ${this.inflate.msg}`, this.id);
+    if (this.inflate.err) this.cluster.emit('error', `${this.inflate.err}: ${this.inflate.msg}`, this.id);
     if (!flush) return;
 
     const { result } = this.inflate;
@@ -462,17 +469,17 @@ export class WebsocketShard implements WebsocketShardOptions {
     this._clearTimeout('open');
     this.debug(`[CONNECTED] ${this._url} in ${Date.now() - this._connectedAt}ms`);
     this.debug(`Setting a HELLO timeout for ${this.helloTimeout}ms.`);
-    this.manager.emit('open', this.id);
+    this.cluster.emit('open', this.id);
     this._registerTimeout('hello', async () => {
       await this.destroy({ reason: 'Did not recieve hello timeout in time', fatal: true });
       this._connectReject?.(new CordisGatewayError('timeoutHit', 'hello', this.helloTimeout));
     }, this.helloTimeout);
 
-    if (this.status !== WebsocketShardStatus.reconnecting) this.status = WebsocketShardStatus.open;
+    if (this.status !== WebsocketConnectionStatus.reconnecting) this.status = WebsocketConnectionStatus.open;
   };
 
   private readonly _onClose = async ({ code, reason, wasClean }: { code: number; reason: string; wasClean: boolean }) => {
-    const destroy = (options?: WebsocketShardDestroyOptions) => this.destroy(options);
+    const destroy = (options?: WebsocketConnectionDestroyOptions) => this.destroy(options);
 
     this.debug(stripIndent`
       [CLOSE]
@@ -571,7 +578,7 @@ export class WebsocketShard implements WebsocketShardOptions {
         this._clearTimeout('hello');
         this.debug('Clearing HELLO timeout');
 
-        let reconnecting = this.status === WebsocketShardStatus.reconnecting;
+        let reconnecting = this.status === WebsocketConnectionStatus.reconnecting;
         this.debug(`Setting heartbeat interval of ${packet.d.heartbeat_interval}ms`);
 
         this._registerInterval('heartbeat', () => this._heartbeat(false), packet.d.heartbeat_interval);
@@ -591,7 +598,7 @@ export class WebsocketShard implements WebsocketShardOptions {
           await this.send({
             op: GatewayOPCodes.Resume,
             d: {
-              token: this.manager.auth,
+              token: this.cluster.auth,
               // eslint-disable-next-line @typescript-eslint/naming-convention
               session_id: this._sessionId!,
               seq: this._sequence!
@@ -603,7 +610,7 @@ export class WebsocketShard implements WebsocketShardOptions {
             await this.destroy({ reason: 'Tried to resume but was missing essential state', reconnect: true, fatal: true });
           }
 
-          this.status = WebsocketShardStatus.open;
+          this.status = WebsocketConnectionStatus.open;
           reconnecting = false;
           await this._identify();
         }
@@ -636,14 +643,14 @@ export class WebsocketShard implements WebsocketShardOptions {
     if (this._sequence == null || payload.s > this._sequence) this._sequence = payload.s;
 
     switch (payload.t) {
-      case 'READY': {
+      case GatewayDispatchEvents.Ready: {
         this._clearTimeout('discordReady');
 
-        this.manager.user = payload.d.user;
+        this.cluster.user = payload.d.user;
         this._sessionId = payload.d.session_id;
 
         if (payload.d.guilds.length) {
-          this.status = WebsocketShardStatus.waiting;
+          this.status = WebsocketConnectionStatus.waiting;
           // eslint-disable-next-line no-multi-assign
           this._pendingGuilds = this.guilds = new Set(payload.d.guilds.map(g => g.id));
           this._registerTimeout('guilds', () => {
@@ -660,7 +667,7 @@ export class WebsocketShard implements WebsocketShardOptions {
       }
 
       case 'GUILD_CREATE': {
-        if (this.status === WebsocketShardStatus.waiting) {
+        if (this.status === WebsocketConnectionStatus.waiting) {
           this._pendingGuilds!.delete(payload.d.id);
 
           if (!this._pendingGuilds!.size) {
@@ -685,23 +692,23 @@ export class WebsocketShard implements WebsocketShardOptions {
       case 'RESUMED': {
         this._clearTimeout('reconnecting');
         this.debug(`Resumed Session ${this._sessionId}; Replayed ${payload.s - this._sequence} events`);
-        this.status = WebsocketShardStatus.ready;
+        this.status = WebsocketConnectionStatus.ready;
         break;
       }
 
       default: break;
     }
 
-    this.manager.emit('dispatch', payload, this.id);
+    this.cluster.emit('dispatch', payload, this.id);
   }
 
   /**
-   * Marks the shard as ready, and if applicable the manager
+   * Marks the shard as ready, and if applicable the cluster
    */
   private _turnReady() {
-    this.status = WebsocketShardStatus.ready;
+    this.status = WebsocketConnectionStatus.ready;
     this._connectResolve?.();
-    if (this.manager.ready) this.manager.emit('ready', this.manager.shardCount, this.manager.shardsSpawned);
+    if (this.cluster.ready) this.cluster.emit('ready', this.cluster.shardCount, this.cluster.shardsSpawned);
   }
 
   private readonly _heartbeat = async (force = false) => {
@@ -718,12 +725,12 @@ export class WebsocketShard implements WebsocketShardOptions {
    * Identifies the client to the gateway
    */
   private async _identify() {
-    if (this.manager.lastIdentify !== -1) {
-      const time = Date.now() - this.manager.lastIdentify;
+    if (this.cluster.lastIdentify !== -1) {
+      const time = Date.now() - this.cluster.lastIdentify;
       if (time < 5000) await halt(5000);
     }
 
-    this.manager.lastIdentify = Date.now();
+    this.cluster.lastIdentify = Date.now();
 
     this.debug(stripIndent`
       [IDENTIFY] 
@@ -734,7 +741,7 @@ export class WebsocketShard implements WebsocketShardOptions {
             $browser: ${Util.CONSTANTS.properties.$browser};
             $device: ${Util.CONSTANTS.properties.$device};
           },
-          shard: [${this.id}, ${this.manager.shardsSpawned}],
+          shard: [${this.id}, ${this.cluster.shardsSpawned}],
           large_threshold: ${this.largeThreshold}
           intents: ${this.intents}
         }
@@ -743,9 +750,9 @@ export class WebsocketShard implements WebsocketShardOptions {
     return this.send({
       op: GatewayOPCodes.Identify,
       d: {
-        token: this.manager.auth,
+        token: this.cluster.auth,
         properties: Util.CONSTANTS.properties,
-        shard: [this.id, this.manager.shardsSpawned],
+        shard: [this.id, this.cluster.wsTotalShardCount as number],
         // eslint-disable-next-line @typescript-eslint/naming-convention
         large_threshold: this.largeThreshold,
         intents: this.intents

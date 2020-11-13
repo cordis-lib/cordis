@@ -1,13 +1,13 @@
 import * as yargs from 'yargs';
 import * as redis from 'ioredis';
-import { RoutingServer, RpcClient } from '@cordis/brokers';
-import { WebsocketManager } from '@cordis/gateway';
-import { createAmqp, Events, IntentKeys } from '@cordis/util';
-import { Channel } from 'amqplib';
+import { RoutingServer, RpcClient, RpcServer } from '@cordis/brokers';
+import { Cluster, IntentKeys } from '@cordis/gateway';
+import { createAmqp, Events, CORDIS_REDIS_SYMBOLS, CORDIS_AMQP_SYMBOLS } from '@cordis/util';
 import { RequestBuilderOptions } from '@cordis/rest';
+import { Channel } from 'amqplib';
 import { StoreManager } from './StoreManager';
 import { Handler } from './Handler';
-import { APIUser } from 'discord-api-types';
+import { GatewaySendPayload } from 'discord-api-types';
 
 const main = async () => {
   const { argv } = yargs
@@ -26,9 +26,21 @@ const main = async () => {
     })
     .option('shard-count', {
       global: true,
-      description: 'How many shards to spawn; leave none for automatic',
+      description: 'How many shards are being spawned for the gateway',
       type: 'number',
       required: false
+    })
+    .option('cluster-count', {
+      'global': true,
+      'description': 'How many clusters you intend to spawn',
+      'type': 'number',
+      'default': 1
+    })
+    .option('cluster-id', {
+      global: true,
+      description: 'What identifier this cluster has',
+      demandOption: 'A cluster ID is required.',
+      type: 'number'
     })
     .option('amqp-host', {
       global: true,
@@ -117,38 +129,31 @@ const main = async () => {
     })
     .help();
 
-  process.env.DEBUG = String(argv.debug);
+  const redisClient = new redis({
+    host: argv['redis-host'],
+    port: argv['redis-port'],
+    password: argv['redis-auth'],
+    db: argv['redis-db']
+  });
 
-  const cache = new StoreManager(
-    new redis({
-      host: argv['redis-host'],
-      port: argv['redis-port'],
-      password: argv['redis-auth'],
-      db: argv['redis-db']
-    })
-  );
+  const cache = new StoreManager(redisClient);
 
   const log = (label: string) => (data: any, shard: any) => console.log(`[${label.toUpperCase()} -> ${shard}]: ${data}`);
 
   let amqpChannel!: Channel;
-
   await (async function registerChannel() {
     const { channel } = (await createAmqp(
       argv['amqp-host'] ?? 'localhost',
       () => registerChannel(),
-      e => log('amqp error')(e, 'MANAGER')
+      e => log('amqp error')(e, 'CLUSTER')
     ))!;
 
     amqpChannel = channel;
   })();
 
-  const rest = new RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>(amqpChannel);
-  await rest.init('rest');
-
   const service = new RoutingServer<Events[keyof Events]>(amqpChannel);
-  const ws = new WebsocketManager(
+  const ws = new Cluster(
     argv.auth,
-    argv['shard-count'],
     {
       compress: argv['ws-compress'],
       encoding: argv['ws-encoding'] as 'json' | 'etf' | undefined,
@@ -162,22 +167,41 @@ const main = async () => {
     }
   );
 
-  let botUser: APIUser = await rest.post({ path: '/users/@me' });
-  const updateBotUser = (data: APIUser) => botUser = data;
+  const { shards } = await ws.fetchGateway();
+  const total = argv['shard-count'] ?? shards;
+  const count = total / argv['cluster-count'];
+
+  ws.wsTotalShardCount = total;
+  ws.shardCount = total / count;
+  ws.clusterId = argv['cluster-id'];
+
+  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.shardCount, total);
+  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.clusters.count, argv['cluster-count']);
+  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.clusters.shardCount, count);
+  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.clusters.currentlySpawning, argv['cluster-id']);
+
+  const gatewayCommandsServer = new RpcServer<void, GatewaySendPayload>(amqpChannel);
+  await gatewayCommandsServer.init(
+    CORDIS_AMQP_SYMBOLS.gateway.commands,
+    req => ws.broadcast(req)
+  );
+
+  const rest = new RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>(amqpChannel);
+  await rest.init(CORDIS_AMQP_SYMBOLS.rest.queue);
 
   ws
     .on('disconnecting', shard => log('disconnecting')(null, shard))
     .on('reconecting', shard => log('reconecting')(null, shard))
     .on('open', shard => log('open')(null, shard))
     .on('error', log('error'))
-    .on('ready', (options, shards) => log('ready')(`Spawned ${shards} shards from config ${options}`, 'MANAGER'))
+    .on('ready', (options, shards) => log('ready')(`Spawned ${shards} shards from config ${options}`, 'CLUSTER'))
     .on(
       'dispatch',
       async (data, shard) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
-          await handle?.(data.d, service, cache, rest, [botUser, updateBotUser]);
+          await handle?.(data.d, service, cache, rest, ws.user!);
         } catch (e) {
           log('packet error')(e.stack ?? e.toString(), `${shard} -> ${data.t}`);
         }
@@ -186,7 +210,7 @@ const main = async () => {
 
   if (argv.debug) ws.on('debug', log('debug'));
 
-  await service.init('gateway', false)
+  await service.init(CORDIS_AMQP_SYMBOLS.gateway.packets, false)
     .then(() => console.log('Service is live, waiting for the gateway to sign in...'))
     .catch(console.error);
   await ws.connect()

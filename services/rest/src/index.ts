@@ -1,6 +1,6 @@
 import * as yargs from 'yargs';
 import { RpcServer } from '@cordis/brokers';
-import { createAmqp } from '@cordis/util';
+import { createAmqp, CORDIS_AMQP_SYMBOLS } from '@cordis/util';
 import { RestManager, RequestBuilderOptions } from '@cordis/rest';
 import { Channel } from 'amqplib';
 
@@ -98,10 +98,10 @@ const main = async () => {
         console.log(`[${endpoint}]: bucket ${bucket} ${prevented ? 'prevented' : 'hit'} a ratelimit, waiting for ${waiting}ms`)
     );
 
-  service.on('error', e => console.error(e));
+  service.on('error', console.error);
 
   await service.init(
-    'rest',
+    CORDIS_AMQP_SYMBOLS.rest.rest,
     req => rest.make(req)
   )
     .then(() => console.log('Service is live!'))

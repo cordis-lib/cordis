@@ -52,6 +52,95 @@ export const CORDIS_EVENTS = keyMirror([
   'botUserUpdate'
 ]);
 
+// Anything beginning with cordis_internal is used & depended on internally; please do NOT mutate the data/publish anything to these.
+
+export const CORDIS_REDIS_SYMBOLS = {
+  internal: {
+    amqp: {
+      queues: (exchange: string) => `cordis_internal_amqp_${exchange}_queues`
+    },
+    gateway: {
+      shardCount: 'cordis_internal_gateway_shard_count',
+      clusters: {
+        count: 'cordis_internal_gateway_clusters_count',
+        currentlySpawning: 'cordis_internal_gateway_clusters_currently_spawning',
+        shardCount: 'cordis_internal_gateway_clusters_shard_count'
+      }
+    }
+  },
+  cache: {
+    guilds: 'guilds',
+    users: 'users',
+    presences: (guild: string) => `${guild}_presences`,
+    channels: (guild?: string) => guild ? `${guild}_channels` : 'dm_channels',
+    members: (guild: string) => `${guild}_members`,
+    roles: (guild: string) => `${guild}_roles`,
+    messages: (channel: string) => `${channel}_messages`,
+    reactions: (message: string) => `${message}_reactions`
+  }
+};
+
+export const CORDIS_AMQP_SYMBOLS = {
+  gateway: {
+    packets: 'gateway',
+    commands: 'gateway_commands',
+    events: keyMirror([
+      'channelCreate',
+      'channelDelete',
+      'channelPinsUpdate',
+      'channelUpdate',
+
+      'emojiCreate',
+      'emojiDelete',
+      'emojiUpdate',
+
+      'guildIntegrationsUpdate',
+      'guildBanAdd',
+      'guildBanRemove',
+      'guildCreate',
+      'guildAvailable',
+      'guildDelete',
+      'guildUnavailable',
+      'guildUpdate',
+
+      'guildMemberAdd',
+      'guildMemberRemove',
+      'guildMemberUpdate',
+
+      'roleCreate',
+      'roleDelete',
+      'roleUpdate',
+
+      'messageCreate',
+      'bulkMessageDelete',
+      'messageDelete',
+      'messageUpdate',
+
+      'messageReactionAdd',
+      'messageReactionRemove',
+      'messageReactionRemoveEmoji',
+      'messageReactionRemoveAll',
+
+      'inviteCreate',
+      'inviteDelete',
+
+      'presenceUpdate',
+      'ready',
+      'typingStart',
+      'userUpdate',
+      'voiceServerUpdate',
+      'voiceStateUpdate',
+      'webhooksUpdate',
+
+      'botUserUpdate'
+    ])
+  },
+  rest: {
+    rest: 'rest',
+    queue: 'rest_queue'
+  }
+};
+
 export const ENDPOINTS = {
   api: 'https://discord.com/api',
   cdn: 'https://cdn.discordapp.com',

@@ -1,30 +1,23 @@
-import { Patcher } from '@cordis/util';
+import { Patcher, CORDIS_REDIS_SYMBOLS, CORDIS_AMQP_SYMBOLS } from '@cordis/util';
 import { APIChannel, APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const channelDelete: Handler<APIChannel> = async (data, service, cache) => {
-  if (data.guild_id) {
-    const guild = await cache.get<APIGuild>('guilds', data.guild_id);
-    if (guild) {
-      const index = (guild.channels ??= []).findIndex(e => e.id === data.id);
-      let channel = data;
+  const guild = data.guild_id ? await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id) : null;
+  if (guild) {
+    const old = await cache.get<APIChannel>(CORDIS_REDIS_SYMBOLS.cache.channels(guild.id), data.id);
+    const { data: channel } = old ? Patcher.patchChannel(data, old) : Patcher.patchChannel(data);
 
-      if (index !== -1) {
-        channel = (guild.channels ??= []).splice(index, 1)[0];
-        Patcher.patchGuild({ channels: guild.channels }, guild);
-      }
-
-      const { data: patchedChannel } = Patcher.patchChannel(channel);
-      service.publish({ guild, channel: patchedChannel }, 'channelDelete');
-      await cache.set('guilds', guild.id, guild);
-    }
+    service.publish({ guild, channel: old ?? channel }, CORDIS_AMQP_SYMBOLS.gateway.events.channelDelete);
+    await cache.delete(CORDIS_REDIS_SYMBOLS.cache.channels(guild.id), channel.id);
   } else {
-    const { data: patchedChannel } = Patcher.patchChannel(data);
-    service.publish({ channel: patchedChannel }, 'channelDelete');
-    await cache.delete('dm_channels', patchedChannel.id);
+    const old = await cache.get<APIChannel>(CORDIS_REDIS_SYMBOLS.cache.channels(), data.id);
+    const { data: channel } = old ? Patcher.patchChannel(data, old) : Patcher.patchChannel(data);
+    service.publish({ channel: old ?? channel }, CORDIS_AMQP_SYMBOLS.gateway.events.channelDelete);
+    await cache.delete(CORDIS_REDIS_SYMBOLS.cache.channels(), channel.id);
   }
 
-  await cache.delete(`${data.id}_messages`);
+  await cache.delete(CORDIS_REDIS_SYMBOLS.cache.messages(data.id));
 };
 
 export default channelDelete;

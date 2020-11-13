@@ -1,11 +1,12 @@
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS } from '@cordis/util';
 import { APIMessage, GatewayMessageDeleteDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const messageDelete: Handler<GatewayMessageDeleteDispatch['d']> = async (data, service, cache) => {
-  const message = await cache.get<APIMessage>(`${data.channel_id}_messages`, data.id);
+  const message = await cache.get<APIMessage>(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), data.id);
   if (message) {
-    service.publish(message, 'messageDelete');
-    await cache.delete(`${data.channel_id}_messages`, data.id);
+    service.publish(message, CORDIS_AMQP_SYMBOLS.gateway.events.messageDelete);
+    await cache.delete(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), data.id);
   }
 };
 

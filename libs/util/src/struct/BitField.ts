@@ -1,16 +1,15 @@
-// ? Readonly<T> uses the `keyof` operator, which ignores anything `Symbol` related
-// ? This interface is reapplied to a Readonly<BitField>, as such preserving the iterator
-
 import { CordisUtilRangeError } from '../error';
 
+// ? Readonly<T> uses the `keyof` operator, which ignores anything `Symbol` related
+// ? This interface is reapplied to a Readonly<BitField>, as such preserving the iterator
 // ? https://github.com/microsoft/TypeScript/issues/37182
-export interface UnsafeBitFieldProperties {
-  [Symbol.iterator](): Generator<string, void, undefined>;
+export interface UnsafeBitFieldProperties<K> {
+  [Symbol.iterator](): Generator<K, void, undefined>;
 }
 
-export type FrozenBitField<T extends BitField<any>> = Readonly<T> & UnsafeBitFieldProperties;
+export type FrozenBitField<K extends string, T extends BitField<K>> = Readonly<T> & UnsafeBitFieldProperties<K>;
 
-export type BitFieldResolvable<T extends string> = T | bigint | BitField<T> | (T | bigint | BitField<T>)[];
+export type BitFieldResolvable<T extends string> = T | bigint | BitField<T> | FrozenBitField<T, BitField<T>> | (T | bigint | BitField<T>)[];
 
 /**
  * Utility structure for interacting with bitfields
@@ -19,6 +18,20 @@ export type BitFieldResolvable<T extends string> = T | bigint | BitField<T> | (T
 export class BitField<T extends string> {
   public static bigintify(bit: number) {
     return 1n << BigInt(bit);
+  }
+
+  public static resolve<T extends string>(bit: BitFieldResolvable<T> = 0n, flags: Record<T, bigint>): bigint {
+    if (typeof bit === 'bigint' && bit >= 0n) return bit;
+    if (bit instanceof BitField) return bit.bits;
+
+    if (typeof bit === 'string') {
+      const num = flags[bit];
+      if (num) return num;
+    }
+
+    if (Array.isArray(bit)) return bit.map(p => this.resolve(p, flags)).reduce((prev, p) => prev | p, 0n);
+
+    throw new CordisUtilRangeError('bitfieldInvalid');
   }
 
   public flags: Record<T, bigint>;
@@ -31,29 +44,15 @@ export class BitField<T extends string> {
     bits: BitFieldResolvable<T>
   ) {
     this.flags = flags;
-    this.bits = this.resolve(bits);
+    this.bits = this.constructor.resolve(bits, flags);
   }
 
   public *[Symbol.iterator]() {
     yield *this.toArray();
   }
 
-  public resolve(bit: BitFieldResolvable<T> = 0n): bigint {
-    if (typeof bit === 'bigint' && bit >= 0n) return bit;
-    if (bit instanceof BitField) return bit.bits;
-
-    if (typeof bit === 'string') {
-      const num = this.flags[bit];
-      if (num) return num;
-    }
-
-    if (Array.isArray(bit)) return bit.map(p => this.resolve(p)).reduce((prev, p) => prev | p, 0n);
-
-    throw new CordisUtilRangeError('bitfieldInvalid');
-  }
-
   public freeze() {
-    return Object.freeze(this) as FrozenBitField<this>;
+    return Object.freeze(this) as FrozenBitField<T, this>;
   }
 
   public toArray() {
@@ -65,22 +64,22 @@ export class BitField<T extends string> {
   }
 
   public valueOf(asNumber: true): number;
-  public valueOf(asNumber: false): bigint;
+  public valueOf(asNumber?: false): bigint;
   public valueOf(asNumber = false) {
     return asNumber ? Number(this.bits) : this.bits;
   }
 
   public any(bit: BitFieldResolvable<T>) {
-    return (this.bits & this.resolve(bit)) !== 0n;
+    return (this.bits & this.constructor.resolve(bit, this.flags)) !== 0n;
   }
 
   public equals(bit: BitFieldResolvable<T>) {
-    return this.bits === this.resolve(bit);
+    return this.bits === this.constructor.resolve(bit, this.flags);
   }
 
   public has(bit: BitFieldResolvable<T>): boolean {
     if (Array.isArray(bit)) return bit.every(b => this.has(b));
-    bit = this.resolve(bit);
+    bit = this.constructor.resolve(bit, this.flags);
     return (this.bits & bit) === bit;
   }
 
@@ -91,7 +90,7 @@ export class BitField<T extends string> {
 
   public add(...bits: BitFieldResolvable<T>[]) {
     let total = 0n;
-    for (const bit of bits) total |= this.resolve(bit);
+    for (const bit of bits) total |= this.constructor.resolve(bit, this.flags);
 
     if (Object.isFrozen(this)) return new this.constructor(this.flags, this.bits | total);
     this.bits |= total;
@@ -100,7 +99,7 @@ export class BitField<T extends string> {
 
   public remove(...bits: BitFieldResolvable<T>[]) {
     let total = 0n;
-    for (const bit of bits) total |= this.resolve(bit);
+    for (const bit of bits) total |= this.constructor.resolve(bit, this.flags);
 
     if (Object.isFrozen(this)) return new this.constructor(this.flags, this.bits & ~total);
     this.bits &= ~total;

@@ -3,6 +3,7 @@ export * from './functions/getMissingProps';
 export * from './functions/halt';
 export * from './functions/isPromise';
 export * from './functions/makeDiscordCdnUrl';
+export * from './functions/massAssign';
 export * from './functions/readdirRecursive';
 export * from './functions/resolveFromESModule';
 export * from './functions/tryImport';

@@ -1,18 +1,15 @@
-import { Patcher } from '@cordis/util';
-import { GatewayGuildMemberRemoveDispatch, APIGuild } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
+import { GatewayGuildMemberRemoveDispatch, APIGuild, APIGuildMember } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildMemberRemove: Handler<GatewayGuildMemberRemoveDispatch['d']> = async (data, service, cache) => {
-  const guild = await cache.get<APIGuild>('guilds', data.guild_id);
-  if (guild) {
-    const index = (guild.members ??= []).findIndex(e => e.user!.id === data.user.id);
-    if (index !== -1) guild.members.splice(0, 1);
-    const { data: member } = Patcher.patchGuildMember(data);
-    service.publish({ guild, member }, 'guildMemberRemove');
-    await cache.set('guilds', guild.id, guild);
-  }
+  const guild = await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id);
+  const existing = await cache.get<APIGuildMember>(CORDIS_REDIS_SYMBOLS.cache.members(data.guild_id), data.user.id);
+  const { data: member } = Patcher.patchGuildMember(data, existing);
+  if (guild) service.publish({ guild, member }, CORDIS_AMQP_SYMBOLS.gateway.events.guildMemberRemove);
 
-  await cache.set('users', data.user.id, data.user);
+  await cache.delete(CORDIS_REDIS_SYMBOLS.cache.members(data.guild_id), member.user!.id);
+  await cache.set(CORDIS_REDIS_SYMBOLS.cache.users, member.user!.id, member.user);
 };
 
 export default guildMemberRemove;

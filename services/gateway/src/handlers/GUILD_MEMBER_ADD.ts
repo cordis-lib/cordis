@@ -1,18 +1,18 @@
-import { Patcher } from '@cordis/util';
-import { GatewayGuildMemberAddDispatch, APIGuild } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
+import { GatewayGuildMemberAddDispatch, APIGuild, APIUser } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildMemberAdd: Handler<GatewayGuildMemberAddDispatch['d']> = async (data, service, cache) => {
-  const guild = await cache.get<APIGuild>('guilds', data.guild_id);
+  const guild = await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id);
+  const { data: member } = Patcher.patchGuildMember(data);
   if (guild) {
-    const { data: member } = Patcher.patchGuildMember(data);
-    guild.members = (guild.members ??= []).concat([member]);
-    service.publish({ guild, member }, 'guildMemberAdd');
-
-    await cache.set('guilds', guild.id, guild);
+    service.publish({ guild, member }, CORDIS_AMQP_SYMBOLS.gateway.events.guildMemberAdd);
+    await cache.set(CORDIS_REDIS_SYMBOLS.cache.members(data.guild_id), member.user!.id, member);
   }
 
-  await cache.set('users', data.user!.id, data.user);
+  const existing = await cache.get<APIUser>(CORDIS_REDIS_SYMBOLS.cache.users, member.user!.id);
+  const { data: user } = existing ? Patcher.patchUser(data.user!, existing) : Patcher.patchUser(data.user!);
+  await cache.set(CORDIS_REDIS_SYMBOLS.cache.users, user.id, user);
 };
 
 export default guildMemberAdd;

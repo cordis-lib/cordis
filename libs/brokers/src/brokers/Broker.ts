@@ -20,22 +20,25 @@ export class Broker extends EventEmitter {
     cb: (content: any, properties: amqp.MessageProperties, original: amqp.Message) => any,
     noAck = false
   ): Promise<amqp.Replies.Consume | void> {
-    const data = await this.channel.consume(queue, async msg => {
+    const messageCb = async (msg: amqp.ConsumeMessage | null) => {
       if (!msg) return null;
 
-      try {
-        const content = JSON.parse(msg.content.toString('utf-8'));
-        const res = cb(content, msg.properties, msg);
-        if (isPromise(res)) await res;
-        if (!noAck) this.channel.ack(msg);
-      } catch (e) {
-        this.emit('error', e);
-        if (!noAck) this.channel.reject(msg, false);
-      }
-    }, { noAck })
-      .catch(e => void this.emit(e));
+      const content = JSON.parse(msg.content.toString('utf-8'));
+      const res = cb(content, msg.properties, msg);
+      if (isPromise(res)) await res;
+      if (!noAck) this.channel.ack(msg);
+    };
 
-    if (data?.consumerTag) this._consumers.add(data.consumerTag);
+    const data = await this.channel.consume(
+      queue,
+      msg => void messageCb(msg).catch(e => {
+        this.emit('error', e);
+        if (!noAck && msg) this.channel.reject(msg, false);
+      }),
+      { noAck }
+    );
+
+    if (data.consumerTag) this._consumers.add(data.consumerTag);
   }
 
   protected _sendToQueue(queue: string, content: any, properties?: Partial<amqp.MessageProperties>) {

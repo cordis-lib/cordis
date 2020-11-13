@@ -1,5 +1,5 @@
 import { makeCordisError } from '@cordis/util';
-import { WebsocketShardStatus } from './websocket/WebsocketShard';
+import { WebsocketConnectionStatus } from './websocket/WebsocketConnection';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const CordisGatewayError = makeCordisError(
@@ -9,8 +9,8 @@ export const CordisGatewayError = makeCordisError(
     tokenInvalid: 'The token you passed is invalid',
     invalidShard: 'An invalid shard was provided to Discord',
     shardingRequired: 'Sharding is required for this bot to connect.',
-    notConnectable: (id: number, status: WebsocketShardStatus) =>
-      `Shard<${id}>#connect was called, but the shard's current status is: ${WebsocketShardStatus[status]}`,
+    notConnectable: (id: number, status: WebsocketConnectionStatus) =>
+      `Shard<${id}>#connect was called, but the shard's current status is: ${WebsocketConnectionStatus[status]}`,
     timeoutHit: (name: string, waitedFor: number) => `The timeout with the name of "${name}" was hit, waited for ${waitedFor}`,
     invalidApiVersion: 'The API version you are attempting to use is invalid. Are you messing with library internals?',
     invalidIntents: (intents: number) => `The intents provided to Discord, ${intents}, are invalid.`,

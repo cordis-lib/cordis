@@ -9,5 +9,5 @@ export type Handler<T> = (
   service: RoutingServer<Events[keyof Events]>,
   cache: StoreManager,
   rest: RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>,
-  user: [APIUser, (data: APIUser) => any]
+  user: APIUser
 ) => any;

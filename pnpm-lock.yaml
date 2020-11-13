@@ -4,49 +4,49 @@ importers:
       '@commitlint/cli': 11.0.0
       '@commitlint/config-angular': 11.0.0
       '@strictsoftware/typedoc-plugin-monorepo': 0.3.1_typedoc@0.19.2
-      '@typescript-eslint/eslint-plugin': 4.4.1_08be5cdc80d109b060448e8ad59a1c67
-      '@typescript-eslint/parser': 4.4.1_eslint@7.11.0+typescript@4.0.3
+      '@typescript-eslint/eslint-plugin': 4.5.0_f877203403d334e633a89a1c42a84f8a
+      '@typescript-eslint/parser': 4.5.0_eslint@7.11.0+typescript@4.0.3
       eslint: 7.11.0
       eslint-config-marine: 7.2.0
       husky: 4.3.0
       lint-staged: 10.4.2
       typedoc: 0.19.2_typescript@4.0.3
       typedoc-plugin-as-member-of: 1.0.2_typedoc@0.19.2
-      typedoc-plugin-markdown: 3.0.10_typedoc@0.19.2
+      typedoc-plugin-markdown: 3.0.11_typedoc@0.19.2
       typedoc-plugin-no-inherit: 1.2.0_typedoc@0.19.2
       typescript: 4.0.3
     specifiers:
       '@commitlint/cli': ^11.0.0
       '@commitlint/config-angular': ^11.0.0
       '@strictsoftware/typedoc-plugin-monorepo': ^0.3.1
-      '@typescript-eslint/eslint-plugin': ^4.4.1
-      '@typescript-eslint/parser': ^4.4.1
+      '@typescript-eslint/eslint-plugin': ^4.5.0
+      '@typescript-eslint/parser': ^4.5.0
       eslint: ^7.11.0
       eslint-config-marine: ^7.2.0
       husky: ^4.3.0
       lint-staged: ^10.4.2
       typedoc: ^0.19.2
       typedoc-plugin-as-member-of: ^1.0.2
-      typedoc-plugin-markdown: ^3.0.10
+      typedoc-plugin-markdown: ^3.0.11
       typedoc-plugin-no-inherit: ^1.2.0
       typescript: ^4.0.3
   libs/brokers:
     dependencies:
       '@cordis/util': 'link:../util'
       ioredis: 4.17.3
-      tslib: 2.0.1
+      tslib: 2.0.3
     devDependencies:
-      '@types/amqplib': 0.5.13
-      '@types/ioredis': 4.17.4
-      '@types/node': 14.11.2
+      '@types/amqplib': 0.5.14
+      '@types/ioredis': 4.17.6
+      '@types/node': 14.14.2
       typescript: 4.0.3
     specifiers:
-      '@cordis/util': 0.1.0
-      '@types/amqplib': ^0.5.13
-      '@types/ioredis': ^4.17.3
-      '@types/node': ^14.11.1
+      '@cordis/util': 'workspace:0.1.0'
+      '@types/amqplib': ^0.5.14
+      '@types/ioredis': ^4.17.6
+      '@types/node': ^14.14.2
       ioredis: ^4.17.3
-      tslib: ^2.0.1
+      tslib: ^2.0.3
       typescript: ^4.0.3
   libs/core:
     dependencies:
@@ -55,24 +55,24 @@ importers:
       amqplib: 0.6.0
       discord-api-types: 0.7.0
       ioredis: 4.17.3
-      tslib: 2.0.1
+      tslib: 2.0.3
     devDependencies:
       '@cordis/rest': 'link:../rest'
       '@types/amqplib': 0.5.14
       '@types/ioredis': 4.17.6
-      '@types/node': 14.11.2
+      '@types/node': 14.14.2
       typescript: 4.0.3
     specifiers:
-      '@cordis/brokers': 0.1.0
-      '@cordis/rest': 0.1.0
-      '@cordis/util': 0.1.0
+      '@cordis/brokers': 'workspace:0.1.0'
+      '@cordis/rest': 'workspace:0.1.0'
+      '@cordis/util': 'workspace:0.1.0'
       '@types/amqplib': ^0.5.14
       '@types/ioredis': ^4.17.6
-      '@types/node': ^14.11.1
+      '@types/node': ^14.14.2
       amqplib: ^0.6.0
       discord-api-types: ^0.7.0
       ioredis: ^4.17.3
-      tslib: ^2.0.1
+      tslib: ^2.0.3
       typescript: ^4.0.3
   libs/gateway:
     dependencies:
@@ -80,29 +80,29 @@ importers:
       common-tags: 1.8.0
       discord-api-types: 0.7.0
       node-fetch: 2.6.1
-      tslib: 2.0.1
+      tslib: 2.0.3
       ws: 7.3.1
     devDependencies:
       '@types/common-tags': 1.8.0
-      '@types/node': 14.11.2
+      '@types/node': 14.14.2
       '@types/node-fetch': 2.5.7
-      '@types/ws': 7.2.6
+      '@types/ws': 7.2.7
       erlpack: github.com/discordapp/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d
       typescript: 4.0.3
       zlib-sync: 0.1.7
     specifiers:
-      '@cordis/util': 0.1.0
+      '@cordis/util': 'workspace:0.1.0'
       '@types/common-tags': ^1.8.0
-      '@types/node': ^14.0.13
+      '@types/node': ^14.14.2
       '@types/node-fetch': ^2.5.7
-      '@types/ws': ^7.2.5
+      '@types/ws': ^7.2.7
       common-tags: ^1.8.0
       discord-api-types: ^0.7.0
-      erlpack: discordapp/erlpack
-      node-fetch: ^2.6.0
-      tslib: ^2.0.0
+      erlpack: 'github:discordapp/erlpack'
+      node-fetch: ^2.6.1
+      tslib: ^2.0.3
       typescript: ^4.0.3
-      ws: ^7.3.0
+      ws: ^7.3.1
       zlib-sync: ^0.1.7
   libs/rest:
     dependencies:
@@ -110,35 +110,35 @@ importers:
       abort-controller: 3.0.0
       form-data: 3.0.0
       node-fetch: 2.6.1
-      tslib: 2.0.1
+      tslib: 2.0.3
     devDependencies:
-      '@types/node': 14.11.2
+      '@types/node': 14.14.2
       '@types/node-fetch': 2.5.7
       typescript: 4.0.3
     specifiers:
-      '@cordis/util': 0.1.0
-      '@types/node': ^14.0.13
+      '@cordis/util': 'workspace:0.1.0'
+      '@types/node': ^14.14.2
       '@types/node-fetch': ^2.5.7
       abort-controller: ^3.0.0
       form-data: ^3.0.0
-      node-fetch: ^2.6.0
-      tslib: ^2.0.0
+      node-fetch: ^2.6.1
+      tslib: ^2.0.3
       typescript: ^4.0.3
   libs/util:
     dependencies:
       discord-api-types: 0.7.0
-      tslib: 2.0.1
+      tslib: 2.0.3
     devDependencies:
       '@types/amqplib': 0.5.14
-      '@types/node': 14.11.2
+      '@types/node': 14.14.2
       ioredis: 4.17.3
       typescript: 4.0.3
     specifiers:
       '@types/amqplib': ^0.5.14
-      '@types/node': ^14.11.1
+      '@types/node': ^14.14.2
       discord-api-types: ^0.7.0
       ioredis: ^4.17.3
-      tslib: ^2.0.1
+      tslib: ^2.0.3
       typescript: ^4.0.3
   services/gateway:
     dependencies:
@@ -146,28 +146,28 @@ importers:
       '@cordis/gateway': 'link:../../libs/gateway'
       amqplib: 0.6.0
       ioredis: 4.17.3
-      tslib: 2.0.1
+      tslib: 2.0.3
       yargs: 15.4.1
     devDependencies:
       '@cordis/rest': 'link:../../libs/rest'
       '@cordis/util': 'link:../../libs/util'
       '@types/amqplib': 0.5.14
-      '@types/ioredis': 4.17.4
-      '@types/node': 14.11.2
-      '@types/yargs': 15.0.7
+      '@types/ioredis': 4.17.6
+      '@types/node': 14.14.2
+      '@types/yargs': 15.0.9
       typescript: 4.0.3
     specifiers:
-      '@cordis/brokers': 0.1.0
-      '@cordis/gateway': 0.1.0
-      '@cordis/rest': 0.1.0
-      '@cordis/util': 0.1.0
+      '@cordis/brokers': 'workspace:0.1.0'
+      '@cordis/gateway': 'workspace:0.1.0'
+      '@cordis/rest': 'workspace:0.1.0'
+      '@cordis/util': 'workspace:0.1.0'
       '@types/amqplib': ^0.5.14
-      '@types/ioredis': ^4.17.4
-      '@types/node': ^14.6.0
-      '@types/yargs': ^15.0.5
+      '@types/ioredis': ^4.17.6
+      '@types/node': ^14.14.2
+      '@types/yargs': ^15.0.9
       amqplib: ^0.6.0
       ioredis: ^4.17.3
-      tslib: ^2.0.1
+      tslib: ^2.0.3
       typescript: ^4.0.3
       yargs: ^15.4.1
   services/rest:
@@ -177,25 +177,25 @@ importers:
       '@cordis/util': 'link:../../libs/util'
       amqplib: 0.6.0
       ioredis: 4.17.3
-      tslib: 2.0.1
+      tslib: 2.0.3
       yargs: 15.4.1
     devDependencies:
       '@types/amqplib': 0.5.14
-      '@types/ioredis': 4.17.4
-      '@types/node': 14.11.2
-      '@types/yargs': 15.0.7
+      '@types/ioredis': 4.17.6
+      '@types/node': 14.14.2
+      '@types/yargs': 15.0.9
       typescript: 4.0.3
     specifiers:
-      '@cordis/brokers': 0.1.0
-      '@cordis/rest': 0.1.0
-      '@cordis/util': 0.1.0
+      '@cordis/brokers': 'workspace:0.1.0'
+      '@cordis/rest': 'workspace:0.1.0'
+      '@cordis/util': 'workspace:0.1.0'
       '@types/amqplib': ^0.5.14
-      '@types/ioredis': ^4.17.4
-      '@types/node': ^14.6.0
-      '@types/yargs': ^15.0.5
+      '@types/ioredis': ^4.17.6
+      '@types/node': ^14.14.2
+      '@types/yargs': ^15.0.9
       amqplib: ^0.6.0
       ioredis: ^4.17.3
-      tslib: ^2.0.1
+      tslib: ^2.0.3
       typescript: ^4.0.3
       yargs: ^15.4.1
 lockfileVersion: 5.1
@@ -433,17 +433,10 @@ packages:
       typedoc: '>=0.17.3 <1.0'
     resolution:
       integrity: sha512-b7oolCeKZ40jyEfQrDd/Z216M5ZE4tRML0B0bV35tUIALoQsBBA7dz3Kr+X6DtbZA7FQmaqNGS6WAt7zxLL7wg==
-  /@types/amqplib/0.5.13:
-    dependencies:
-      '@types/bluebird': 3.5.32
-      '@types/node': 14.11.2
-    dev: true
-    resolution:
-      integrity: sha512-0r8cJfUajAlcHxlJsZyqRrSAYzv+pJPsaAQjDC6e5rACi3AOIuR0AfevJG7NLvw3Qu4EGhf3KS/ECwd5cUAY2A==
   /@types/amqplib/0.5.14:
     dependencies:
       '@types/bluebird': 3.5.32
-      '@types/node': 14.14.0
+      '@types/node': 14.14.2
     dev: true
     resolution:
       integrity: sha512-KYJjEZhUlDHIgYhm0f+ymt3FLXG22Bjl1DIjO1WkSAYJGLBbK5t2C3TQnEGD1T+hfapR93LTDfAmQMXO5qQM3g==
@@ -455,15 +448,9 @@ packages:
     dev: true
     resolution:
       integrity: sha512-htRqZr5qn8EzMelhX/Xmx142z218lLyGaeZ3YR8jlze4TATRU9huKKvuBmAJEW4LCC4pnY1N6JAm6p85fMHjhg==
-  /@types/ioredis/4.17.4:
-    dependencies:
-      '@types/node': 14.11.2
-    dev: true
-    resolution:
-      integrity: sha512-kb5+thmQJ7HHyOAnCOeqRJlF2fyvadHghnLLLKZzCNyShStJeIQtNGGDjA30gWqj6UFSDAWBfGEMKrFDrGfvzQ==
   /@types/ioredis/4.17.6:
     dependencies:
-      '@types/node': 14.14.0
+      '@types/node': 14.14.2
     dev: true
     resolution:
       integrity: sha512-Vg3vuhveOaQeiubzGpVU9Hn3UJCi7rPe2TOphc3m3Y2EniHmytHp/wj5ZtfqDGBhFJGaSwbJvGQhhqd/Nqfy4Q==
@@ -477,19 +464,15 @@ packages:
       integrity: sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
   /@types/node-fetch/2.5.7:
     dependencies:
-      '@types/node': 14.11.2
+      '@types/node': 14.14.2
       form-data: 3.0.0
     dev: true
     resolution:
       integrity: sha512-o2WVNf5UhWRkxlf6eq+jMZDu7kjgpgJfl4xVNlvryc95O/6F2ld8ztKX+qu+Rjyet93WAWm5LjeX9H5FGkODvw==
-  /@types/node/14.11.2:
+  /@types/node/14.14.2:
     dev: true
     resolution:
-      integrity: sha512-jiE3QIxJ8JLNcb1Ps6rDbysDhN4xa8DJJvuC9prr6w+1tIh+QAbYyNF3tyiZNLDBIuBCf4KEcV2UvQm/V60xfA==
-  /@types/node/14.14.0:
-    dev: true
-    resolution:
-      integrity: sha512-BfbIHP9IapdupGhq/hc+jT5dyiBVZ2DdeC5WwJWQWDb0GijQlzUFAeIQn/2GtvZcd2HVUU7An8felIICFTC2qg==
+      integrity: sha512-jeYJU2kl7hL9U5xuI/BhKPZ4vqGM/OmK6whiFAXVhlstzZhVamWhDSmHyGLIp+RVyuF9/d0dqr2P85aFj4BvJg==
   /@types/normalize-package-data/2.4.0:
     dev: true
     resolution:
@@ -498,27 +481,27 @@ packages:
     dev: true
     resolution:
       integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
-  /@types/ws/7.2.6:
+  /@types/ws/7.2.7:
     dependencies:
-      '@types/node': 14.11.2
+      '@types/node': 14.14.2
     dev: true
     resolution:
-      integrity: sha512-Q07IrQUSNpr+cXU4E4LtkSIBPie5GLZyyMC1QtQYRLWz701+XcoVygGUZgvLqElq1nU4ICldMYPnexlBsg3dqQ==
+      integrity: sha512-UUFC/xxqFLP17hTva8/lVT0SybLUrfSD9c+iapKb0fEiC8uoDbA+xuZ3pAN603eW+bY8ebSMLm9jXdIPnD0ZgA==
   /@types/yargs-parser/15.0.0:
     dev: true
     resolution:
       integrity: sha512-FA/BWv8t8ZWJ+gEOnLLd8ygxH/2UFbAvgEonyfN6yWGLKc7zVjbpl2Y4CTjid9h2RfgPP6SEt6uHwEOply00yw==
-  /@types/yargs/15.0.7:
+  /@types/yargs/15.0.9:
     dependencies:
       '@types/yargs-parser': 15.0.0
     dev: true
     resolution:
-      integrity: sha512-Gf4u3EjaPNcC9cTu4/j2oN14nSVhr8PQ+BvBcBQHAhDZfl0bVIiLgvnRXv/dn58XhTm9UXvBpvJpDlwV65QxOA==
-  /@typescript-eslint/eslint-plugin/4.4.1_08be5cdc80d109b060448e8ad59a1c67:
+      integrity: sha512-HmU8SeIRhZCWcnRskCs36Q1Q00KBV6Cqh/ora8WN1+22dY07AZdn6Gel8QZ3t26XYPImtcL8WV/eqjhVmMEw4g==
+  /@typescript-eslint/eslint-plugin/4.5.0_f877203403d334e633a89a1c42a84f8a:
     dependencies:
-      '@typescript-eslint/experimental-utils': 4.4.1_eslint@7.11.0+typescript@4.0.3
-      '@typescript-eslint/parser': 4.4.1_eslint@7.11.0+typescript@4.0.3
-      '@typescript-eslint/scope-manager': 4.4.1
+      '@typescript-eslint/experimental-utils': 4.5.0_eslint@7.11.0+typescript@4.0.3
+      '@typescript-eslint/parser': 4.5.0_eslint@7.11.0+typescript@4.0.3
+      '@typescript-eslint/scope-manager': 4.5.0
       debug: 4.2.0
       eslint: 7.11.0
       functional-red-black-tree: 1.0.1
@@ -537,13 +520,13 @@ packages:
       typescript:
         optional: true
     resolution:
-      integrity: sha512-O+8Utz8pb4OmcA+Nfi5THQnQpHSD2sDUNw9AxNHpuYOo326HZTtG8gsfT+EAYuVrFNaLyNb2QnUNkmTRDskuRA==
-  /@typescript-eslint/experimental-utils/4.4.1_eslint@7.11.0+typescript@4.0.3:
+      integrity: sha512-mjb/gwNcmDKNt+6mb7Aj/TjKzIJjOPcoCJpjBQC9ZnTRnBt1p4q5dJSSmIqAtsZ/Pff5N+hJlbiPc5bl6QN4OQ==
+  /@typescript-eslint/experimental-utils/4.5.0_eslint@7.11.0+typescript@4.0.3:
     dependencies:
       '@types/json-schema': 7.0.6
-      '@typescript-eslint/scope-manager': 4.4.1
-      '@typescript-eslint/types': 4.4.1
-      '@typescript-eslint/typescript-estree': 4.4.1_typescript@4.0.3
+      '@typescript-eslint/scope-manager': 4.5.0
+      '@typescript-eslint/types': 4.5.0
+      '@typescript-eslint/typescript-estree': 4.5.0_typescript@4.0.3
       eslint: 7.11.0
       eslint-scope: 5.1.1
       eslint-utils: 2.1.0
@@ -554,12 +537,12 @@ packages:
       eslint: '*'
       typescript: '*'
     resolution:
-      integrity: sha512-Nt4EVlb1mqExW9cWhpV6pd1a3DkUbX9DeyYsdoeziKOpIJ04S2KMVDO+SEidsXRH/XHDpbzXykKcMTLdTXH6cQ==
-  /@typescript-eslint/parser/4.4.1_eslint@7.11.0+typescript@4.0.3:
+      integrity: sha512-bW9IpSAKYvkqDGRZzayBXIgPsj2xmmVHLJ+flGSoN0fF98pGoKFhbunIol0VF2Crka7z984EEhFi623Rl7e6gg==
+  /@typescript-eslint/parser/4.5.0_eslint@7.11.0+typescript@4.0.3:
     dependencies:
-      '@typescript-eslint/scope-manager': 4.4.1
-      '@typescript-eslint/types': 4.4.1
-      '@typescript-eslint/typescript-estree': 4.4.1_typescript@4.0.3
+      '@typescript-eslint/scope-manager': 4.5.0
+      '@typescript-eslint/types': 4.5.0
+      '@typescript-eslint/typescript-estree': 4.5.0_typescript@4.0.3
       debug: 4.2.0
       eslint: 7.11.0
       typescript: 4.0.3
@@ -573,26 +556,26 @@ packages:
       typescript:
         optional: true
     resolution:
-      integrity: sha512-S0fuX5lDku28Au9REYUsV+hdJpW/rNW0gWlc4SXzF/kdrRaAVX9YCxKpziH7djeWT/HFAjLZcnY7NJD8xTeUEg==
-  /@typescript-eslint/scope-manager/4.4.1:
+      integrity: sha512-xb+gmyhQcnDWe+5+xxaQk5iCw6KqXd8VQxGiTeELTMoYeRjpocZYYRP1gFVM2C8Yl0SpUvLa1lhprwqZ00w3Iw==
+  /@typescript-eslint/scope-manager/4.5.0:
     dependencies:
-      '@typescript-eslint/types': 4.4.1
-      '@typescript-eslint/visitor-keys': 4.4.1
+      '@typescript-eslint/types': 4.5.0
+      '@typescript-eslint/visitor-keys': 4.5.0
     dev: true
     engines:
       node: ^8.10.0 || ^10.13.0 || >=11.10.1
     resolution:
-      integrity: sha512-2oD/ZqD4Gj41UdFeWZxegH3cVEEH/Z6Bhr/XvwTtGv66737XkR4C9IqEkebCuqArqBJQSj4AgNHHiN1okzD/wQ==
-  /@typescript-eslint/types/4.4.1:
+      integrity: sha512-C0cEO0cTMPJ/w4RA/KVe4LFFkkSh9VHoFzKmyaaDWAnPYIEzVCtJ+Un8GZoJhcvq+mPFXEsXa01lcZDHDG6Www==
+  /@typescript-eslint/types/4.5.0:
     dev: true
     engines:
       node: ^8.10.0 || ^10.13.0 || >=11.10.1
     resolution:
-      integrity: sha512-KNDfH2bCyax5db+KKIZT4rfA8rEk5N0EJ8P0T5AJjo5xrV26UAzaiqoJCxeaibqc0c/IvZxp7v2g3difn2Pn3w==
-  /@typescript-eslint/typescript-estree/4.4.1_typescript@4.0.3:
+      integrity: sha512-n2uQoXnyWNk0Les9MtF0gCK3JiWd987JQi97dMSxBOzVoLZXCNtxFckVqt1h8xuI1ix01t+iMY4h4rFMj/303g==
+  /@typescript-eslint/typescript-estree/4.5.0_typescript@4.0.3:
     dependencies:
-      '@typescript-eslint/types': 4.4.1
-      '@typescript-eslint/visitor-keys': 4.4.1
+      '@typescript-eslint/types': 4.5.0
+      '@typescript-eslint/visitor-keys': 4.5.0
       debug: 4.2.0
       globby: 11.0.1
       is-glob: 4.0.1
@@ -609,16 +592,16 @@ packages:
       typescript:
         optional: true
     resolution:
-      integrity: sha512-wP/V7ScKzgSdtcY1a0pZYBoCxrCstLrgRQ2O9MmCUZDtmgxCO/TCqOTGRVwpP4/2hVfqMz/Vw1ZYrG8cVxvN3g==
-  /@typescript-eslint/visitor-keys/4.4.1:
+      integrity: sha512-gN1mffq3zwRAjlYWzb5DanarOPdajQwx5MEWkWCk0XvqC8JpafDTeioDoow2L4CA/RkYZu7xEsGZRhqrTsAG8w==
+  /@typescript-eslint/visitor-keys/4.5.0:
     dependencies:
-      '@typescript-eslint/types': 4.4.1
+      '@typescript-eslint/types': 4.5.0
       eslint-visitor-keys: 2.0.0
     dev: true
     engines:
       node: ^8.10.0 || ^10.13.0 || >=11.10.1
     resolution:
-      integrity: sha512-H2JMWhLaJNeaylSnMSQFEhT/S/FsJbebQALmoJxMPMxLtlVAMy2uJP/Z543n9IizhjRayLSqoInehCeNW9rWcw==
+      integrity: sha512-UHq4FSa55NDZqscRU//O5ROFhHa9Hqn9KWTEvJGTArtTQp5GKv9Zqf6d/Q3YXXcFv4woyBml7fJQlQ+OuqRcHA==
   /JSONStream/1.3.5:
     dependencies:
       jsonparse: 1.3.1
@@ -1394,6 +1377,10 @@ packages:
     dev: true
     resolution:
       integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
+  /function-bind/1.1.1:
+    dev: true
+    resolution:
+      integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
   /functional-red-black-tree/1.0.1:
     dev: true
     resolution:
@@ -1497,7 +1484,7 @@ packages:
       node: '>=0.4.7'
     hasBin: true
     optionalDependencies:
-      uglify-js: 3.11.2
+      uglify-js: 3.11.3
     resolution:
       integrity: sha512-1f2BACcBfiwAfStCKZNrUCgqNZkGsAT7UM3kkYtXuLo0KnaVfjKOyf7PRzB6++aK9STyT1Pd2ZCPe3EGOXleXA==
   /hard-rejection/2.1.0:
@@ -1518,6 +1505,14 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==
+  /has/1.0.3:
+    dependencies:
+      function-bind: 1.1.1
+    dev: true
+    engines:
+      node: '>= 0.4.0'
+    resolution:
+      integrity: sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==
   /highlight.js/10.3.1:
     dev: true
     resolution:
@@ -1627,6 +1622,12 @@ packages:
     dev: true
     resolution:
       integrity: sha1-d8mYQFJ6qOyxqLppe4BkWnqSap0=
+  /is-core-module/2.0.0:
+    dependencies:
+      has: 1.0.3
+    dev: true
+    resolution:
+      integrity: sha512-jq1AH6C8MuteOoBPwkxHafmByhL9j5q4OaPGdbuD+ZtQJVzH+i6E3BJDQcBA09k57i2Hh2yQbEG8yObZ0jdlWw==
   /is-extglob/2.1.1:
     dev: true
     engines:
@@ -1881,13 +1882,13 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-glc9y00wgtwcDmp7GaE/0b0OnxpNJsVf3ael/An6Fe2Q51LLwN1er6sdomLRzz5h0+yMpiYLhWYF5R7HeqVd4g==
-  /marked/1.2.0:
+  /marked/1.2.2:
     dev: true
     engines:
       node: '>= 8.16.2'
     hasBin: true
     resolution:
-      integrity: sha512-tiRxakgbNPBr301ihe/785NntvYyhxlqcL3YaC8CaxJQh7kiaEtrN9B/eK2I2943Yjkh5gw25chYFDQhOMCwMA==
+      integrity: sha512-5jjKHVl/FPo0Z6ocP3zYhKiJLzkwJAw4CZoLjv57FkvbUuwOX4LIBBGGcXjAY6ATcd1q9B8UTj5T9Umauj0QYQ==
   /meow/7.1.1:
     dependencies:
       '@types/minimist': 1.2.0
@@ -1983,10 +1984,10 @@ packages:
   /ms/2.1.2:
     resolution:
       integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
-  /nan/2.14.1:
+  /nan/2.14.2:
     dev: true
     resolution:
-      integrity: sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
+      integrity: sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
   /natural-compare/1.4.0:
     dev: true
     resolution:
@@ -2004,7 +2005,7 @@ packages:
   /normalize-package-data/2.5.0:
     dependencies:
       hosted-git-info: 2.8.8
-      resolve: 1.17.0
+      resolve: 1.18.1
       semver: 5.7.1
       validate-npm-package-license: 3.0.4
     dev: true
@@ -2265,7 +2266,7 @@ packages:
       integrity: sha512-BViHy7LKeTz4oNnkcLJ+lVSL6vpiFeX6/d3oSH8zCW7UxP2onchk+vTGB143xuFjHS3deTgkKoXXymXqymiIdA==
   /rechoir/0.6.2:
     dependencies:
-      resolve: 1.17.0
+      resolve: 1.18.1
     dev: true
     engines:
       node: '>= 0.10'
@@ -2337,12 +2338,13 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-zFa12V4OLtT5XUX/Q4VLvTfBf+Ok0SPc1FNGM/z9ctUdiU618qwKpWnd0CHs3+RqROfyEg/DhuHbMWYqcgljEw==
-  /resolve/1.17.0:
+  /resolve/1.18.1:
     dependencies:
+      is-core-module: 2.0.0
       path-parse: 1.0.6
     dev: true
     resolution:
-      integrity: sha512-ic+7JYiV8Vi2yzQGFWOkiZD5Z9z7O2Zhm9XMaTxdJExKasieFCr+yXZ/WmXsckHiKl12ar0y6XiXDx3m4RHn1w==
+      integrity: sha512-lDfCPaMKfOJXjy0dPayzPdF1phampNWr3qFCjAu+rw/qbQmr5jWH5xN2hwh9QKfw9E5v4hwV7A+jrCmL8yjjqA==
   /restore-cursor/3.1.0:
     dependencies:
       onetime: 5.1.2
@@ -2681,10 +2683,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
-  /tslib/2.0.1:
+  /tslib/2.0.3:
     dev: false
     resolution:
-      integrity: sha512-SgIkNheinmEBgx1IUNirK0TUD4X9yjjBRTqqjggWCU3pUEqIk3/Uwl3yRixYKT6WjQuGiwDv4NomL3wqRCj+CQ==
+      integrity: sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==
   /tsutils/3.17.1_typescript@4.0.3:
     dependencies:
       tslib: 1.14.1
@@ -2742,7 +2744,7 @@ packages:
       typedoc: '>=0.7 <1.11.1'
     resolution:
       integrity: sha512-M7nC4i42HOGmbZValMq99Uh5gNJoaOYif5/p/CQR3kXOD3E1qaPu1Aj1MHdRwHE2V1yUeeEbILQVMMkkLJ4JuQ==
-  /typedoc-plugin-markdown/3.0.10_typedoc@0.19.2:
+  /typedoc-plugin-markdown/3.0.11_typedoc@0.19.2:
     dependencies:
       handlebars: 4.7.6
       typedoc: 0.19.2_typescript@4.0.3
@@ -2752,7 +2754,7 @@ packages:
     peerDependencies:
       typedoc: '>=0.19.0'
     resolution:
-      integrity: sha512-pM393xoX1Wbj05cI1TIbubAIaZ7B/EQ5QAwc49KuMEOk/SZbutY/j0bkiX2YnY4+3t8aZi3tS0ZX1djqTcvjmg==
+      integrity: sha512-/BE/PqnIVbQJ525czM+T3CVaA1gVN9X1Le100z8TV/Lze8LZVkuAUiHRIgw9BKYFm9IQaB88W55k4EV6uUVwYQ==
   /typedoc-plugin-no-inherit/1.2.0_typedoc@0.19.2:
     dependencies:
       typedoc: 0.19.2_typescript@4.0.3
@@ -2768,7 +2770,7 @@ packages:
       highlight.js: 10.3.1
       lodash: 4.17.20
       lunr: 2.3.9
-      marked: 1.2.0
+      marked: 1.2.2
       minimatch: 3.0.4
       progress: 2.0.3
       semver: 7.3.2
@@ -2790,14 +2792,14 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-tEu6DGxGgRJPb/mVPIZ48e69xCn2yRmCgYmDugAVwmJ6o+0u1RI18eO7E7WBTLYLaEVVOhwQmcdhQHweux/WPg==
-  /uglify-js/3.11.2:
+  /uglify-js/3.11.3:
     dev: true
     engines:
       node: '>=0.8.0'
     hasBin: true
     optional: true
     resolution:
-      integrity: sha512-G440NU6fewtnQftSgqRV1r2A5ChKbU1gqFCJ7I8S7MPpY/eZZfLGefaY6gUZYiWebMaO+txgiQ1ZyLDuNWJulg==
+      integrity: sha512-wDRziHG94mNj2n3R864CvYw/+pc9y/RNImiTyrrf8BzgWn75JgFSwYvXrtZQMnMnOp/4UTrf3iCSQxSStPiByA==
   /universalify/1.0.0:
     dev: true
     engines:
@@ -2935,7 +2937,7 @@ packages:
       integrity: sha512-aePbxDmcYW++PaqBsJ+HYUFwCdv4LVvdnhBy78E57PIor8/OVvhMrADFFEDh8DHDFRv/O9i3lPhsENjO7QX0+A==
   /zlib-sync/0.1.7:
     dependencies:
-      nan: 2.14.1
+      nan: 2.14.2
     dev: true
     requiresBuild: true
     resolution:
@@ -2943,7 +2945,7 @@ packages:
   github.com/discordapp/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d:
     dependencies:
       bindings: 1.5.0
-      nan: 2.14.1
+      nan: 2.14.2
     dev: true
     name: erlpack
     requiresBuild: true

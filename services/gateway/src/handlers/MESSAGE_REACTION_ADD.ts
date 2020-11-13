@@ -1,28 +1,26 @@
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, CordisReaction } from '@cordis/util';
 import { APIMessage, GatewayMessageReactionAddDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const messageReactionAdd: Handler<GatewayMessageReactionAddDispatch['d']> = async (data, service, cache, _, [botUser]) => {
-  const message = await cache.get<APIMessage>(`${data.channel_id}_messages`, data.message_id);
+const messageReactionAdd: Handler<GatewayMessageReactionAddDispatch['d']> = async (data, service, cache, _, botUser) => {
+  const message = await cache.get<APIMessage>(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), data.message_id);
+  let reaction = await cache.get<CordisReaction>(CORDIS_REDIS_SYMBOLS.cache.reactions(data.message_id), (data.emoji.id ?? data.emoji.name)!);
 
-  if (message) {
-    const existingIndex = (message.reactions ??= [])
-      .findIndex(r => r.emoji.id === data.emoji.id || r.emoji.name === data.emoji.name);
-    if (existingIndex !== -1) {
-      const reaction = message.reactions[existingIndex];
-      reaction.count++;
-      reaction.me = data.user_id === botUser.id;
-      message.reactions.splice(existingIndex, 1, reaction);
-    } else {
-      message.reactions.push({
-        count: 1,
-        emoji: data.emoji,
-        me: data.user_id === botUser.id
-      });
-    }
-
-    service.publish({ emoji: data.emoji, message }, 'messsageReactionAdd');
-    await cache.set(`${data.channel_id}_messages`, message.id, message);
+  if (reaction) {
+    reaction.count++;
+    reaction.me ??= data.user_id === botUser.id;
+    reaction.users.push(data.user_id);
+  } else {
+    reaction = {
+      count: 1,
+      emoji: data.emoji,
+      me: data.user_id === botUser.id,
+      users: [data.user_id]
+    };
   }
+
+  service.publish({ reaction, message, messageId: data.message_id }, CORDIS_AMQP_SYMBOLS.gateway.events.messageReactionAdd);
+  await cache.set(CORDIS_REDIS_SYMBOLS.cache.reactions(data.channel_id), (data.emoji.id ?? data.emoji.name)!, reaction);
 };
 
 export default messageReactionAdd;

@@ -3,12 +3,12 @@ import fetch, { Headers } from 'node-fetch';
 import { CordisGatewayError } from '../error';
 import { CONSTANTS } from '../util';
 import {
-  WebsocketShard,
-  WebsocketShardStatus,
-  WebsocketShardOptions,
-  WebsocketShardDestroyOptions
-} from './WebsocketShard';
-import { APIUser, GatewayDispatchPayload } from 'discord-api-types';
+  WebsocketConnection,
+  WebsocketConnectionStatus,
+  WebsocketConnectionOptions,
+  WebsocketConnectionDestroyOptions
+} from './WebsocketConnection';
+import { APIUser, GatewayDispatchPayload, GatewaySendPayload, RESTGetAPIGatewayBotResult } from 'discord-api-types';
 import { CORDIS_META } from '@cordis/util';
 import { stripIndent } from 'common-tags';
 
@@ -16,56 +16,71 @@ import { stripIndent } from 'common-tags';
 
 /**
  * Fired when one of the shards opens
- * @asMemberOf WebsocketManager
- * @event WebsocketManager#open
+ * @asMemberOf Cluster
+ * @event Cluster#open
  */
 declare function open(id: number): any;
 
 /**
  * Fired when one of the shards begins reconnecting
- * @asMemberOf WebsocketManager
- * @event WebsocketManager#reconnecting
+ * @asMemberOf Cluster
+ * @event Cluster#reconnecting
  */
 declare function reconnecting(id: number): any;
 
 /**
  * Fired when one of the shards begins disconnecting
- * @asMemberOf WebsocketManager
- * @event WebsocketManager#disconnecting
+ * @asMemberOf Cluster
+ * @event Cluster#disconnecting
  */
 declare function disconnecting(id: number): any;
 
 /**
  * Provides information useful for debugging
- * @asMemberOf WebsocketManager
- * @event WebsocketManager#debug
+ * @asMemberOf Cluster
+ * @event Cluster#debug
  */
 declare function debug(info: any, id: number): any;
 
 /**
- * Fired when the gateway gives an error event or when a payload is not successfully sent
- * @asMemberOf WebsocketManager
- * @event WebsocketManager#error
+ * Fired when a gateway connection gives an error event or when a payload is not successfully sent
+ * @asMemberOf Cluster
+ * @event Cluster#error
  */
 declare function error(info: any, id: number): any;
 
 /**
- * Fired when the manager becomes ready
- * @asMemberOf WebsocketManager
- * @event WebsocketManager#ready
+ * Fired when all of the shards under this manager become ready
+ * @asMemberOf Cluster
+ * @event Cluster#ready
  */
 declare function ready(shardOptions: number | 'auto', shards: number): any;
 
 /**
  * Any gateway event after the Shard has become READY
- * @asMemberOf WebsocketManager
- * @event WebsocketManager#dispatch
+ * @asMemberOf Cluster
+ * @event Cluster#dispatch
  */
 declare function dispatch(data: GatewayDispatchPayload, id: number): any;
 
 /* eslint-enable @typescript-eslint/no-unused-vars */
 
-export interface WebsocketManager {
+export interface ClusterOptions extends WebsocketConnectionOptions {
+  /**
+   * The total amount of websocket shards/connections that should be spawned across all clusters
+   */
+  wsTotalShardCount: number | 'auto';
+  /**
+   * How many shards to spawn for this cluster
+   */
+  shardCount: number | 'auto';
+  /**
+   * The unique identifier for this cluster
+   */
+  clusterId: number;
+}
+
+export interface Cluster {
   on(event: 'open' | 'reconecting' | 'disconnecting', listener: typeof open): this;
   on(event: 'debug' | 'error', listener: typeof debug): this;
   on(event: 'ready', listener: typeof ready): this;
@@ -86,11 +101,15 @@ export interface WebsocketManager {
  * The entry point for the cordis gateway
  * @noInheritDoc
  */
-export class WebsocketManager extends EventEmitter {
+export class Cluster extends EventEmitter {
   /**
    * An array of all of the WebsocketShards
    */
-  public readonly shards: WebsocketShard[] = [];
+  public readonly shards: WebsocketConnection[] = [];
+
+  public clusterId: number;
+  public wsTotalShardCount: number | 'auto';
+  public shardCount: number | 'auto';
 
   /**
    * The last time an identify payload was sent on behalf of this token
@@ -103,6 +122,10 @@ export class WebsocketManager extends EventEmitter {
    */
   public user: APIUser | null = null;
 
+  private readonly _shardOptions: Partial<WebsocketConnectionOptions>;
+
+  private _fetchGatewayCache?: RESTGetAPIGatewayBotResult;
+
   /**
    * @param auth The Discord token for your bot
    * @param shardCount How many shards to spawn, leave "auto" for Discord recommended count
@@ -110,10 +133,21 @@ export class WebsocketManager extends EventEmitter {
    */
   public constructor(
     public readonly auth: string,
-    public readonly shardCount: number | 'auto' = 'auto',
-    private readonly _shardOptions: Partial<WebsocketShardOptions> = {}
+    options: Partial<ClusterOptions> = {}
   ) {
     super();
+
+    const {
+      wsTotalShardCount = 'auto',
+      shardCount = wsTotalShardCount,
+      clusterId = 0,
+      ...shardOptions
+    } = options;
+
+    this.wsTotalShardCount = wsTotalShardCount;
+    this.shardCount = shardCount;
+    this.clusterId = clusterId;
+    this._shardOptions = shardOptions;
   }
 
   /**
@@ -128,11 +162,11 @@ export class WebsocketManager extends EventEmitter {
    * Wether or not all of the shards are ready or not
    */
   public get ready() {
-    return this.shards.every(s => s.status === WebsocketShardStatus.ready);
+    return this.shards.every(s => s.status === WebsocketConnectionStatus.ready);
   }
 
   /**
-   * How many shards were actually spawned (may want to use this if you use Discord recommended amount)
+   * How many shards were actually spawned
    */
   public get shardsSpawned() {
     return this.shards.length;
@@ -147,54 +181,63 @@ export class WebsocketManager extends EventEmitter {
   }
 
   /**
+   * Broadcasts a payload to every single shard
+   */
+  public async broadcast(payload: GatewaySendPayload) {
+    for (const shard of this.shards) await shard.send(payload, false);
+  }
+
+  public async fetchGateway() {
+    if (this._fetchGatewayCache) return this._fetchGatewayCache;
+
+    const headers = new Headers();
+    headers.set('Authorization', `Bot ${this.auth}`);
+    headers.set('User-Agent', `DiscordBot (${CORDIS_META.url}, ${CORDIS_META.version}) Node.js/${process.version}`);
+
+    const res = await fetch(CONSTANTS.gateway, { headers }).catch(() => null);
+    const data: RESTGetAPIGatewayBotResult | null = await res?.json().catch(() => null);
+
+    if (!data) throw new CordisGatewayError('fetchGatewayFail');
+
+    this._fetchGatewayCache = data;
+    return data;
+  }
+
+  /**
    * Spawns all of the shards (if not yet spawned) and connects each one to the gateway
    */
   public async connect() {
     if (!this.shards.length) {
-      const headers = new Headers();
-      headers.set('Authorization', `Bot ${this.auth}`);
-      headers.set('User-Agent', `DiscordBot (${CORDIS_META.url}, ${CORDIS_META.version}) Node.js/${process.version}`);
-
-      const res = await fetch(CONSTANTS.gateway, { headers }).catch(() => null);
-      /* eslint-disable @typescript-eslint/naming-convention */
-      const data = await res?.json().catch(() => null) as {
-        url: string;
-        shards: number;
-        session_start_limit: {
-          total: number;
-          remaining: number;
-          reset_after: number;
-        };
-      } | null;
-
-      if (!data) throw new CordisGatewayError('fetchGatewayFail');
       const {
         url,
         shards: recommendedShards,
         session_start_limit: sessionInformation
-      } = data;
+      } = await this.fetchGateway();
 
       this._debug(stripIndent`
         Fetched Gateway Information
           URL: ${url}
           Recommended Shards: ${recommendedShards}
           Session Limit Information
-          Total: ${sessionInformation.total}
-          Remaining: ${sessionInformation.remaining}
+            Total: ${sessionInformation.total}
+            Remaining: ${sessionInformation.remaining}
       `);
 
-      const shards = this.shardCount === 'auto' ? recommendedShards : this.shardCount;
+      if (this.wsTotalShardCount === 'auto') this.wsTotalShardCount = recommendedShards;
+      if (this.shardCount === 'auto') this.shardCount = recommendedShards;
 
-      for (let i = 0; i < shards; i++) this.shards.push(new WebsocketShard(this, i, data.url, this._shardOptions));
+      for (let i = 0; i < this.shardCount; i++) {
+        this.shards.push(new WebsocketConnection(this, i, url, this._shardOptions));
+      }
     }
 
     for (const shard of this.shards) await shard.connect();
   }
 
   /**
-   * Destroys the manager and all of the shards
+   * Destroys the cluster and all of the shards
    */
-  public async destroy(options: WebsocketShardDestroyOptions = { fatal: true }) {
+  public async destroy(options: WebsocketConnectionDestroyOptions = { fatal: true }) {
     for (const shard of this.shards) await shard.destroy(options);
 
     this.user = null;

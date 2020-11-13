@@ -1,21 +1,22 @@
-import { Patcher } from '@cordis/util';
-import { GatewayMessageUpdateDispatch, APIMessage } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
+import { GatewayMessageUpdateDispatch, APIMessage, APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const messageUpdate: Handler<GatewayMessageUpdateDispatch['d']> = async (data, service, cache) => {
-  let message = await cache.get<APIMessage>(`${data.channel_id}_messages`, data.id);
+  const existing = await cache.get<APIMessage>(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), data.id);
+  const { data: message, old } = existing ? Patcher.patchMessage(data, existing) : Patcher.patchMessage(data);
+  const guild = data.guild_id ? await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id) : null;
 
-  if (message) {
-    const { data: patchedMessage, old: o } = Patcher.patchMessage(data, message);
-    message = patchedMessage;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    service.publish({ o: o!, n: message }, 'messageUpdate');
-  } else {
-    const { data: patchedMessage } = Patcher.patchMessage(data);
-    message = patchedMessage;
-  }
+  const res = {
+    n: message,
+    o: old,
+    guild
+  };
 
-  await cache.set(`${data.channel_id}_messages`, message.id, message);
+  if (!res.o) delete res.o;
+
+  service.publish(res, CORDIS_AMQP_SYMBOLS.gateway.events.messageUpdate);
+  await cache.set(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), message.id, message);
 };
 
 export default messageUpdate;

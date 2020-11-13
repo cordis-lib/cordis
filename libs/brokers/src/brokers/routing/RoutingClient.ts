@@ -2,6 +2,7 @@ import { Broker } from '../Broker';
 import * as amqp from 'amqplib';
 import { Redis } from 'ioredis';
 import { CordisBrokerTypeError } from '../../error';
+import { CORDIS_REDIS_SYMBOLS } from '@cordis/util';
 
 export class RoutingClient<S> extends Broker {
   public exchange?: string;
@@ -30,13 +31,17 @@ export class RoutingClient<S> extends Broker {
     this.topicBased = topicBased;
     this.exchange = await this.channel.assertExchange(exchange, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
 
-    const intendedQueueName = balance ? (await this.redis!.hget(`${this.exchange}_queues`, identifier) ?? '') : '';
+    const intendedQueueName = balance
+      ? (await this.redis!.hget(CORDIS_REDIS_SYMBOLS.internal.amqp.queues(this.exchange), identifier) ?? '')
+      : '';
     const { queue } = await this.channel.assertQueue(intendedQueueName, { durable: true, exclusive: !balance });
 
-    if (balance && intendedQueueName === '') await this.redis!.hset(`${this.exchange}_queues`, identifier, queue);
+    if (balance && intendedQueueName === '') {
+      await this.redis!.hset(CORDIS_REDIS_SYMBOLS.internal.amqp.queues(this.exchange), identifier, queue);
+    }
 
     for (const key of keys) await this.channel.bindExchange(queue, this.exchange, key);
 
-    await this._consumeQueue(queue, (content: { type: string; data: S }) => void this.emit(content.type, content.data));
+    await this._consumeQueue(queue, (content: { type: string; data: S }) => this.emit(content.type, content.data), false);
   }
 }

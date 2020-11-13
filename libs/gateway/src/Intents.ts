@@ -16,8 +16,8 @@ export const INTENTS = {
   directMessages: BitField.bigintify(12),
   directMessageReactions: BitField.bigintify(13),
   directMessageTyping: BitField.bigintify(14),
-  privileged: -1n,
   all: -1n,
+  privileged: -1n,
   nonPrivileged: -1n
 };
 

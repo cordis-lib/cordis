@@ -1,6 +1,6 @@
-import { GatewayPresenceUpdateData, PresenceUpdateStatus } from 'discord-api-types';
+import { GatewayPresenceUpdate, PresenceUpdateStatus } from 'discord-api-types';
 
-export const patch = (n: Partial<GatewayPresenceUpdateData>, o?: GatewayPresenceUpdateData | null) => {
+export const patch = (n: Partial<GatewayPresenceUpdate>, o?: GatewayPresenceUpdate | null) => {
   const data = o ?? n;
 
   const {
@@ -12,7 +12,7 @@ export const patch = (n: Partial<GatewayPresenceUpdateData>, o?: GatewayPresence
   data.activities = activities ?? data.activities ?? [];
 
   return {
-    data: data as GatewayPresenceUpdateData,
+    data: data as GatewayPresenceUpdate,
     old: o
   };
 };

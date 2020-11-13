@@ -3,7 +3,7 @@ import { Redis } from 'ioredis';
 import { Bag } from './Bag';
 import { CordisUtilTypeError } from '../../error';
 
-export class RedisStore<T> implements Store<T, false, string> {
+export class RedisStore<T> implements Store<T, false, any> {
   public async *[Symbol.asyncIterator]() {
     const raw = await this.redis.hgetall(this.hash);
 
@@ -17,17 +17,20 @@ export class RedisStore<T> implements Store<T, false, string> {
   public readonly maxSize: number | null;
   public readonly emptyEvery: number | null;
   public readonly emptyCb: (value: T, key: string) => boolean;
-  public readonly convertorIn: (value: T) => string;
-  public readonly convertorOut: (value: string) => T;
+  public readonly convertorIn: (value: T) => any;
+  public readonly convertorOut: (value: any) => T;
 
-  public constructor(options: StoreOptions<T, string> & { redis: Redis; hash: string }) {
+  public constructor(options: StoreOptions<T, any> & { redis: Redis; hash: string }) {
     this.hash = options.hash;
     this.redis = options.redis;
     this.maxSize = options.maxSize ?? null;
     this.emptyEvery = options.emptyEvery ?? null;
     this.emptyCb = options.emptyCb ?? (() => true);
-    this.convertorIn = options.convertorIn ?? (data => data as unknown as string);
-    this.convertorOut = options.convertorOut ?? (data => data as unknown as T);
+    this.convertorIn = options.convertorIn ?? (data => data);
+    this.convertorOut = options.convertorOut ?? (data => data);
+    if (options.entries) {
+      for (const [id, presence] of options.entries) void this.set(id, presence);
+    }
 
     if (this.emptyEvery) setInterval(() => void this.empty(options.emptyCb), this.emptyEvery);
   }

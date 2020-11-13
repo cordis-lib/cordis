@@ -1,33 +1,33 @@
-import { Patcher } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
 import { APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
-const guildCreate: Handler<APIGuild> = async (data, service, redis) => {
-  const existing = await redis.get<APIGuild>('guilds', data.id);
+const guildCreate: Handler<APIGuild> = async (data, service, cache) => {
+  const existing = await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.id);
 
   if (existing?.unavailable && !data.unavailable) {
     const { data: guild, triggerEmojiUpdate, emojiCreations, emojiDeletions, emojiUpdates } = Patcher.patchGuild(data, existing);
-    service.publish(guild, 'guildAvailable');
+    service.publish(guild, CORDIS_AMQP_SYMBOLS.gateway.events.guildAvailable);
 
     if (triggerEmojiUpdate) {
       if (emojiCreations) {
-        for (const emoji of emojiCreations) service.publish({ guild, emoji }, 'emojiCreate');
+        for (const emoji of emojiCreations) service.publish({ guild, emoji }, CORDIS_AMQP_SYMBOLS.gateway.events.emojiCreate);
       }
 
       if (emojiDeletions) {
-        for (const emoji of emojiDeletions.values()) service.publish({ guild, emoji }, 'emojiDelete');
+        for (const emoji of emojiDeletions.values()) service.publish({ guild, emoji }, CORDIS_AMQP_SYMBOLS.gateway.events.emojiDelete);
       }
 
       if (emojiUpdates) {
-        for (const [o, n] of emojiUpdates) service.publish({ guild, o, n }, 'emojiUpdate');
+        for (const [o, n] of emojiUpdates) service.publish({ guild, o, n }, CORDIS_AMQP_SYMBOLS.gateway.events.emojiUpdate);
       }
     }
 
-    await redis.set('guilds', guild.id, guild);
+    await cache.set(CORDIS_REDIS_SYMBOLS.cache.guilds, guild.id, guild);
   } else {
     const { data: guild } = Patcher.patchGuild(data);
-    service.publish(guild, 'guildCreate');
-    await redis.set('guilds', guild.id, guild);
+    service.publish(guild, CORDIS_AMQP_SYMBOLS.gateway.events.guildCreate);
+    await cache.set(CORDIS_REDIS_SYMBOLS.cache.guilds, guild.id, guild);
   }
 };
 

@@ -1,17 +1,18 @@
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
 import { APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildDelete: Handler<APIGuild> = async (data, service, cache) => {
   if (data.unavailable) {
-    const existing = await cache.get<APIGuild>('guilds', data.id) ?? data;
-    existing.unavailable = true;
-
-    service.publish(existing, 'guildUnavailable');
-    await cache.set('guilds', existing.id, existing);
+    const existing = await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.id);
+    const { data: guild } = existing ? Patcher.patchGuild(data, existing) : Patcher.patchGuild(data);
+    service.publish(guild, CORDIS_AMQP_SYMBOLS.gateway.events.guildUnavailable);
+    await cache.set(CORDIS_REDIS_SYMBOLS.cache.guilds, guild.id, guild);
   } else {
-    service.publish(data, 'guildDelete');
-    await cache.delete('guilds', data.id);
+    service.publish(Patcher.patchGuild(data).data, CORDIS_AMQP_SYMBOLS.gateway.events.guildDelete);
   }
+
+  await cache.delete('guilds', data.id);
 };
 
 export default guildDelete;

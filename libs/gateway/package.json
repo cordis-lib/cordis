@@ -23,19 +23,19 @@
   "homepage": "https://github.com/cordisjs/cordis#readme",
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
-    "@types/node": "^14.0.13",
+    "@types/node": "^14.14.2",
     "@types/node-fetch": "^2.5.7",
-    "@types/ws": "^7.2.5",
-    "erlpack": "discordapp/erlpack",
+    "@types/ws": "^7.2.7",
+    "erlpack": "github:discordapp/erlpack",
     "typescript": "^4.0.3",
     "zlib-sync": "^0.1.7"
   },
   "dependencies": {
-    "@cordis/util": "0.1.0",
+    "@cordis/util": "workspace:0.1.0",
     "common-tags": "^1.8.0",
     "discord-api-types": "^0.7.0",
-    "node-fetch": "^2.6.0",
-    "tslib": "^2.0.0",
-    "ws": "^7.3.0"
+    "node-fetch": "^2.6.1",
+    "tslib": "^2.0.3",
+    "ws": "^7.3.1"
   }
 }

@@ -1,33 +1,28 @@
-import { Patcher } from '@cordis/util';
-import { GatewayGuildMemberUpdateDispatch, APIGuild } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
+import { GatewayGuildMemberUpdateDispatch, APIGuild, APIGuildMember } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildMemberUpdate: Handler<GatewayGuildMemberUpdateDispatch['d']> = async (data, service, cache) => {
   const guild = await cache.get<APIGuild>('guilds', data.guild_id);
+  const existing = await cache.get<APIGuildMember>(CORDIS_REDIS_SYMBOLS.cache.members(data.guild_id), data.user!.id);
+  const { data: n, old: o, newUser, oldUser, roles: [oldRoles, newRoles] } = Patcher.patchGuildMember(data, existing);
   if (guild) {
-    const oldIndex = (guild.members ??= []).findIndex(e => e.user!.id === data.user!.id);
-    if (oldIndex !== -1) {
-      const old = guild.members[oldIndex];
-      const { data: n, newUser, oldUser, roles: [oldRoles, newRoles] } = Patcher.patchGuildMember(data, old);
+    if (n.nick !== o!.nick || !oldRoles.every((role, i) => role === newRoles[i])) {
+      service.publish({ guild, o: o!, n }, CORDIS_AMQP_SYMBOLS.gateway.events.guildMemberUpdate);
+    }
 
-      if (n.nick !== old.nick || !oldRoles.every((role, i) => role === newRoles[i])) {
-        service.publish({ guild, o: old, n }, 'guildMemberUpdate');
-      }
-
-      if (
-        (newUser && oldUser) &&
+    if (
+      (newUser && oldUser) &&
         (newUser.username !== oldUser.username ||
         newUser.discriminator !== oldUser.discriminator ||
         newUser.avatar !== oldUser.avatar)
-      ) {
-        service.publish({ o: oldUser, n: newUser }, 'userUpdate');
-        await cache.set('users', newUser.id, newUser);
-      }
-
-      guild.members.splice(oldIndex, 1, n);
-      await cache.set('guilds', guild.id, guild);
+    ) {
+      service.publish({ o: oldUser, n: newUser }, CORDIS_AMQP_SYMBOLS.gateway.events.userUpdate);
+      await cache.set(CORDIS_REDIS_SYMBOLS.cache.users, newUser.id, newUser);
     }
   }
+
+  await cache.set(CORDIS_REDIS_SYMBOLS.cache.members(data.guild_id), n.user!.id, n);
 };
 
 export default guildMemberUpdate;

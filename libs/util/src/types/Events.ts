@@ -8,7 +8,7 @@ import {
   APIMessage,
   APIRole,
   GatewayGuildRoleUpdateDispatch,
-  GatewayPresenceUpdateData,
+  GatewayPresenceUpdate,
   GatewayReadyDispatch,
   GatewayTypingStartDispatch,
   GatewayVoiceServerUpdateDispatch,
@@ -21,6 +21,10 @@ import {
 interface Updated<T> {
   o: T;
   n: T;
+}
+
+export interface CordisReaction extends APIReaction {
+  users: string[];
 }
 
 export interface Events {
@@ -37,7 +41,9 @@ export interface Events {
   guildBanAdd: { guild: APIGuild; user: APIUser };
   guildBanRemove: { guild: APIGuild; user: APIUser };
   guildCreate: APIGuild;
+  guildAvailable: APIGuild;
   guildDelete: APIGuild;
+  guildUnavailable: APIGuild;
   guildUpdate: Updated<APIGuild>;
 
   guildMemberAdd: { guild: APIGuild; member: APIGuildMember };
@@ -51,17 +57,17 @@ export interface Events {
   messageCreate: APIMessage;
   bulkMessageDelete: APIMessage[];
   messageDelete: APIMessage;
-  messageUpdate: { o: APIMessage; n: Partial<APIMessage> };
+  messageUpdate: ({ o: APIMessage; n: APIMessage } | { n: Partial<APIMessage> }) & { guild: APIGuild | null };
 
-  messageReactionAdd: { emoji: APIEmoji; message: APIMessage | null };
-  messageReactionRemove: { emoji: APIEmoji; message: APIMessage | null };
-  messageReactionRemoveEmoji: { emoji: APIEmoji; message: APIMessage | null };
-  messageReactionRemoveAll: { reactions: APIReaction[]; message: APIMessage | null };
+  messageReactionAdd: { reaction: CordisReaction; message: APIMessage | null; messageId: string };
+  messageReactionRemove: { reaction: CordisReaction; message: APIMessage | null; messageId: string };
+  messageReactionRemoveEmoji: { reaction: CordisReaction; message: APIMessage | null; messageId: string };
+  messageReactionRemoveAll: { reactions: CordisReaction[]; message: APIMessage | null; messageId: string };
 
   inviteCreate: { guild: APIGuild; invite: GatewayInviteCreateDispatch['d'] };
   inviteDelete: { guild: APIGuild; invite: GatewayInviteDeleteDispatch['d'] };
 
-  presenceUpdate: GatewayPresenceUpdateData;
+  presenceUpdate: { n: GatewayPresenceUpdate; o?: GatewayPresenceUpdate | null };
   ready: GatewayReadyDispatch['d'];
   typingStart: GatewayTypingStartDispatch['d'];
   userUpdate: Updated<APIUser>;

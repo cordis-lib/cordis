@@ -1,4 +1,3 @@
-import { CordisBrokerError } from '../../error';
 import { Broker } from '../Broker';
 import * as amqp from 'amqplib';
 
@@ -11,20 +10,16 @@ export class PubSubClient<S> extends Broker {
     fanout = false,
     cb: (content?: S, properties?: amqp.MessageProperties, original?: amqp.Message) => any
   ) {
-    if (!this.queueOrExchange) throw new CordisBrokerError('brokerNotInit');
-
-    const channel = this.channel;
-
     this.queueOrExchange = (
       fanout
-        ? await channel.assertExchange(name, 'fanout', { durable: true }).then(d => d.exchange)
-        : await channel.assertQueue(name, { durable: true }).then(d => d.queue)
+        ? await this.channel.assertExchange(name, 'fanout', { durable: true }).then(d => d.exchange)
+        : await this.channel.assertQueue(name, { durable: true }).then(d => d.queue)
     );
 
     this.fanout = fanout;
 
-    const queue = fanout ? await channel.assertQueue('', { exclusive: true }).then(d => d.queue) : name;
-    if (fanout) await channel.bindQueue(queue, name, '');
+    const queue = fanout ? await this.channel.assertQueue('', { exclusive: true }).then(d => d.queue) : name;
+    if (fanout) await this.channel.bindQueue(queue, name, '');
 
     await this._consumeQueue(name, cb, true);
   }

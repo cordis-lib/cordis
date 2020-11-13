@@ -24,6 +24,10 @@ export class RpcClient<S, C> extends Broker {
 
       const correlationId = this._generateCorrelation();
 
+      // Unfortunately a case where variable hoisting is simply needed
+      // To bluntly put what is going on here:
+      // This callback is called when a response to a message comes back, cancelling the timeout
+      // However, to prevent memory leaks, the timeout also needs to use this callback object to stop the event emitter from listening
       const cb = (res: S | string, isError: boolean) => {
         clearTimeout(timeout);
         if (isError) return reject(res);

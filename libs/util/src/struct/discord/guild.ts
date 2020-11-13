@@ -73,14 +73,14 @@ export const patch = (n: Partial<APIGuild>, o?: APIGuild | null) => {
   if (premium_subscription_count !== undefined) data.premium_subscription_count = premium_subscription_count;
   data.widget_enabled = widget_enabled ?? data.widget_enabled ?? false;
   data.widget_channel_id = widget_channel_id ?? data.widget_channel_id;
-  data.max_members = max_members ?? data.max_members ?? 250000;
-  data.max_presences = max_presences ?? data.max_presences ?? 25000;
+  data.max_members = max_members ?? data.max_members ?? 25e4;
+  data.max_presences = max_presences ?? data.max_presences ?? 25e3;
   if (approximate_member_count != null) data.approximate_member_count = approximate_member_count;
   if (approximate_presence_count != null) data.approximate_presence_count = approximate_presence_count;
 
-  if (channels) data.channels = channels;
-  if (roles) data.roles = roles;
-  if (members) data.members = members;
+  data.channels = channels ?? [];
+  data.roles = roles ?? [];
+  data.members = members ?? [];
 
   let triggerEmojiUpdate = false;
   let emojiCreations = null;
