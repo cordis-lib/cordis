@@ -13,6 +13,6 @@ export class RoutingServer<S> extends Broker {
 
   public publish(content: S, key: string, options?: amqp.Options.Publish) {
     if (!this.exchange) throw new CordisBrokerError('brokerNotInit');
-    return this._publishToExchange(this.exchange, content, key, options);
+    return this._publishToExchange(this.exchange, { type: key, data: content }, key, options);
   }
 }

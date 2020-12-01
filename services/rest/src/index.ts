@@ -101,7 +101,7 @@ const main = async () => {
   service.on('error', console.error);
 
   await service.init(
-    CORDIS_AMQP_SYMBOLS.rest.rest,
+    CORDIS_AMQP_SYMBOLS.rest.queue,
     req => rest.make(req)
   )
     .then(() => console.log('Service is live!'))

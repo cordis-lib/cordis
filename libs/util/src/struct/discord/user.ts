@@ -14,13 +14,13 @@ export const patch = (n: Partial<APIUser>, o?: APIUser | null) => {
     public_flags
   } = n;
 
-  data.bot = bot !== undefined ? bot : (data.bot ?? false);
-  if (username !== undefined) data.username = username;
-  if (discriminator !== undefined) data.discriminator = discriminator;
-  if (avatar !== undefined) data.avatar = avatar;
-  if (system !== undefined) data.system = system;
-  if (locale !== undefined) data.locale = locale;
-  if (public_flags !== undefined) data.public_flags = public_flags;
+  data.bot = bot ?? data.bot ?? false;
+  data.username = username ?? data.username;
+  data.discriminator = discriminator ?? data.discriminator;
+  data.avatar = avatar ?? data.avatar;
+  data.system = system ?? data.system ?? false;
+  data.locale = locale ?? data.locale;
+  data.public_flags = public_flags ?? data.public_flags ?? 0;
 
   return {
     data: data as APIUser,

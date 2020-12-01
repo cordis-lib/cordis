@@ -666,7 +666,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
         break;
       }
 
-      case 'GUILD_CREATE': {
+      case GatewayDispatchEvents.GuildCreate: {
         if (this.status === WebsocketConnectionStatus.waiting) {
           this._pendingGuilds!.delete(payload.d.id);
 
@@ -684,12 +684,12 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
         break;
       }
 
-      case 'GUILD_DELETE': {
+      case GatewayDispatchEvents.GuildDelete: {
         if (!payload.d.unavailable) this.guilds.delete(payload.d.id);
         break;
       }
 
-      case 'RESUMED': {
+      case GatewayDispatchEvents.Resumed: {
         this._clearTimeout('reconnecting');
         this.debug(`Resumed Session ${this._sessionId}; Replayed ${payload.s - this._sequence} events`);
         this.status = WebsocketConnectionStatus.ready;

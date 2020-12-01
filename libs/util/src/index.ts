@@ -20,7 +20,9 @@ export * from './struct/AsyncQueue';
 export * from './struct/BitField';
 export * from './struct/Snowflake';
 
+export * from './types/Array';
 export * from './types/Events';
+export * from './types/RequiredProp';
 
 export * from './constants';
 export { makeCordisError } from './error';

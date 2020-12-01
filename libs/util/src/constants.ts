@@ -136,7 +136,6 @@ export const CORDIS_AMQP_SYMBOLS = {
     ])
   },
   rest: {
-    rest: 'rest',
     queue: 'rest_queue'
   }
 };

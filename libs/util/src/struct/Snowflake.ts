@@ -1,3 +1,8 @@
+export interface SnowflakeEntity {
+  createdTimestamp: number;
+  createdAt: Date;
+}
+
 /**
  * Class representing a Discord snowflake and all if its properties
  */
@@ -24,6 +29,14 @@ export class Snowflake {
 
   public static deconstruct(id: string) {
     return new Snowflake(id).freeze();
+  }
+
+  public static getCreationData(id: string | Snowflake): SnowflakeEntity {
+    const { timestamp } = id instanceof Snowflake ? id : Snowflake.deconstruct(id);
+    return {
+      createdTimestamp: timestamp,
+      createdAt: new Date(timestamp)
+    };
   }
 
   public binary: string;
