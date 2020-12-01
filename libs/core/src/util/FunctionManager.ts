@@ -1,13 +1,17 @@
-import { isUser, isCordisUser, sanatizeUser } from '../functions/user';
-import { Head } from '@cordis/util';
+import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId } from '../functions/user';
+import { Head, ImageOptions } from '@cordis/util';
 import {
   userAvatar,
   defaultUserAvatar,
-  displayedUserAvatar
+  AvatarOptions
 } from '../functions/cdn';
+import { Rest } from '../services/Rest';
+import { Redis } from 'ioredis';
 
 interface FactoryMeta {
   functions: FunctionManager;
+  rest: Rest;
+  redis: Redis;
 }
 
 type ExtractMetaParameter<T extends (...args: any) => any> = (...args: Head<Parameters<T>>) => ReturnType<T>;
@@ -16,10 +20,12 @@ interface BuiltInFunctions {
   isUser: ExtractMetaParameter<typeof isUser>;
   isCordisUser: typeof isCordisUser;
   sanatizeUser: typeof sanatizeUser;
+  resolveUser: ExtractMetaParameter<typeof resolveUser>;
+  resolveUserId: ExtractMetaParameter<typeof resolveUserId>;
 
-  userAvatar: ResolveRegisteredFunc<typeof userAvatar>;
-  defaultUserAvatar: ResolveRegisteredFunc<typeof defaultUserAvatar>;
-  displayedUserAvatar: ResolveRegisteredFunc<typeof displayedUserAvatar>;
+  userAvatar: typeof userAvatar;
+  defaultUserAvatar: typeof defaultUserAvatar;
+  displayedUserAvatar: (user: AvatarOptions & { discriminator: string }, options?: ImageOptions | null) => string;
 }
 
 class FunctionManager { // eslint-disable-line @typescript-eslint/ban-types

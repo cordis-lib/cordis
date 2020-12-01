@@ -56,6 +56,9 @@ const resolveUser = (user: UserResolvable, { functions: { retrieveFunction } }: 
   return null;
 };
 
+const resolveUserId = (user: UserResolvable, { functions: { retrieveFunction } }: FactoryMeta): string | null =>
+  retrieveFunction('resolveUser')(user)?.id ?? null;
+
 export {
   PatchedAPIUser,
   CordisUser,
@@ -63,5 +66,6 @@ export {
   isUser,
   isCordisUser,
   sanatizeUser,
-  resolveUser
+  resolveUser,
+  resolveUserId
 };

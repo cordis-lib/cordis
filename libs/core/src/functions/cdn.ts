@@ -6,21 +6,18 @@ interface AvatarOptions {
   avatar: string | null;
 }
 
-const userAvatar = ({ user, ...options }: { user: AvatarOptions } & ImageOptions) => {
+const userAvatar = (user: AvatarOptions, options?: ImageOptions | null) => {
   if (!user.avatar) return null;
   return makeDiscordCdnUrl(`${ENDPOINTS.cdn}/avatars/${user.id}/${user.avatar}`, options);
 };
 
-const defaultUserAvatar = ({ discriminator }: { discriminator: string }) =>
-  makeDiscordCdnUrl(`${ENDPOINTS.cdn}/embed/avatars/${discriminator}.png`);
+const defaultUserAvatar = (discriminator: string) => makeDiscordCdnUrl(`${ENDPOINTS.cdn}/embed/avatars/${discriminator}.png`);
 
-const displayedUserAvatar = ({ user, functions, ...options }: {
-  user: AvatarOptions & {
-    discriminator: string;
-  };
-} & ImageOptions & FactoryMeta) =>
-  functions.retrieveFunction('userAvatar')({ user, ...options }) ??
-  functions.retrieveFunction('defaultUserAvatar')({ discrim: user.discriminator });
+const displayedUserAvatar = (
+  user: AvatarOptions & { discriminator: string },
+  options: ImageOptions | null,
+  { functions: { retrieveFunction } }: FactoryMeta
+) => retrieveFunction('userAvatar')(user, options) ?? retrieveFunction('defaultUserAvatar')(user.discriminator);
 
 export {
   AvatarOptions,

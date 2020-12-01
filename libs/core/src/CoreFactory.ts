@@ -17,10 +17,9 @@ const coreFactory = (
   worker = true
 ) => {
   const rest = new Rest(channel);
-
   const gateway = new Gateway(channel, redis);
 
-  const functionManager = new FunctionManager({});
+  const functionManager = new FunctionManager({ rest, redis });
   const functions = new Proxy<FunctionManager & BuiltInFunctions>(functionManager as any, {
     get: <K extends keyof BuiltInFunctions>(target: FunctionManager, key: K) => target.retrieveFunction(key)
   });

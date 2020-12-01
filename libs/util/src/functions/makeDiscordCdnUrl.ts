@@ -14,7 +14,7 @@ export interface ImageOptions {
  * @param root The root for the image
  * @param options Options for the image
  */
-export const makeDiscordCdnUrl = (root: string, options?: ImageOptions) => {
+export const makeDiscordCdnUrl = (root: string, options?: ImageOptions | null) => {
   let {
     dynamic = true,
     format = 'webp',
