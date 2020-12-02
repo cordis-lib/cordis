@@ -22,7 +22,8 @@ const coreFactory = (
 
   const functionManager = new FunctionManager({ rest, cache });
   const functions = new Proxy<FunctionManager & BuiltInFunctions>(functionManager as any, {
-    get: <K extends keyof BuiltInFunctions>(target: FunctionManager, key: K) => target.retrieveFunction(key)
+    // @ts-ignore
+    get: (target, key) => target.retrieveFunction(key) ?? target[key] // eslint-disable-line @typescript-eslint/no-unnecessary-condition
   });
 
   return {

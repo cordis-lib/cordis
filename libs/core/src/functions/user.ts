@@ -32,6 +32,9 @@ const sanatizeUser = (raw: PatchedAPIUser): CordisUser => {
     ...user,
     ...Snowflake.getCreationData(user.id),
     flags: new UserFlags(BigInt(public_flags)).freeze(),
+    get tag() {
+      return `${this.username}#${this.discriminator}`;
+    },
     toString() {
       return `<@${this.id}>`;
     },
@@ -48,6 +51,9 @@ const resolveUser = (user: UserResolvable, { functions: { retrieveFunction } }: 
   return null;
 };
 
+/**
+ * Attempts to resolve a user id from the given value
+ */
 const resolveUserId = (user: UserResolvable, { functions: { retrieveFunction } }: FactoryMeta): string | null =>
   retrieveFunction('resolveUser')(user)?.id ?? null;
 

@@ -4,7 +4,8 @@ import { Rest } from './services/Rest';
 import {
   userAvatar,
   defaultUserAvatar,
-  AvatarOptions
+  AvatarOptions,
+  displayedUserAvatar
 } from './functions/cdn';
 
 interface FactoryMeta {
@@ -24,17 +25,18 @@ interface BuiltInFunctionsRaw {
 
   userAvatar: typeof userAvatar;
   defaultUserAvatar: typeof defaultUserAvatar;
-  // ? Need to actually mark options as an optional parameter
-  displayedUserAvatar: (user: AvatarOptions & { discriminator: string }, options?: ImageOptions | null) => string;
+  displayedUserAvatar: typeof displayedUserAvatar;
 }
 
 // ? This check used to be done in ExtractMetaParameter<T> but unfortunately that meant that every function's return type was mutated by
 // ? ReturnType<T>. Initially, this seemed fine, however, as it appears, type-guard functions such as isUser simply resolved to boolean
 // ? Currently, this will only work as long as a type guard function doesn't depend on the meta parameter, which shouldn't ever happen anyway
 type BuiltInFunctions = {
-  [K in keyof BuiltInFunctionsRaw]: ArrayTail<Parameters<BuiltInFunctionsRaw[K]>> extends FactoryMeta
+  [K in keyof Omit<BuiltInFunctionsRaw, 'displayedUserAvatar'>]: ArrayTail<Parameters<BuiltInFunctionsRaw[K]>> extends FactoryMeta
     ? ExtractMetaParameter<BuiltInFunctionsRaw[K]>
     : BuiltInFunctionsRaw[K];
+} & {
+  displayedUserAvatar: (user: AvatarOptions & { discriminator: string }, options?: ImageOptions | null) => string;
 };
 
 class FunctionManager {

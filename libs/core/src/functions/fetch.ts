@@ -4,19 +4,19 @@ import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
 import { CordisUser, UserResolvable } from '../Types';
 
-const fetchUser = async (user: UserResolvable | string, force = false, { functions: { retrieveFunction }, cache, rest }: FactoryMeta) => {
+/**
+ * Attempts to fetch a user; retrieves from cache if possible
+ */
+const fetchUser = async (user: UserResolvable | string, useCache = true, { functions: { retrieveFunction }, cache, rest }: FactoryMeta) => {
   if (typeof user !== 'string') {
     const resolved = retrieveFunction('resolveUserId')(user);
-    // TODO: Throw error
+    // TODO: Internal errors
     if (!resolved) return null;
     user = resolved;
   }
 
   let cached: CordisUser | null = null;
-  if (
-    !force &&
-    (cached = await cache.get<CordisUser>(CORDIS_REDIS_SYMBOLS.cache.users, user))
-  ) {
+  if (useCache && (cached = await cache.get<CordisUser>(CORDIS_REDIS_SYMBOLS.cache.users, user))) {
     return cached;
   }
 

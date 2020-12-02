@@ -1,6 +1,6 @@
-import { PatchedAPIUser, SnowflakeEntity } from '@cordis/util';
+import { FrozenBitField, PatchedAPIUser, SnowflakeEntity } from '@cordis/util';
 import { rawData } from './util/Symbols';
-import { UserFlags } from './util/UserFlags';
+import { UserFlagKeys, UserFlags } from './util/UserFlags';
 
 // Begin cdn types
 interface AvatarOptions {
@@ -11,8 +11,9 @@ interface AvatarOptions {
 
 // Begin user types
 interface CordisUser extends Omit<PatchedAPIUser, 'public_flags'>, SnowflakeEntity {
-  flags: UserFlags;
+  flags: FrozenBitField<UserFlagKeys, UserFlags>;
   toString(): string;
+  readonly tag: string;
   [rawData]: PatchedAPIUser;
 }
 
