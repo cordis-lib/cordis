@@ -1,9 +1,10 @@
-import { RedisStore, StoreOptions } from '@cordis/util';
+import { RedisStore } from './store/RedisStore';
+import { StoreOptions } from './store/Store';
 import { Redis } from 'ioredis';
 
-type RedisOptions = StoreOptions<any, string>;
+type RedisOptions = StoreOptions<any, any>;
 
-export class StoreManager {
+export class RedisCache {
   public readonly stores = new Map<string, RedisStore<any>>();
 
   public constructor(public readonly redis: Redis) {}

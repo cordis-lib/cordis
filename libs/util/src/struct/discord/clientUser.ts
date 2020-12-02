@@ -1,8 +1,16 @@
 import { APIUser } from 'discord-api-types';
-import { patch as patchUser } from './user';
+import { RequiredProp } from '../../types/RequiredProp';
+import { default as patchUser } from './user';
 
-export const patch = (n: Partial<APIUser>, o?: APIUser | null) => {
-  const { data: newUser } = patchUser(n, o);
+export type ExcludedClientUserProperties = 'email' | 'flags' | 'premium_type';
+
+export interface PatchedAPIClientUser extends RequiredProp<
+Omit<APIUser, ExcludedClientUserProperties>,
+'bot' | 'system' | 'public_flags' | 'verified' | 'mfa_enabled'
+> {}
+
+export default (n: Partial<APIUser>, o?: APIUser | null) => {
+  const { data: newUser }: { data: APIUser } = patchUser(n, o) as any;
 
   const {
     verified,
@@ -16,7 +24,7 @@ export const patch = (n: Partial<APIUser>, o?: APIUser | null) => {
   data.mfa_enabled = mfa_enabled ?? data.mfa_enabled ?? false;
 
   return {
-    data: data as APIUser,
-    old: o
+    data: data as PatchedAPIClientUser,
+    old: o as PatchedAPIClientUser
   };
 };

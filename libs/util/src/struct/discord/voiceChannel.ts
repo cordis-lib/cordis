@@ -1,7 +1,7 @@
 import { APIChannel } from 'discord-api-types';
-import { patch as patchGuildChannel } from './guildChannel';
+import { default as patchGuildChannel } from './guildChannel';
 
-export const patch = (n: Partial<APIChannel>, o?: APIChannel | null) => {
+export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
   const { data: newChannel, old: oldChannel } = patchGuildChannel(n, o);
 
   const data = oldChannel ?? newChannel;

@@ -10,7 +10,7 @@ export class Rest {
     this.service = new RpcClient(channel);
   }
 
-  public get<T>(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
+  public get<T>(path: string, options?: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
     return this.make<T>({
       path,
       method: 'get',
@@ -18,7 +18,7 @@ export class Rest {
     });
   }
 
-  public delete<T>(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
+  public delete<T>(path: string, options?: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
     return this.make<T>({
       path,
       method: 'delete',
@@ -26,7 +26,7 @@ export class Rest {
     });
   }
 
-  public put<T>(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
+  public put<T>(path: string, options?: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
     return this.make<T>({
       path,
       method: 'put',
@@ -34,7 +34,7 @@ export class Rest {
     });
   }
 
-  public post<T>(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
+  public post<T>(path: string, options?: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
     return this.make<T>({
       path,
       method: 'post',
@@ -42,7 +42,7 @@ export class Rest {
     });
   }
 
-  public patch<T>(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
+  public patch<T>(path: string, options?: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
     return this.make<T>({
       path,
       method: 'patch',
@@ -50,8 +50,8 @@ export class Rest {
     });
   }
 
-  public make<T>(options: Partial<RequestBuilderOptions> & { path: string }): T {
-    return this.service.post(options) as unknown as T;
+  public make<T>(options: Partial<RequestBuilderOptions> & { path: string }): Promise<T> {
+    return this.service.post(options) as Promise<unknown> as Promise<T>;
   }
 
   public init() {

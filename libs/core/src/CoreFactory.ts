@@ -2,10 +2,9 @@ import * as amqp from 'amqplib';
 import { Rest } from './services/Rest';
 import { Gateway } from './services/Gateway';
 import { Redis } from 'ioredis';
-
-import { BuiltInFunctions, FunctionManager } from './util/FunctionManager';
-
-import { CORDIS_AMQP_SYMBOLS, Events } from '@cordis/util';
+import { BuiltInFunctions, FunctionManager } from './FunctionManager';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Events, RedisCache } from '@cordis/util';
+import { rawData } from './util/Symbols';
 
 /**
  * This is the core factory, it constructs a root object with all of the context needed for all of the other functions to work
@@ -19,7 +18,9 @@ const coreFactory = (
   const rest = new Rest(channel);
   const gateway = new Gateway(channel, redis);
 
-  const functionManager = new FunctionManager({ rest, redis });
+  const cache = new RedisCache(redis);
+
+  const functionManager = new FunctionManager({ rest, cache });
   const functions = new Proxy<FunctionManager & BuiltInFunctions>(functionManager as any, {
     get: <K extends keyof BuiltInFunctions>(target: FunctionManager, key: K) => target.retrieveFunction(key)
   });
@@ -29,6 +30,12 @@ const coreFactory = (
     rest,
     gateway,
     async init() {
+      cache.registerStore({
+        hash: CORDIS_REDIS_SYMBOLS.cache.users,
+        convertorOut: data => functions.sanatizeUser(data),
+        convertorIn: data => data[rawData]
+      });
+
       await rest.init();
       return gateway.init({ keys: events, worker });
     }

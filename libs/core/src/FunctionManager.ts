@@ -1,34 +1,43 @@
-import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId } from '../functions/user';
-import { Head, ImageOptions } from '@cordis/util';
+import { ArrayHead, ArrayTail, ImageOptions, RedisCache } from '@cordis/util';
+import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId } from './functions/user';
+import { Rest } from './services/Rest';
 import {
   userAvatar,
   defaultUserAvatar,
   AvatarOptions
-} from '../functions/cdn';
-import { Rest } from '../services/Rest';
-import { Redis } from 'ioredis';
+} from './functions/cdn';
 
 interface FactoryMeta {
   functions: FunctionManager;
   rest: Rest;
-  redis: Redis;
+  cache: RedisCache;
 }
 
-type ExtractMetaParameter<T extends (...args: any) => any> = (...args: Head<Parameters<T>>) => ReturnType<T>;
+type ExtractMetaParameter<T extends (...args: any) => any> = (...args: ArrayHead<Parameters<T>>) => ReturnType<T>;
 
-interface BuiltInFunctions {
-  isUser: ExtractMetaParameter<typeof isUser>;
+interface BuiltInFunctionsRaw {
+  isUser: typeof isUser;
   isCordisUser: typeof isCordisUser;
   sanatizeUser: typeof sanatizeUser;
-  resolveUser: ExtractMetaParameter<typeof resolveUser>;
-  resolveUserId: ExtractMetaParameter<typeof resolveUserId>;
+  resolveUser: typeof resolveUser;
+  resolveUserId: typeof resolveUserId;
 
   userAvatar: typeof userAvatar;
   defaultUserAvatar: typeof defaultUserAvatar;
+  // ? Need to actually mark options as an optional parameter
   displayedUserAvatar: (user: AvatarOptions & { discriminator: string }, options?: ImageOptions | null) => string;
 }
 
-class FunctionManager { // eslint-disable-line @typescript-eslint/ban-types
+// ? This check used to be done in ExtractMetaParameter<T> but unfortunately that meant that every function's return type was mutated by
+// ? ReturnType<T>. Initially, this seemed fine, however, as it appears, type-guard functions such as isUser simply resolved to boolean
+// ? Currently, this will only work as long as a type guard function doesn't depend on the meta parameter, which shouldn't ever happen anyway
+type BuiltInFunctions = {
+  [K in keyof BuiltInFunctionsRaw]: ArrayTail<Parameters<BuiltInFunctionsRaw[K]>> extends FactoryMeta
+    ? ExtractMetaParameter<BuiltInFunctionsRaw[K]>
+    : BuiltInFunctionsRaw[K];
+};
+
+class FunctionManager {
   private readonly _entries: BuiltInFunctions = {} as any;
   private readonly _meta: FactoryMeta;
 
@@ -45,7 +54,7 @@ class FunctionManager { // eslint-disable-line @typescript-eslint/ban-types
     };
   }
 
-  public registerFunction<N extends keyof BuiltInFunctions>(name: N, fn: BuiltInFunctions[N]) {
+  public registerFunction<N extends keyof BuiltInFunctionsRaw>(name: N, fn: BuiltInFunctionsRaw[N]) {
     // @ts-ignore
     this._entries[name] = (...data) => fn(...[...data, this._meta]);
   }
@@ -74,6 +83,6 @@ class FunctionManager { // eslint-disable-line @typescript-eslint/ban-types
 
 export {
   FactoryMeta,
-  BuiltInFunctions,
+  BuiltInFunctionsRaw as BuiltInFunctions,
   FunctionManager
 };

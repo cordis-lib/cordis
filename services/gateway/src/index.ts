@@ -2,10 +2,9 @@ import * as yargs from 'yargs';
 import * as redis from 'ioredis';
 import { RoutingServer, RpcClient, RpcServer } from '@cordis/brokers';
 import { Cluster, IntentKeys } from '@cordis/gateway';
-import { createAmqp, Events, CORDIS_REDIS_SYMBOLS, CORDIS_AMQP_SYMBOLS } from '@cordis/util';
+import { RedisCache, createAmqp, Events, CORDIS_REDIS_SYMBOLS, CORDIS_AMQP_SYMBOLS } from '@cordis/util';
 import { RequestBuilderOptions } from '@cordis/rest';
 import { Channel } from 'amqplib';
-import { StoreManager } from './StoreManager';
 import { Handler } from './Handler';
 import { GatewaySendPayload } from 'discord-api-types';
 
@@ -136,7 +135,7 @@ const main = async () => {
     db: argv['redis-db']
   });
 
-  const cache = new StoreManager(redisClient);
+  const cache = new RedisCache(redisClient);
 
   const log = (label: string) => (data: any, shard: any) => console.log(`[${label.toUpperCase()} -> ${shard}]: ${data}`);
 

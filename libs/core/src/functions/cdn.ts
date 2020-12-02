@@ -1,10 +1,6 @@
 import { ENDPOINTS, ImageOptions, makeDiscordCdnUrl } from '@cordis/util';
-import { FactoryMeta } from '../util/FunctionManager';
-
-interface AvatarOptions {
-  id: string;
-  avatar: string | null;
-}
+import { FactoryMeta } from '../FunctionManager';
+import { AvatarOptions } from '../Types';
 
 const userAvatar = (user: AvatarOptions, options?: ImageOptions | null) => {
   if (!user.avatar) return null;

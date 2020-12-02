@@ -1,6 +1,6 @@
 import { APIRole } from 'discord-api-types';
 
-export const patch = (n: Partial<APIRole>, o?: APIRole | null) => {
+export default (n: Partial<APIRole>, o?: APIRole | null) => {
   const data = o ?? n;
 
   const {

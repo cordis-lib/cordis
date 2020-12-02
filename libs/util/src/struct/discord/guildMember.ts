@@ -1,7 +1,7 @@
 import { APIGuildMember, APIUser } from 'discord-api-types';
-import { patch as patchUser } from './user';
+import { default as patchUser } from './user';
 
-export const patch = (n: Partial<APIGuildMember>, o?: APIGuildMember | null) => {
+export default (n: Partial<APIGuildMember>, o?: APIGuildMember | null) => {
   const data = o ?? n;
 
   /* eslint-disable @typescript-eslint/naming-convention */
@@ -23,8 +23,8 @@ export const patch = (n: Partial<APIGuildMember>, o?: APIGuildMember | null) => 
   };
 
   if (user) {
-    const { data: newUser, old: oldUser } = patchUser(user, data.user);
-    extras.oldUser = oldUser ?? null;
+    const { data: newUser, old: oldUser = null } = patchUser(user, data.user);
+    extras.oldUser = oldUser;
     extras.newUser = newUser;
 
     data.user = newUser;

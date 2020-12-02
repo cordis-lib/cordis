@@ -1,6 +1,6 @@
 import { APIChannel } from 'discord-api-types';
 
-export const patch = (n: Partial<APIChannel>, o?: APIChannel | null) => {
+export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
   const data = o ?? n;
 
   const {

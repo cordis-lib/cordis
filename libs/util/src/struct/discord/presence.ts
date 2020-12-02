@@ -1,6 +1,6 @@
 import { GatewayPresenceUpdate, PresenceUpdateStatus } from 'discord-api-types';
 
-export const patch = (n: Partial<GatewayPresenceUpdate>, o?: GatewayPresenceUpdate | null) => {
+export default (n: Partial<GatewayPresenceUpdate>, o?: GatewayPresenceUpdate | null) => {
   const data = o ?? n;
 
   const {

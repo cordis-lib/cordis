@@ -1,6 +1,6 @@
 import { APIEmoji, APIGuild } from 'discord-api-types';
 
-export const patch = (n: Partial<APIGuild>, o?: APIGuild | null) => {
+export default (n: Partial<APIGuild>, o?: APIGuild | null) => {
   const data = o ?? n;
 
   /* eslint-disable @typescript-eslint/naming-convention */

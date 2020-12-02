@@ -1,17 +1,8 @@
-import { APIUser } from 'discord-api-types';
 import { UserFlags } from '../util/UserFlags';
-import { RequiredProp, Snowflake, SnowflakeEntity } from '@cordis/util';
-import { FactoryMeta } from '../util/FunctionManager';
-
-type ExcludedUserProperties = 'email' | 'flags' | 'mfa_enabled' | 'premium_type' | 'verified';
-
-interface PatchedAPIUser extends RequiredProp<Omit<APIUser, ExcludedUserProperties>, 'bot' | 'system' | 'public_flags'> {}
-interface CordisUser extends Omit<PatchedAPIUser, 'public_flags'>, SnowflakeEntity {
-  flags: UserFlags;
-  toString(): string;
-}
-
-type UserResolvable = PatchedAPIUser | CordisUser;
+import { PatchedAPIUser, Snowflake } from '@cordis/util';
+import { FactoryMeta } from '../FunctionManager';
+import { rawData } from '../util/Symbols';
+import { CordisUser, UserResolvable } from '../Types';
 
 /**
  * Indicates if the given value is or isn't a discord user (sanatized or not)
@@ -43,7 +34,8 @@ const sanatizeUser = (raw: PatchedAPIUser): CordisUser => {
     flags: new UserFlags(BigInt(public_flags)).freeze(),
     toString() {
       return `<@${this.id}>`;
-    }
+    },
+    [rawData]: raw
   };
 };
 
@@ -60,9 +52,6 @@ const resolveUserId = (user: UserResolvable, { functions: { retrieveFunction } }
   retrieveFunction('resolveUser')(user)?.id ?? null;
 
 export {
-  PatchedAPIUser,
-  CordisUser,
-  UserResolvable,
   isUser,
   isCordisUser,
   sanatizeUser,

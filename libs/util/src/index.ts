@@ -10,6 +10,7 @@ export * from './functions/tryImport';
 
 export * from './resolvers/resolveColor';
 
+export * from './struct/Discord';
 export { default as Patcher } from './struct/Discord';
 
 export * from './struct/store/Bag';
@@ -18,6 +19,7 @@ export * from './struct/store/Store';
 
 export * from './struct/AsyncQueue';
 export * from './struct/BitField';
+export * from './struct/RedisCache';
 export * from './struct/Snowflake';
 
 export * from './types/Array';

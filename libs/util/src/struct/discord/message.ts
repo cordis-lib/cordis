@@ -1,6 +1,6 @@
 import { APIMessage } from 'discord-api-types';
 
-export const patch = (n: Partial<APIMessage>, o?: APIMessage | null) => {
+export default (n: Partial<APIMessage>, o?: APIMessage | null) => {
   const data = o ?? n;
 
   const {
