@@ -4,7 +4,13 @@ import { Redis } from 'ioredis';
 import { CordisBrokerTypeError } from '../../error';
 import { CORDIS_REDIS_SYMBOLS } from '@cordis/util';
 
-export class RoutingClient<S> extends Broker {
+export interface RoutingClient<K extends string, S extends Record<K, any>> {
+  on(event: K, listener: (data: S[K]) => any): this;
+  once(event: K, listener: (data: S[K]) => any): this;
+  emit(event: K, data: S[K]): boolean;
+}
+
+export class RoutingClient<K extends string, S extends Record<K, any>> extends Broker {
   public exchange?: string;
   public topicBased?: boolean;
   public redis?: Redis;
@@ -42,6 +48,6 @@ export class RoutingClient<S> extends Broker {
 
     for (const key of keys) await this.channel.bindExchange(queue, this.exchange, key);
 
-    await this._consumeQueue(queue, (content: { type: string; data: S }) => this.emit(content.type, content.data), false);
+    await this._consumeQueue(queue, (content: { type: K; data: S[K] }) => this.emit(content.type, content.data), false);
   }
 }
