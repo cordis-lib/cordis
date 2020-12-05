@@ -10,6 +10,7 @@ cordis is a fully modular, micro-service based [Node.js](https://nodejs.org/) wr
 It is cut up in multiple packages/libraries:
 
 - `@cordis/brokers`, message brokers for routing patterns, pub/sub systems and RPC!
+- `@cordis/core`, a library for interfacing with the Cordis services
 - `@cordis/rest`, containing a REST manager for the Discord API, including a rate limiting system and various utilities
 - `@cordis/gateway`, containing a very flexible way of connecting to Discord's gateway
 - `@cordis/util`, utilities for interacting with Discord or just generally useful functions/structures
@@ -18,3 +19,8 @@ But also services that hook into RabbitMQ using the libraries mentioned above:
 
 - `@cordis/rest-service`
 - `@cordis/gateway-service`
+
+# Roadmap
+- Finishing `@cordis/core` is the currect absolute priority. No voice support is initially planned; but really high API coverage is.
+- Unit tests for the entire toolset.
+- Front facing website and documentation.
