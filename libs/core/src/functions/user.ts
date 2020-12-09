@@ -1,13 +1,13 @@
 import { UserFlags } from '../util/UserFlags';
-import { PatchedAPIUser, Snowflake } from '@cordis/util';
+import { PatchedUser, PatchedClientUser, Snowflake } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
-import { CordisUser, UserResolvable } from '../Types';
+import { CordisUser, CordisClientUser, UserResolvable } from '../Types';
 
 /**
  * Indicates if the given value is or isn't a discord user (sanatized or not)
  */
-const isUser = (user: any, { functions }: FactoryMeta): user is PatchedAPIUser => functions.retrieveFunction('isCordisUser')(user) || (
+const isUser = (user: any, { functions }: FactoryMeta): user is PatchedUser => functions.retrieveFunction('isCordisUser')(user) || (
   'id' in user &&
   'username' in user &&
   'discriminator' in user
@@ -19,9 +19,15 @@ const isUser = (user: any, { functions }: FactoryMeta): user is PatchedAPIUser =
 const isCordisUser = (user: any): user is CordisUser => user.flags instanceof UserFlags && user.toString() === `<@${user.id}>`;
 
 /**
+ * Indicates wether the given value is a sanatized Cordis client user or not
+ */
+const isCordisClientUser = (user: any, { functions }: FactoryMeta): user is CordisClientUser =>
+  functions.retrieveFunction('isCordisUser')(user) && 'mfaEnabled' in user && 'verified' in user;
+
+/**
  * Sanatizes a raw Discord user into a Cordis user
  */
-const sanatizeUser = (raw: PatchedAPIUser): CordisUser => {
+const sanatizeUser = (raw: PatchedUser): CordisUser => {
   const {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     public_flags,
@@ -38,6 +44,19 @@ const sanatizeUser = (raw: PatchedAPIUser): CordisUser => {
     toString() {
       return `<@${this.id}>`;
     },
+    [rawData]: raw
+  };
+};
+
+const sanatizeClientUser = (raw: PatchedClientUser): CordisClientUser => {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { mfa_enabled, verified } = raw;
+  const user = sanatizeUser(raw);
+
+  return {
+    ...user,
+    mfaEnabled: mfa_enabled,
+    verified,
     [rawData]: raw
   };
 };
@@ -60,6 +79,8 @@ const resolveUserId = (user: UserResolvable, { functions: { retrieveFunction } }
 export {
   isUser,
   isCordisUser,
+  isCordisClientUser,
+  sanatizeClientUser,
   sanatizeUser,
   resolveUser,
   resolveUserId

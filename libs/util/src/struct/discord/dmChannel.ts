@@ -1,6 +1,11 @@
-import { APIChannel } from 'discord-api-types';
+import { APIChannel, ChannelType } from 'discord-api-types';
+import { RequiredProp } from '../../types/RequiredProp';
 
-export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
+export interface PatchedDMChannel extends RequiredProp<Omit<APIChannel, 'type' | 'recipients'>> {
+  type: ChannelType.DM;
+}
+
+export default <T extends APIChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
   const data = o ?? n;
 
   const {
@@ -9,12 +14,12 @@ export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
     last_pin_timestamp // eslint-disable-line @typescript-eslint/naming-convention
   } = n;
 
-  if (recipients?.length) data.recipients = recipients;
-  if (last_message_id !== undefined) data.last_message_id = last_message_id;
-  if (last_pin_timestamp !== undefined) data.last_pin_timestamp = last_pin_timestamp;
+  data.recipients = recipients ?? data.recipients ?? [];
+  data.last_message_id = last_message_id ?? data.last_message_id;
+  data.last_pin_timestamp = last_pin_timestamp ?? data.last_pin_timestamp;
 
   return {
-    data: data as APIChannel,
-    old: o
+    data: data as PatchedDMChannel,
+    old: o as T
   };
 };

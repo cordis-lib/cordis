@@ -1,6 +1,9 @@
 import { GatewayPresenceUpdate, PresenceUpdateStatus } from 'discord-api-types';
+import { RequiredProp } from '../../types/RequiredProp';
 
-export default (n: Partial<GatewayPresenceUpdate>, o?: GatewayPresenceUpdate | null) => {
+export interface PatchedPresence extends RequiredProp<GatewayPresenceUpdate, 'status' | 'activities'> {}
+
+export default <T extends GatewayPresenceUpdate | null | undefined>(n: Partial<GatewayPresenceUpdate>, o?: T) => {
   const data = o ?? n;
 
   const {
@@ -12,7 +15,7 @@ export default (n: Partial<GatewayPresenceUpdate>, o?: GatewayPresenceUpdate | n
   data.activities = activities ?? data.activities ?? [];
 
   return {
-    data: data as GatewayPresenceUpdate,
-    old: o
+    data: data as PatchedPresence,
+    old: o as T
   };
 };

@@ -1,8 +1,12 @@
-import { APIChannel } from 'discord-api-types';
-import { default as patchGuildChannel } from './guildChannel';
+import { APIChannel, ChannelType } from 'discord-api-types';
+import { default as patchGuildChannel, PatchedGuildChannel } from './guildChannel';
 
-export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
-  const { data: newChannel, old: oldChannel } = patchGuildChannel(n, o);
+export interface PatchedVoiceChannel extends Omit<PatchedGuildChannel, 'type'> {
+  type: ChannelType.GUILD_VOICE;
+}
+
+export default <T extends APIChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+  const { data: newChannel, old: oldChannel } = patchGuildChannel<T>(n, o);
 
   const data = oldChannel ?? newChannel;
 
@@ -12,11 +16,11 @@ export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
     user_limit
   } = n;
 
-  if (bitrate !== undefined) data.bitrate = bitrate;
-  if (user_limit !== undefined) data.user_limit = user_limit;
+  data.bitrate = bitrate ?? data.bitrate;
+  data.user_limit = user_limit ?? data.user_limit;
 
   return {
-    data,
+    data: data as PatchedVoiceChannel,
     old: oldChannel
   };
 };

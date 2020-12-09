@@ -1,6 +1,14 @@
 import { APIEmoji, APIGuild } from 'discord-api-types';
+import { RequiredProp } from '../../types/RequiredProp';
 
-export default (n: Partial<APIGuild>, o?: APIGuild | null) => {
+export interface PatchedGuild extends RequiredProp<
+APIGuild,
+'member_count' | 'large' | 'features' |
+'unavailable' | 'widget_enabled' | 'max_members' |
+'max_presences' | 'channels' | 'roles' | 'members' | 'emojis' | 'presences'
+> {}
+
+export default <T extends APIGuild | null | undefined>(n: Partial<APIGuild>, o?: T) => {
   const data = o ?? n;
 
   /* eslint-disable @typescript-eslint/naming-convention */
@@ -45,42 +53,41 @@ export default (n: Partial<APIGuild>, o?: APIGuild | null) => {
   } = n;
     /* eslint-enable @typescript-eslint/naming-convention */
 
-  if (name !== undefined) data.name = name;
-  if (icon !== undefined) data.icon = icon;
-  if (splash !== undefined) data.splash = splash;
-  if (region !== undefined) data.region = region;
-  if (owner_id !== undefined) data.owner_id = owner_id;
-  if (member_count !== undefined) data.member_count = member_count;
+  data.name = name ?? data.name;
+  data.icon = icon ?? data.icon;
+  data.splash = splash ?? data.splash;
+  data.region = region ?? data.region;
+  data.owner_id = owner_id ?? data.owner_id;
+  data.member_count = member_count ?? data.member_count;
   data.large = large ?? data.large ?? false;
   data.features = features ?? data.features ?? [];
-  if (application_id !== undefined) data.application_id = application_id;
-  if (afk_timeout !== undefined) data.afk_timeout = afk_timeout;
-  if (afk_channel_id !== undefined) data.afk_channel_id = afk_channel_id;
-  if (system_channel_id !== undefined) data.system_channel_id = system_channel_id;
-  if (system_channel_flags !== undefined) data.system_channel_flags = system_channel_flags;
-  if (premium_tier !== undefined) data.premium_tier = premium_tier;
-  if (verification_level !== undefined) data.verification_level = verification_level;
-  if (explicit_content_filter !== undefined) data.explicit_content_filter = explicit_content_filter;
-  if (mfa_level !== undefined) data.mfa_level = mfa_level;
+  data.application_id = application_id ?? data.application_id;
+  data.afk_timeout = afk_timeout ?? data.afk_timeout;
+  data.afk_channel_id = afk_channel_id ?? data.afk_channel_id;
+  data.system_channel_id = system_channel_id ?? data.system_channel_id;
+  data.system_channel_flags = system_channel_flags ?? data.system_channel_flags;
+  data.premium_tier = premium_tier ?? data.premium_tier;
+  data.verification_level = verification_level ?? data.verification_level;
+  data.explicit_content_filter = explicit_content_filter ?? data.explicit_content_filter;
+  data.mfa_level = mfa_level ?? data.mfa_level;
   data.joined_at = joined_at ?? data.joined_at;
-  if (default_message_notifications !== undefined) data.default_message_notifications = default_message_notifications;
-  if (vanity_url_code !== undefined) data.vanity_url_code = vanity_url_code;
-  if (description !== undefined) data.description = description;
-  if (banner !== undefined) data.banner = banner;
-  if (unavailable !== undefined) data.unavailable = data.unavailable ?? false;
-  if (rules_channel_id !== undefined) data.rules_channel_id = rules_channel_id;
-  if (public_updates_channel_id !== undefined) data.public_updates_channel_id = public_updates_channel_id;
-  if (premium_subscription_count !== undefined) data.premium_subscription_count = premium_subscription_count;
+  data.default_message_notifications = default_message_notifications ?? data.default_message_notifications;
+  data.vanity_url_code = vanity_url_code ?? data.vanity_url_code;
+  data.description = description ?? data.description;
+  data.banner = banner ?? data.banner;
+  data.unavailable = unavailable ?? data.unavailable ?? false;
+  data.rules_channel_id = rules_channel_id ?? data.rules_channel_id;
+  data.public_updates_channel_id = public_updates_channel_id ?? data.public_updates_channel_id;
+  data.premium_subscription_count = premium_subscription_count ?? data.premium_subscription_count;
   data.widget_enabled = widget_enabled ?? data.widget_enabled ?? false;
   data.widget_channel_id = widget_channel_id ?? data.widget_channel_id;
   data.max_members = max_members ?? data.max_members ?? 25e4;
   data.max_presences = max_presences ?? data.max_presences ?? 25e3;
-  if (approximate_member_count != null) data.approximate_member_count = approximate_member_count;
-  if (approximate_presence_count != null) data.approximate_presence_count = approximate_presence_count;
-
-  data.channels = channels ?? [];
-  data.roles = roles ?? [];
-  data.members = members ?? [];
+  data.approximate_member_count = approximate_member_count ?? data.approximate_member_count;
+  data.approximate_presence_count = approximate_presence_count ?? data.approximate_presence_count;
+  data.channels = channels ?? data.channels ?? [];
+  data.roles = roles ?? data.roles ?? [];
+  data.members = members ?? data.members ?? [];
 
   let triggerEmojiUpdate = false;
   let emojiCreations = null;
@@ -113,11 +120,11 @@ export default (n: Partial<APIGuild>, o?: APIGuild | null) => {
     data.emojis = emojis;
   }
 
-  if (presences) data.presences = presences;
+  data.presences = presences ?? data.presences ?? [];
 
   return {
-    data: data as APIGuild,
-    old: o,
+    data: data as PatchedGuild,
+    old: o as T,
     triggerEmojiUpdate,
     emojiCreations,
     emojiDeletions,

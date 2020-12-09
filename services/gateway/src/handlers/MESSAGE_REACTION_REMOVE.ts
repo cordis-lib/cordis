@@ -1,10 +1,10 @@
-import { CORDIS_REDIS_SYMBOLS, CordisReaction, CORDIS_AMQP_SYMBOLS } from '@cordis/util';
-import { APIMessage, GatewayMessageReactionRemoveDispatch } from 'discord-api-types';
+import { CORDIS_REDIS_SYMBOLS, PatchedReaction, CORDIS_AMQP_SYMBOLS, PatchedMessage } from '@cordis/util';
+import { GatewayMessageReactionRemoveDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const messageReactionRemove: Handler<GatewayMessageReactionRemoveDispatch['d']> = async (data, service, cache, _, botUser) => {
-  const message = await cache.get<APIMessage>(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), data.message_id);
-  const reaction = await cache.get<CordisReaction>(
+  const message = await cache.get<PatchedMessage>(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), data.message_id);
+  const reaction = await cache.get<PatchedReaction>(
     CORDIS_REDIS_SYMBOLS.cache.reactions(data.message_id),
     (data.emoji.id ?? data.emoji.name)!
   );

@@ -4,12 +4,12 @@ import { default as patchUser } from './user';
 
 export type ExcludedClientUserProperties = 'email' | 'flags' | 'premium_type';
 
-export interface PatchedAPIClientUser extends RequiredProp<
+export interface PatchedClientUser extends RequiredProp<
 Omit<APIUser, ExcludedClientUserProperties>,
 'bot' | 'system' | 'public_flags' | 'verified' | 'mfa_enabled'
 > {}
 
-export default (n: Partial<APIUser>, o?: APIUser | null) => {
+export default <T extends APIUser | null | undefined>(n: Partial<APIUser>, o?: T) => {
   const { data: newUser }: { data: APIUser } = patchUser(n, o) as any;
 
   const {
@@ -24,7 +24,7 @@ export default (n: Partial<APIUser>, o?: APIUser | null) => {
   data.mfa_enabled = mfa_enabled ?? data.mfa_enabled ?? false;
 
   return {
-    data: data as PatchedAPIClientUser,
-    old: o as PatchedAPIClientUser
+    data: data as PatchedClientUser,
+    old: o as T
   };
 };

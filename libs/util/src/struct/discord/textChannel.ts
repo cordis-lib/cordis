@@ -1,8 +1,16 @@
-import { APIChannel } from 'discord-api-types';
-import { default as patchGuildChannel } from './guildChannel';
+import { APIChannel, ChannelType } from 'discord-api-types';
+import { RequiredProp } from '../../types/RequiredProp';
+import { default as patchGuildChannel, PatchedGuildChannel } from './guildChannel';
 
-export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
-  const { data: newChannel, old: oldChannel } = patchGuildChannel(n, o);
+export interface PatchedTextChannel extends RequiredProp<
+Omit<PatchedGuildChannel, 'type'>,
+'topic' | 'nsfw' | 'last_message_id' | 'last_pin_timestamp'
+> {
+  type: ChannelType.GUILD_TEXT;
+}
+
+export default <T extends APIChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+  const { data: newChannel, old: oldChannel } = patchGuildChannel<T>(n, o);
 
   const data = oldChannel ?? newChannel;
 
@@ -16,13 +24,13 @@ export default (n: Partial<APIChannel>, o?: APIChannel | null) => {
   } = n;
 
   data.topic = topic ?? data.topic ?? null;
-  if (nsfw !== undefined) data.nsfw = nsfw;
-  if (last_message_id !== undefined) data.last_message_id = last_message_id;
-  if (rate_limit_per_user !== undefined) data.rate_limit_per_user = rate_limit_per_user;
-  if (last_pin_timestamp) data.last_pin_timestamp = last_pin_timestamp;
+  data.nsfw = nsfw ?? data.nsfw ?? false;
+  data.last_message_id = last_message_id ?? data.last_message_id ?? null;
+  data.rate_limit_per_user = rate_limit_per_user ?? data.rate_limit_per_user;
+  data.last_pin_timestamp = last_pin_timestamp ?? data.last_pin_timestamp ?? null;
 
   return {
-    data,
+    data: data as PatchedTextChannel,
     old: oldChannel
   };
 };

@@ -1,11 +1,11 @@
-import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
-import { GatewayMessageUpdateDispatch, APIMessage, APIGuild } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedGuild, Patcher } from '@cordis/util';
+import { GatewayMessageUpdateDispatch, APIMessage } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const messageUpdate: Handler<GatewayMessageUpdateDispatch['d']> = async (data, service, cache) => {
   const existing = await cache.get<APIMessage>(CORDIS_REDIS_SYMBOLS.cache.messages(data.channel_id), data.id);
   const { data: message, old } = existing ? Patcher.patchMessage(data, existing) : Patcher.patchMessage(data);
-  const guild = data.guild_id ? await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id) : null;
+  const guild = data.guild_id ? await cache.get<PatchedGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id) : null;
 
   const res = {
     n: message,

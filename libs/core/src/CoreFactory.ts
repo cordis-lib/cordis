@@ -16,11 +16,11 @@ const coreFactory = (
   worker = true
 ) => {
   const rest = new Rest(channel);
-  const gateway = new Gateway(channel, redis);
-
   const cache = new RedisCache(redis);
 
   const functionManager = new FunctionManager({ rest, cache });
+  const gateway = new Gateway(channel, redis, functionManager);
+
   const functions = new Proxy<FunctionManager & BuiltInFunctions>(functionManager as any, {
     // @ts-ignore
     get: (target, key) => target.retrieveFunction(key) ?? target[key] // eslint-disable-line @typescript-eslint/no-unnecessary-condition

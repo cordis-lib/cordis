@@ -1,7 +1,10 @@
 import { APIGuildMember, APIUser } from 'discord-api-types';
-import { default as patchUser } from './user';
+import { RequiredProp } from '../../types/RequiredProp';
+import { default as patchUser, PatchedUser } from './user';
 
-export default (n: Partial<APIGuildMember>, o?: APIGuildMember | null) => {
+export interface PatchedGuildMember extends RequiredProp<APIGuildMember, 'mute' | 'deaf'> {}
+
+export default <T extends PatchedGuildMember | null | undefined>(n: Partial<APIGuildMember>, o?: T) => {
   const data = o ?? n;
 
   /* eslint-disable @typescript-eslint/naming-convention */
@@ -18,7 +21,7 @@ export default (n: Partial<APIGuildMember>, o?: APIGuildMember | null) => {
 
   const extras = {
     oldUser: null as APIUser | null,
-    newUser: null as APIUser | null,
+    newUser: null as PatchedUser | null,
     roles: [] as unknown as [string[], string[]]
   };
 
@@ -30,9 +33,9 @@ export default (n: Partial<APIGuildMember>, o?: APIGuildMember | null) => {
     data.user = newUser;
   }
 
-  if (nick !== undefined) data.nick = nick;
-  if (joined_at !== undefined) data.joined_at = joined_at;
-  if (premium_since !== undefined) data.premium_since = premium_since;
+  data.nick = nick ?? data.nick;
+  data.joined_at = joined_at ?? data.joined_at;
+  data.premium_since = premium_since ?? data.premium_since;
   data.mute = mute ?? data.mute ?? false;
   data.deaf = deaf ?? data.deaf ?? false;
 
@@ -42,8 +45,8 @@ export default (n: Partial<APIGuildMember>, o?: APIGuildMember | null) => {
   }
 
   return {
-    data: data as APIGuildMember,
-    old: o,
+    data: data as PatchedGuildMember,
+    old: o as T,
     ...extras
   };
 };

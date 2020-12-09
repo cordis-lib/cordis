@@ -5,9 +5,9 @@ import { CordisBrokerTypeError } from '../../error';
 import { CORDIS_REDIS_SYMBOLS } from '@cordis/util';
 
 export interface RoutingClient<K extends string, S extends Record<K, any>> {
-  on(event: K, listener: (data: S[K]) => any): this;
-  once(event: K, listener: (data: S[K]) => any): this;
-  emit(event: K, data: S[K]): boolean;
+  on<LK extends K>(event: LK, listener: (data: S[LK]) => any): this;
+  once<LK extends K>(event: LK, listener: (data: S[LK]) => any): this;
+  emit<LK extends K>(event: LK, data: S[LK]): boolean;
 }
 
 export class RoutingClient<K extends string, S extends Record<K, any>> extends Broker {

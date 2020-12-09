@@ -11,7 +11,7 @@ export class RoutingServer<K extends string, S extends Record<K, any>> extends B
     this.exchange = await this.channel.assertExchange(exchange, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
   }
 
-  public publish(content: S[K], key: K, options?: amqp.Options.Publish) {
+  public publish<R extends K>(content: S[R], key: R, options?: amqp.Options.Publish) {
     if (!this.exchange) throw new CordisBrokerError('brokerNotInit');
     return this._publishToExchange(this.exchange, { type: key, data: content }, key, options);
   }

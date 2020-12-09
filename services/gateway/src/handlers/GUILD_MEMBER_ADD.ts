@@ -1,9 +1,9 @@
-import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
-import { GatewayGuildMemberAddDispatch, APIGuild, APIUser } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedGuild, Patcher } from '@cordis/util';
+import { GatewayGuildMemberAddDispatch, APIUser } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildMemberAdd: Handler<GatewayGuildMemberAddDispatch['d']> = async (data, service, cache) => {
-  const guild = await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id);
+  const guild = await cache.get<PatchedGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id);
   const { data: member } = Patcher.patchGuildMember(data);
   if (guild) {
     service.publish({ guild, member }, CORDIS_AMQP_SYMBOLS.gateway.events.guildMemberAdd);

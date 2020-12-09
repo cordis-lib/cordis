@@ -1,9 +1,9 @@
-import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedGuild, Patcher } from '@cordis/util';
 import { APIGuild } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildCreate: Handler<APIGuild> = async (data, service, cache) => {
-  const existing = await cache.get<APIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.id);
+  const existing = await cache.get<PatchedGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.id);
 
   if (existing?.unavailable && !data.unavailable) {
     const { data: guild, triggerEmojiUpdate, emojiCreations, emojiDeletions, emojiUpdates } = Patcher.patchGuild(data, existing);

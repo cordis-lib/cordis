@@ -1,5 +1,5 @@
 import { ArrayHead, ArrayTail, ImageOptions, RedisCache } from '@cordis/util';
-import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId } from './functions/user';
+import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId, isCordisClientUser, sanatizeClientUser } from './functions/user';
 import { Rest } from './services/Rest';
 import {
   userAvatar,
@@ -19,7 +19,9 @@ type ExtractMetaParameter<T extends (...args: any) => any> = (...args: ArrayHead
 interface BuiltInFunctionsRaw {
   isUser: typeof isUser;
   isCordisUser: typeof isCordisUser;
+  isCordisClientUser: typeof isCordisClientUser;
   sanatizeUser: typeof sanatizeUser;
+  sanatizeClientUser: typeof sanatizeClientUser;
   resolveUser: typeof resolveUser;
   resolveUserId: typeof resolveUserId;
 

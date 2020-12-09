@@ -1,79 +1,85 @@
 import {
   APIChannel,
-  APIGuild,
   APIEmoji,
+  APIGuild,
   APIReaction,
-  APIGuildMember,
   APIUser,
-  APIMessage,
-  APIRole,
-  GatewayGuildRoleUpdateDispatch,
+  GatewayInviteCreateDispatch,
+  GatewayInviteDeleteDispatch,
   GatewayPresenceUpdate,
   GatewayReadyDispatch,
   GatewayTypingStartDispatch,
   GatewayVoiceServerUpdateDispatch,
   GatewayVoiceStateUpdateDispatch,
-  GatewayWebhooksUpdateDispatch,
-  GatewayInviteCreateDispatch,
-  GatewayInviteDeleteDispatch
+  GatewayWebhooksUpdateDispatch
 } from 'discord-api-types';
+import {
+  PatchedChannel,
+  PatchedClientUser,
+  PatchedGuild,
+  PatchedGuildMember,
+  PatchedMessage,
+  PatchedPresence,
+  PatchedRole,
+  PatchedUser
+} from '../struct/Discord';
 
 interface Updated<T> {
   o: T;
   n: T;
 }
 
-export interface CordisReaction extends APIReaction {
+export interface PatchedReaction extends APIReaction {
   users: string[];
 }
 
 export interface Events {
-  channelCreate: { guild?: APIGuild; channel: APIChannel };
-  channelDelete: { guild?: APIGuild; channel: APIChannel };
-  channelPinsUpdate: { guild?: APIGuild; channel: APIChannel; lastPinTimestamp?: string };
-  channelUpdate: Updated<APIChannel> & { guild?: APIGuild };
+  channelCreate: { guild?: PatchedGuild; channel: PatchedChannel };
+  channelDelete: { guild?: PatchedGuild; channel: PatchedChannel };
+  channelPinsUpdate: { guild?: PatchedGuild; channel: PatchedChannel; lastPinTimestamp?: string };
+  channelUpdate: { n: PatchedChannel; o: APIChannel } & { guild?: PatchedGuild };
 
-  emojiCreate: { guild: APIGuild; emoji: APIEmoji };
-  emojiDelete: { guild: APIGuild; emoji: APIEmoji };
-  emojiUpdate: Updated<APIEmoji> & { guild: APIGuild };
+  emojiCreate: { guild: PatchedGuild; emoji: APIEmoji };
+  emojiDelete: { guild: PatchedGuild; emoji: APIEmoji };
+  emojiUpdate: Updated<APIEmoji> & { guild: PatchedGuild };
 
-  guildIntegrationsUpdate: APIGuild;
-  guildBanAdd: { guild: APIGuild; user: APIUser };
-  guildBanRemove: { guild: APIGuild; user: APIUser };
-  guildCreate: APIGuild;
-  guildAvailable: APIGuild;
-  guildDelete: APIGuild;
-  guildUnavailable: APIGuild;
-  guildUpdate: Updated<APIGuild>;
+  guildIntegrationsUpdate: PatchedGuild;
+  guildBanAdd: { guild: PatchedGuild; user: PatchedUser };
+  guildBanRemove: { guild: PatchedGuild; user: PatchedUser };
+  guildCreate: PatchedGuild;
+  guildAvailable: PatchedGuild;
+  guildDelete: PatchedGuild;
+  guildUnavailable: PatchedGuild;
+  guildUpdate: Updated<PatchedGuild>;
 
-  guildMemberAdd: { guild: APIGuild; member: APIGuildMember };
-  guildMemberRemove: { guild: APIGuild; member: APIGuildMember };
-  guildMemberUpdate: Updated<APIGuildMember> & { guild: APIGuild };
+  guildMemberAdd: { guild: PatchedGuild; member: PatchedGuildMember };
+  guildMemberRemove: { guild: PatchedGuild; member: PatchedGuildMember };
+  guildMemberUpdate: Updated<PatchedGuildMember> & { guild: APIGuild };
 
-  roleCreate: { guild: APIGuild; role: APIRole };
-  roleDelete: { guild: APIGuild; role: APIRole };
-  roleUpdate: Updated<GatewayGuildRoleUpdateDispatch['d']> & { guild: APIGuild };
+  roleCreate: { guild: PatchedGuild; role: PatchedRole };
+  roleDelete: { guild: PatchedGuild; role: PatchedRole };
+  roleUpdate: Updated<PatchedRole> & { guild: PatchedGuild };
 
-  messageCreate: APIMessage;
-  bulkMessageDelete: APIMessage[];
-  messageDelete: APIMessage;
-  messageUpdate: ({ o: APIMessage; n: APIMessage } | { n: Partial<APIMessage> }) & { guild: APIGuild | null };
+  messageCreate: PatchedMessage;
+  bulkMessageDelete: PatchedMessage[];
+  messageDelete: PatchedMessage;
+  messageUpdate: ({ o: PatchedMessage; n: PatchedMessage } | { n: Partial<PatchedMessage> }) & { guild: APIGuild | null };
 
-  messageReactionAdd: { reaction: CordisReaction; message: APIMessage | null; messageId: string };
-  messageReactionRemove: { reaction: CordisReaction; message: APIMessage | null; messageId: string };
-  messageReactionRemoveEmoji: { reaction: CordisReaction; message: APIMessage | null; messageId: string };
-  messageReactionRemoveAll: { reactions: CordisReaction[]; message: APIMessage | null; messageId: string };
+  messageReactionAdd: { reaction: PatchedReaction; message: PatchedMessage | null; messageId: string };
+  messageReactionRemove: { reaction: PatchedReaction; message: PatchedMessage | null; messageId: string };
+  messageReactionRemoveEmoji: { reaction: PatchedReaction; message: PatchedMessage | null; messageId: string };
+  messageReactionRemoveAll: { reactions: PatchedReaction[]; message: PatchedMessage | null; messageId: string };
 
-  inviteCreate: { guild: APIGuild; invite: GatewayInviteCreateDispatch['d'] };
-  inviteDelete: { guild: APIGuild; invite: GatewayInviteDeleteDispatch['d'] };
+  inviteCreate: { guild: PatchedGuild; invite: GatewayInviteCreateDispatch['d'] };
+  inviteDelete: { guild: PatchedGuild; invite: GatewayInviteDeleteDispatch['d'] };
 
-  presenceUpdate: { n: GatewayPresenceUpdate; o?: GatewayPresenceUpdate | null };
-  ready: GatewayReadyDispatch['d'];
+  presenceUpdate: { n: PatchedPresence; o?: GatewayPresenceUpdate | null };
+  ready: GatewayReadyDispatch['d'] & { user: PatchedClientUser };
   typingStart: GatewayTypingStartDispatch['d'];
-  userUpdate: Updated<APIUser>;
+  userUpdate: { n: PatchedUser; o: APIUser };
   voiceServerUpdate: GatewayVoiceServerUpdateDispatch['d'];
   voiceStateUpdate: GatewayVoiceStateUpdateDispatch['d'];
   webhooksUpdate: GatewayWebhooksUpdateDispatch['d'];
 
-  botUserUpdate: Updated<APIUser>;
+  botUserUpdate: Updated<PatchedClientUser>;
 }

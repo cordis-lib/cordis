@@ -1,8 +1,12 @@
 import { RoutingClient } from '@cordis/brokers';
-import { CORDIS_AMQP_SYMBOLS, Events } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_EVENTS, Events } from '@cordis/util';
 import * as amqp from 'amqplib';
 import { Redis } from 'ioredis';
 import { EventEmitter } from 'events';
+import { GatewayCommands } from './GatewayCommands';
+import { GatewaySendPayload } from 'discord-api-types';
+import { CordisClientUser } from '../Types';
+import { FunctionManager } from '../FunctionManager';
 
 export interface GatewayOptions {
   keys: (keyof Events)[];
@@ -15,14 +19,26 @@ export interface Gateway {
 }
 
 export class Gateway extends EventEmitter {
-  public service: RoutingClient<Events[keyof Events]>;
+  private readonly _commands: GatewayCommands;
 
-  public constructor(channel: amqp.Channel, redis: Redis) {
+  public readonly service: RoutingClient<keyof Events, Events>;
+  public clientUser?: CordisClientUser;
+
+  public constructor(channel: amqp.Channel, redis: Redis, public readonly functions: FunctionManager) {
     super();
+    this._commands = new GatewayCommands(channel);
     this.service = new RoutingClient(channel, redis);
   }
 
+  public send(options: GatewaySendPayload) {
+    return this._commands.send(options);
+  }
+
   public init(options: GatewayOptions) {
+    this.service.on(CORDIS_EVENTS.ready, data => {
+      this.clientUser = this.functions.retrieveFunction('sanatizeClientUser')(data.user);
+    });
+
     return this.service.init(
       CORDIS_AMQP_SYMBOLS.gateway.packets,
       options.keys,
