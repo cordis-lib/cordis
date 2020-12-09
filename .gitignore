@@ -1,10 +1,10 @@
 dist
 types
-!libs/types
-!libs/util/src/types
 
 node_modules
 
 .vscode
 *.log
 doc
+docs
+cordisjs.github.io

@@ -1,4 +1,4 @@
-import { CORDIS_REDIS_SYMBOLS, Patcher } from '@cordis/util';
+import { Patcher } from '@cordis/util';
 import { APIUser } from 'discord-api-types';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
@@ -7,7 +7,7 @@ import { CordisUser, UserResolvable } from '../Types';
 /**
  * Attempts to fetch a user; retrieves from cache if possible
  */
-const fetchUser = async (user: UserResolvable | string, useCache = true, { functions: { retrieveFunction }, cache, rest }: FactoryMeta) => {
+const fetchUser = async (user: UserResolvable | string, useCache = true, { functions: { retrieveFunction }, users, rest }: FactoryMeta) => {
   if (typeof user !== 'string') {
     const resolved = retrieveFunction('resolveUserId')(user);
     // TODO: Internal errors
@@ -15,8 +15,8 @@ const fetchUser = async (user: UserResolvable | string, useCache = true, { funct
     user = resolved;
   }
 
-  let cached: CordisUser | null = null;
-  if (useCache && (cached = await cache.get<CordisUser>(CORDIS_REDIS_SYMBOLS.cache.users, user))) {
+  let cached: CordisUser | undefined;
+  if (useCache && (cached = await users.get(user))) {
     return cached;
   }
 
@@ -26,7 +26,7 @@ const fetchUser = async (user: UserResolvable | string, useCache = true, { funct
       return retrieveFunction('sanatizeUser')(patched);
     });
 
-  await cache.set<CordisUser>(CORDIS_REDIS_SYMBOLS.cache.users, user, result);
+  await users.set(user, result);
   return result;
 };
 
