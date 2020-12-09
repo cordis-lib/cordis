@@ -39,4 +39,4 @@ jobs:
         run: cd cordisjs.github.io && git add . && git commit -m "Docs build for cordis $(basename $GITHUB_REF) commit on $(date)"
 
       - name: Push the changes
-        run: cd doc && git push --force origin main
+        run: cd cordisjs.github.io && git push --force origin main
