@@ -1,4 +1,4 @@
-import { ArrayHead, ArrayTail, ImageOptions, RedisCache } from '@cordis/util';
+import { ArrayHead, ArrayTail, ImageOptions, RedisStore } from '@cordis/util';
 import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId, isCordisClientUser, sanatizeClientUser } from './functions/user';
 import { Rest } from './services/Rest';
 import {
@@ -7,11 +7,12 @@ import {
   AvatarOptions,
   displayedUserAvatar
 } from './functions/cdn';
+import { CordisUser } from './Types';
 
 interface FactoryMeta {
   functions: FunctionManager;
   rest: Rest;
-  cache: RedisCache;
+  users: RedisStore<CordisUser>;
 }
 
 type ExtractMetaParameter<T extends (...args: any) => any> = (...args: ArrayHead<Parameters<T>>) => ReturnType<T>;
@@ -87,6 +88,7 @@ class FunctionManager {
 
 export {
   FactoryMeta,
-  BuiltInFunctionsRaw as BuiltInFunctions,
+  BuiltInFunctionsRaw,
+  BuiltInFunctions,
   FunctionManager
 };

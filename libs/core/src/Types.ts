@@ -28,6 +28,10 @@ interface CordisClientUser extends Omit<PatchedClientUser, 'public_flags' | 'mfa
 type UserResolvable = PatchedUser | CordisUser;
 // End user types
 
+export interface CoreEvents {
+  ready: CordisClientUser;
+}
+
 export {
   AvatarOptions,
   CordisUser,

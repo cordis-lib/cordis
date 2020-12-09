@@ -7,7 +7,7 @@ import { CordisUser, CordisClientUser, UserResolvable } from '../Types';
 /**
  * Indicates if the given value is or isn't a discord user (sanatized or not)
  */
-const isUser = (user: any, { functions }: FactoryMeta): user is PatchedUser => functions.retrieveFunction('isCordisUser')(user) || (
+const isUser = (user: any): user is PatchedUser => (user.flags instanceof UserFlags && user.toString() === `<@${user.id}>`) || (
   'id' in user &&
   'username' in user &&
   'discriminator' in user
@@ -21,8 +21,8 @@ const isCordisUser = (user: any): user is CordisUser => user.flags instanceof Us
 /**
  * Indicates wether the given value is a sanatized Cordis client user or not
  */
-const isCordisClientUser = (user: any, { functions }: FactoryMeta): user is CordisClientUser =>
-  functions.retrieveFunction('isCordisUser')(user) && 'mfaEnabled' in user && 'verified' in user;
+const isCordisClientUser = (user: any): user is CordisClientUser =>
+  user.flags instanceof UserFlags && user.toString() === `<@${user.id}>` && 'mfaEnabled' in user && 'verified' in user;
 
 /**
  * Sanatizes a raw Discord user into a Cordis user

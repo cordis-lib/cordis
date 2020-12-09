@@ -1,11 +1,11 @@
 import { RoutingClient } from '@cordis/brokers';
-import { CORDIS_AMQP_SYMBOLS, CORDIS_EVENTS, Events } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, Events } from '@cordis/util';
 import * as amqp from 'amqplib';
 import { Redis } from 'ioredis';
 import { EventEmitter } from 'events';
 import { GatewayCommands } from './GatewayCommands';
 import { GatewaySendPayload } from 'discord-api-types';
-import { CordisClientUser } from '../Types';
+import { CordisClientUser, CoreEvents } from '../Types';
 import { FunctionManager } from '../FunctionManager';
 
 export interface GatewayOptions {
@@ -14,14 +14,19 @@ export interface GatewayOptions {
 }
 
 export interface Gateway {
-  on<E extends keyof Events, T extends Events[E]>(event: E, listener: (data: T) => any): this;
-  once<E extends keyof Events, T extends Events[E]>(event: E, listener: (data: T) => any): this;
+  on<E extends keyof CoreEvents, T extends CoreEvents[E]>(event: E, listener: (data: T) => any): this;
+  once<E extends keyof CoreEvents, T extends CoreEvents[E]>(event: E, listener: (data: T) => any): this;
+  emit<E extends keyof CoreEvents, T extends CoreEvents[E]>(event: E, data: T): boolean;
 }
 
 export class Gateway extends EventEmitter {
+  public readonly events: { [K in keyof CoreEvents]: (data: Events[K]) => CoreEvents[K] } = {
+    ready: data => (this.clientUser = this.functions.retrieveFunction('sanatizeClientUser')(data.user))
+  };
+
   private readonly _commands: GatewayCommands;
 
-  public readonly service: RoutingClient<keyof Events, Events>;
+  public readonly service: RoutingClient<keyof CoreEvents, Events>;
   public clientUser?: CordisClientUser;
 
   public constructor(channel: amqp.Channel, redis: Redis, public readonly functions: FunctionManager) {
@@ -35,9 +40,11 @@ export class Gateway extends EventEmitter {
   }
 
   public init(options: GatewayOptions) {
-    this.service.on(CORDIS_EVENTS.ready, data => {
-      this.clientUser = this.functions.retrieveFunction('sanatizeClientUser')(data.user);
-    });
+    for (const key of options.keys) {
+      // @ts-ignore
+      // TODO
+      this.service.on(key, data => this.emit(key, this.events[key](data)));
+    }
 
     return this.service.init(
       CORDIS_AMQP_SYMBOLS.gateway.packets,
