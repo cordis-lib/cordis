@@ -1,5 +1,5 @@
-import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedGuild, Patcher } from '@cordis/util';
-import { GatewayGuildMemberAddDispatch, APIUser } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedGuild, PatchedUser, Patcher } from '@cordis/util';
+import { GatewayGuildMemberAddDispatch } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const guildMemberAdd: Handler<GatewayGuildMemberAddDispatch['d']> = async (data, service, cache) => {
@@ -10,7 +10,7 @@ const guildMemberAdd: Handler<GatewayGuildMemberAddDispatch['d']> = async (data,
     await cache.set(CORDIS_REDIS_SYMBOLS.cache.members(data.guild_id), member.user!.id, member);
   }
 
-  const existing = await cache.get<APIUser>(CORDIS_REDIS_SYMBOLS.cache.users, member.user!.id);
+  const existing = await cache.get<PatchedUser>(CORDIS_REDIS_SYMBOLS.cache.users, member.user!.id);
   const { data: user } = existing ? Patcher.patchUser(data.user!, existing) : Patcher.patchUser(data.user!);
   await cache.set(CORDIS_REDIS_SYMBOLS.cache.users, user.id, user);
 };

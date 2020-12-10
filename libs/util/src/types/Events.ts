@@ -1,12 +1,9 @@
 import {
-  APIChannel,
   APIEmoji,
   APIGuild,
   APIReaction,
-  APIUser,
   GatewayInviteCreateDispatch,
   GatewayInviteDeleteDispatch,
-  GatewayPresenceUpdate,
   GatewayReadyDispatch,
   GatewayTypingStartDispatch,
   GatewayVoiceServerUpdateDispatch,
@@ -37,7 +34,7 @@ export interface Events {
   channelCreate: { guild?: PatchedGuild; channel: PatchedChannel };
   channelDelete: { guild?: PatchedGuild; channel: PatchedChannel };
   channelPinsUpdate: { guild?: PatchedGuild; channel: PatchedChannel; lastPinTimestamp?: string };
-  channelUpdate: { n: PatchedChannel; o: APIChannel } & { guild?: PatchedGuild };
+  channelUpdate: Updated<PatchedChannel> & { guild?: PatchedGuild };
 
   emojiCreate: { guild: PatchedGuild; emoji: APIEmoji };
   emojiDelete: { guild: PatchedGuild; emoji: APIEmoji };
@@ -63,7 +60,7 @@ export interface Events {
   messageCreate: PatchedMessage;
   bulkMessageDelete: PatchedMessage[];
   messageDelete: PatchedMessage;
-  messageUpdate: ({ o: PatchedMessage; n: PatchedMessage } | { n: Partial<PatchedMessage> }) & { guild: APIGuild | null };
+  messageUpdate: ({ o: PatchedMessage; n: PatchedMessage } | { n: PatchedMessage }) & { guild: APIGuild | null };
 
   messageReactionAdd: { reaction: PatchedReaction; message: PatchedMessage | null; messageId: string };
   messageReactionRemove: { reaction: PatchedReaction; message: PatchedMessage | null; messageId: string };
@@ -73,10 +70,10 @@ export interface Events {
   inviteCreate: { guild: PatchedGuild; invite: GatewayInviteCreateDispatch['d'] };
   inviteDelete: { guild: PatchedGuild; invite: GatewayInviteDeleteDispatch['d'] };
 
-  presenceUpdate: { n: PatchedPresence; o?: GatewayPresenceUpdate | null };
+  presenceUpdate: { n: PatchedPresence; o?: PatchedPresence | null };
   ready: GatewayReadyDispatch['d'] & { user: PatchedClientUser };
   typingStart: GatewayTypingStartDispatch['d'];
-  userUpdate: { n: PatchedUser; o: APIUser };
+  userUpdate: Updated<PatchedUser>;
   voiceServerUpdate: GatewayVoiceServerUpdateDispatch['d'];
   voiceStateUpdate: GatewayVoiceStateUpdateDispatch['d'];
   webhooksUpdate: GatewayWebhooksUpdateDispatch['d'];

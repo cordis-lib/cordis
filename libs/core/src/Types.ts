@@ -29,7 +29,8 @@ type UserResolvable = PatchedUser | CordisUser;
 // End user types
 
 export interface CoreEvents {
-  ready: CordisClientUser;
+  ready: [CordisClientUser];
+  userUpdate: [CordisUser, CordisUser];
 }
 
 export {

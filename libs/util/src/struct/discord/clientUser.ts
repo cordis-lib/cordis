@@ -9,7 +9,7 @@ Omit<APIUser, ExcludedClientUserProperties>,
 'bot' | 'system' | 'public_flags' | 'verified' | 'mfa_enabled'
 > {}
 
-export default <T extends APIUser | null | undefined>(n: Partial<APIUser>, o?: T) => {
+export default <T extends PatchedClientUser | null | undefined>(n: Partial<APIUser>, o?: T) => {
   const { data: newUser }: { data: APIUser } = patchUser(n, o) as any;
 
   const {

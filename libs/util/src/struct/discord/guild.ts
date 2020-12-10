@@ -8,7 +8,7 @@ APIGuild,
 'max_presences' | 'channels' | 'roles' | 'members' | 'emojis' | 'presences'
 > {}
 
-export default <T extends APIGuild | null | undefined>(n: Partial<APIGuild>, o?: T) => {
+export default <T extends PatchedGuild | null | undefined>(n: Partial<APIGuild>, o?: T) => {
   const data = o ?? n;
 
   /* eslint-disable @typescript-eslint/naming-convention */

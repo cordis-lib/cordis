@@ -9,8 +9,8 @@ Omit<PatchedGuildChannel, 'type'>,
   type: ChannelType.GUILD_TEXT;
 }
 
-export default <T extends APIChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
-  const { data: newChannel, old: oldChannel } = patchGuildChannel<T>(n, o);
+export default <T extends PatchedTextChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+  const { data: newChannel, old: oldChannel } = patchGuildChannel(n, o as any);
 
   const data = oldChannel ?? newChannel;
 

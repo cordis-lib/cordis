@@ -21,7 +21,11 @@ export interface Gateway {
 
 export class Gateway extends EventEmitter {
   public readonly events: { [K in keyof CoreEvents]: (data: Events[K]) => CoreEvents[K] } = {
-    ready: data => (this.clientUser = this.functions.retrieveFunction('sanatizeClientUser')(data.user))
+    ready: data => [(this.clientUser = this.functions.retrieveFunction('sanatizeClientUser')(data.user))],
+    userUpdate: data => {
+      const sanatizeUser = this.functions.retrieveFunction('sanatizeUser');
+      return [sanatizeUser(data.n), sanatizeUser(data.o)];
+    }
   };
 
   private readonly _commands: GatewayCommands;
@@ -43,7 +47,7 @@ export class Gateway extends EventEmitter {
     for (const key of options.keys) {
       // @ts-ignore
       // TODO
-      this.service.on(key, data => this.emit(key, this.events[key](data)));
+      this.service.on(key, data => this.emit(key, ...this.events[key](data)));
     }
 
     return this.service.init(

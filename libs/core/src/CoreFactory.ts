@@ -24,8 +24,11 @@ const coreFactory = (
     convertorIn: data => data[rawData]
   });
 
-  const functionManager = new FunctionManager({ rest, users });
-  const gateway = new Gateway(channel, redis, functionManager);
+  // eslint-disable-next-line prefer-const
+  let gateway!: Gateway;
+
+  const functionManager = new FunctionManager({ rest, users, gateway });
+  gateway = new Gateway(channel, redis, functionManager);
 
   const functions = new Proxy<FunctionManager & BuiltInFunctions>(functionManager as any, {
     // @ts-ignore

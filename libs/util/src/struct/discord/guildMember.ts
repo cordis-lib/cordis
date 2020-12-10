@@ -1,4 +1,4 @@
-import { APIGuildMember, APIUser } from 'discord-api-types';
+import { APIGuildMember } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
 import { default as patchUser, PatchedUser } from './user';
 
@@ -20,13 +20,13 @@ export default <T extends PatchedGuildMember | null | undefined>(n: Partial<APIG
   /* eslint-enable @typescript-eslint/naming-convention */
 
   const extras = {
-    oldUser: null as APIUser | null,
+    oldUser: null as PatchedUser | null,
     newUser: null as PatchedUser | null,
     roles: [] as unknown as [string[], string[]]
   };
 
   if (user) {
-    const { data: newUser, old: oldUser = null } = patchUser(user, data.user);
+    const { data: newUser, old: oldUser = null } = patchUser(user, data.user as any);
     extras.oldUser = oldUser;
     extras.newUser = newUser;
 

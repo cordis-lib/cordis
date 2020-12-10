@@ -6,7 +6,7 @@ APIMessage,
 'type' | 'pinned' | 'tts' | 'embeds' | 'attachments' | 'edited_timestamp' |
 'reactions' | 'mentions' | 'webhook_id' | 'flags' | 'message_reference'> {}
 
-export default <T extends APIMessage | null | undefined>(n: Partial<APIMessage>, o?: T) => {
+export default <T extends PatchedMessage | null | undefined>(n: Partial<APIMessage>, o?: T) => {
   const data = o ?? n;
 
   const {

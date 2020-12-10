@@ -1,6 +1,7 @@
 import { ArrayHead, ArrayTail, ImageOptions, RedisStore } from '@cordis/util';
 import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId, isCordisClientUser, sanatizeClientUser } from './functions/user';
 import { Rest } from './services/Rest';
+import { Gateway } from './services/Gateway';
 import {
   userAvatar,
   defaultUserAvatar,
@@ -12,6 +13,7 @@ import { CordisUser } from './Types';
 interface FactoryMeta {
   functions: FunctionManager;
   rest: Rest;
+  gateway: Gateway;
   users: RedisStore<CordisUser>;
 }
 

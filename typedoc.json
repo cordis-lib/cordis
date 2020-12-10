@@ -3,7 +3,7 @@
   "mode": "modules",
   "out": "doc",
   "theme": "default",
-  "ignoreCompilerErrors": "false",
+  "ignoreCompilerErrors": "true",
   "preserveConstEnums": "true",
   "exclude": ["services/**"],
   "external-modulemap": ".*libs\/([^\/]+)\/.*",
@@ -12,8 +12,8 @@
   "media": "media",
   "readme": "README.md",
   "plugin": [
-    "typedoc-plugin-as-member-of",
     "@strictsoftware/typedoc-plugin-monorepo",
+    "typedoc-plugin-as-member-of",
     "typedoc-plugin-no-inherit"
   ]
 }

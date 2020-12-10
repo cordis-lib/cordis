@@ -5,7 +5,7 @@ export type ExcludedUserProperties = 'email' | 'flags' | 'mfa_enabled' | 'premiu
 
 export interface PatchedUser extends RequiredProp<Omit<APIUser, ExcludedUserProperties>, 'bot' | 'system' | 'public_flags'> {}
 
-export default <T extends APIUser | null | undefined>(n: Partial<APIUser>, o?: T) => {
+export default <T extends PatchedUser | null | undefined>(n: Partial<APIUser>, o?: T) => {
   const data = o ?? n;
 
   const {

@@ -37,12 +37,12 @@ export default {
     };
 
     switch (n.type) {
-      case ChannelType.GUILD_TEXT: res = patchTextChannel(n, o);
-      case ChannelType.GUILD_VOICE: res = patchVoiceChannel(n, o);
-      case ChannelType.GUILD_STORE: res = patchStoreChannel(n, o);
+      case ChannelType.GUILD_TEXT: res = patchTextChannel(n, o as any);
+      case ChannelType.GUILD_VOICE: res = patchVoiceChannel(n, o as any);
+      case ChannelType.GUILD_STORE: res = patchStoreChannel(n, o as any);
       case ChannelType.GUILD_CATEGORY:
-      case ChannelType.GUILD_NEWS: res = patchGuildChannel(n, o);
-      case ChannelType.DM: res = patchDmChannel(n, o);
+      case ChannelType.GUILD_NEWS: res = patchGuildChannel(n, o as any);
+      case ChannelType.DM: res = patchDmChannel(n, o as any);
       default: break;
     }
 

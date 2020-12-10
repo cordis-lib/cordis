@@ -3,7 +3,7 @@ import { RequiredProp } from '../../types/RequiredProp';
 
 export interface PatchedPresence extends RequiredProp<GatewayPresenceUpdate, 'status' | 'activities'> {}
 
-export default <T extends GatewayPresenceUpdate | null | undefined>(n: Partial<GatewayPresenceUpdate>, o?: T) => {
+export default <T extends PatchedPresence | null | undefined>(n: Partial<GatewayPresenceUpdate>, o?: T) => {
   const data = o ?? n;
 
   const {

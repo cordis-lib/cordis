@@ -5,7 +5,7 @@ export interface PatchedGuildChannel extends RequiredProp<Omit<APIChannel, 'type
   type: ChannelType.GUILD_CATEGORY | ChannelType.GUILD_NEWS;
 }
 
-export default <T extends APIChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+export default <T extends PatchedGuildChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
   const data = o ?? n;
 
   const {
