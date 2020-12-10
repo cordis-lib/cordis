@@ -8,7 +8,7 @@ import {
 import { Patcher } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
-import { CordisUser, UserResolvable } from '../Types';
+import { User, UserResolvable } from '../Types';
 
 // Begin user functions
 /**
@@ -22,7 +22,7 @@ const getUser = async (user: UserResolvable | string, useCache = true, { functio
     user = resolved;
   }
 
-  let cached: CordisUser | undefined;
+  let cached: User | undefined;
   if (useCache && (cached = await users.get(user))) {
     return cached;
   }

@@ -5,7 +5,7 @@ import { Redis } from 'ioredis';
 import { BuiltInFunctions, FunctionManager } from './FunctionManager';
 import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Events, RedisStore } from '@cordis/util';
 import { rawData } from './util/Symbols';
-import { CordisUser } from './Types';
+import { User } from './Types';
 
 /**
  * This is the core factory, it constructs a root object with all of the context needed for all of the other functions to work
@@ -17,7 +17,7 @@ const coreFactory = (
   worker = true
 ) => {
   const rest = new Rest(channel);
-  const users: RedisStore<CordisUser> = new RedisStore({
+  const users: RedisStore<User> = new RedisStore({
     redis,
     hash: CORDIS_REDIS_SYMBOLS.cache.users,
     convertorOut: data => functions.sanatizeUser(data),

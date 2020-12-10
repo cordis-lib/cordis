@@ -1,12 +1,12 @@
 import { APIChannel, ChannelType } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
-import { default as patchGuildChannel, PatchedGuildChannel } from './guildChannel';
+import { default as patchGuildChannel, PatchedAPIGuildChannel } from './guildChannel';
 
-export interface PatchedStoreChannel extends RequiredProp<Omit<PatchedGuildChannel, 'type'>, 'nsfw'> {
+export interface PatchedAPIStoreChannel extends RequiredProp<Omit<PatchedAPIGuildChannel, 'type'>, 'nsfw'> {
   type: ChannelType.GUILD_STORE;
 }
 
-export default <T extends PatchedStoreChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+export default <T extends PatchedAPIStoreChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
   const { data: newChannel, old: oldChannel } = patchGuildChannel(n, o as any);
 
   const data = oldChannel ?? newChannel;
@@ -18,7 +18,7 @@ export default <T extends PatchedStoreChannel | null | undefined>(n: Partial<API
   data.nsfw = nsfw ?? data.nsfw ?? false;
 
   return {
-    data: data as PatchedStoreChannel,
+    data: data as PatchedAPIStoreChannel,
     old: oldChannel
   };
 };

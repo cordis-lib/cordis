@@ -1,11 +1,11 @@
 import { APIChannel, ChannelType } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
 
-export interface PatchedGuildChannel extends RequiredProp<Omit<APIChannel, 'type'>, 'name' | 'guild_id'> {
+export interface PatchedAPIGuildChannel extends RequiredProp<Omit<APIChannel, 'type'>, 'name' | 'guild_id'> {
   type: ChannelType.GUILD_CATEGORY | ChannelType.GUILD_NEWS;
 }
 
-export default <T extends PatchedGuildChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+export default <T extends PatchedAPIGuildChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
   const data = o ?? n;
 
   const {
@@ -21,7 +21,7 @@ export default <T extends PatchedGuildChannel | null | undefined>(n: Partial<API
   data.permission_overwrites = permission_overwrites ?? data.permission_overwrites;
 
   return {
-    data: data as PatchedGuildChannel,
+    data: data as PatchedAPIGuildChannel,
     old: o as T
   };
 };

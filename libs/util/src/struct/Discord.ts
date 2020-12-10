@@ -14,25 +14,25 @@ export * from './discord/user';
 export * from './discord/voiceChannel';
 
 import { default as patchClientUser } from './discord/clientUser';
-import { default as patchDmChannel, PatchedDMChannel } from './discord/dmChannel';
+import { default as patchDmChannel, PatchedAPIDMChannel } from './discord/dmChannel';
 import { default as patchGuild } from './discord/guild';
-import { default as patchGuildChannel, PatchedGuildChannel } from './discord/guildChannel';
+import { default as patchGuildChannel, PatchedAPIGuildChannel } from './discord/guildChannel';
 import { default as patchGuildMember } from './discord/guildMember';
 import { default as patchMessage } from './discord/message';
 import { default as patchPresence } from './discord/presence';
 import { default as patchRole } from './discord/role';
-import { default as patchStoreChannel, PatchedStoreChannel } from './discord/storeChannel';
-import { default as patchTextChannel, PatchedTextChannel } from './discord/textChannel';
+import { default as patchStoreChannel, PatchedAPIStoreChannel } from './discord/storeChannel';
+import { default as patchTextChannel, PatchedAPITextChannel } from './discord/textChannel';
 import { default as patchUser } from './discord/user';
-import { default as patchVoiceChannel, PatchedVoiceChannel } from './discord/voiceChannel';
+import { default as patchVoiceChannel, PatchedAPIVoiceChannel } from './discord/voiceChannel';
 
-export type PatchedChannel = PatchedDMChannel | PatchedGuildChannel | PatchedStoreChannel | PatchedTextChannel | PatchedVoiceChannel;
+export type PatchedAPIChannel = PatchedAPIDMChannel | PatchedAPIGuildChannel | PatchedAPIStoreChannel | PatchedAPITextChannel | PatchedAPIVoiceChannel;
 
 export default {
   patchClientUser,
-  patchChannel: <T extends PatchedChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+  patchChannel: <T extends PatchedAPIChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
     let res!: {
-      data: PatchedGuildChannel | PatchedTextChannel | PatchedVoiceChannel | PatchedStoreChannel | PatchedDMChannel;
+      data: PatchedAPIGuildChannel | PatchedAPITextChannel | PatchedAPIVoiceChannel | PatchedAPIStoreChannel | PatchedAPIDMChannel;
       old: T | undefined;
     };
 

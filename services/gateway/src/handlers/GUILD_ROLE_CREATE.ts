@@ -1,9 +1,9 @@
 import { Handler } from '../Handler';
 import { GatewayGuildRoleCreateDispatch } from 'discord-api-types';
-import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedGuild, Patcher } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedAPIGuild, Patcher } from '@cordis/util';
 
 const guildRoleCreate: Handler<GatewayGuildRoleCreateDispatch['d']> = async (data, service, cache) => {
-  const guild = await cache.get<PatchedGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id);
+  const guild = await cache.get<PatchedAPIGuild>(CORDIS_REDIS_SYMBOLS.cache.guilds, data.guild_id);
   const { data: role } = Patcher.patchRole(data.role);
   if (guild) {
     service.publish({ guild, role }, CORDIS_AMQP_SYMBOLS.gateway.events.roleCreate);

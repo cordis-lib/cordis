@@ -1,11 +1,11 @@
 import { APIChannel, ChannelType } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
 
-export interface PatchedDMChannel extends RequiredProp<Omit<APIChannel, 'type'>, 'recipients'> {
+export interface PatchedAPIDMChannel extends RequiredProp<Omit<APIChannel, 'type'>, 'recipients'> {
   type: ChannelType.DM;
 }
 
-export default <T extends PatchedDMChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+export default <T extends PatchedAPIDMChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
   const data = o ?? n;
 
   const {
@@ -19,7 +19,7 @@ export default <T extends PatchedDMChannel | null | undefined>(n: Partial<APICha
   data.last_pin_timestamp = last_pin_timestamp ?? data.last_pin_timestamp;
 
   return {
-    data: data as PatchedDMChannel,
+    data: data as PatchedAPIDMChannel,
     old: o as T
   };
 };

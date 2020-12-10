@@ -5,7 +5,7 @@ import { Redis } from 'ioredis';
 import { EventEmitter } from 'events';
 import { GatewayCommands } from './GatewayCommands';
 import { GatewaySendPayload } from 'discord-api-types';
-import { CordisClientUser, CoreEvents } from '../Types';
+import { ClientUser, CoreEvents } from '../Types';
 import { FunctionManager } from '../FunctionManager';
 
 export interface GatewayOptions {
@@ -31,7 +31,7 @@ export class Gateway extends EventEmitter {
   private readonly _commands: GatewayCommands;
 
   public readonly service: RoutingClient<keyof CoreEvents, Events>;
-  public clientUser?: CordisClientUser;
+  public clientUser?: ClientUser;
 
   public constructor(channel: amqp.Channel, redis: Redis, public readonly functions: FunctionManager) {
     super();

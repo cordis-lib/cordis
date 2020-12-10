@@ -1,12 +1,12 @@
 import { APIMessage } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
 
-export interface PatchedMessage extends RequiredProp<
+export interface PatchedAPIMessage extends RequiredProp<
 APIMessage,
 'type' | 'pinned' | 'tts' | 'embeds' | 'attachments' | 'edited_timestamp' |
 'reactions' | 'mentions' | 'webhook_id' | 'flags' | 'message_reference'> {}
 
-export default <T extends PatchedMessage | null | undefined>(n: Partial<APIMessage>, o?: T) => {
+export default <T extends PatchedAPIMessage | null | undefined>(n: Partial<APIMessage>, o?: T) => {
   const data = o ?? n;
 
   const {
@@ -46,7 +46,7 @@ export default <T extends PatchedMessage | null | undefined>(n: Partial<APIMessa
   data.message_reference = message_reference ?? data.message_reference;
 
   return {
-    data: data as PatchedMessage,
+    data: data as PatchedAPIMessage,
     old: o as T
   };
 };

@@ -3,9 +3,9 @@ import { RequiredProp } from '../../types/RequiredProp';
 
 export type ExcludedUserProperties = 'email' | 'flags' | 'mfa_enabled' | 'premium_type' | 'verified';
 
-export interface PatchedUser extends RequiredProp<Omit<APIUser, ExcludedUserProperties>, 'bot' | 'system' | 'public_flags'> {}
+export interface PatchedAPIUser extends RequiredProp<Omit<APIUser, ExcludedUserProperties>, 'bot' | 'system' | 'public_flags'> {}
 
-export default <T extends PatchedUser | null | undefined>(n: Partial<APIUser>, o?: T) => {
+export default <T extends PatchedAPIUser | null | undefined>(n: Partial<APIUser>, o?: T) => {
   const data = o ?? n;
 
   const {
@@ -28,7 +28,7 @@ export default <T extends PatchedUser | null | undefined>(n: Partial<APIUser>, o
   data.public_flags = public_flags ?? data.public_flags ?? 0;
 
   return {
-    data: data as PatchedUser,
+    data: data as PatchedAPIUser,
     old: o as T
   };
 };

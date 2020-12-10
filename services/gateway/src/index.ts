@@ -2,7 +2,7 @@ import * as yargs from 'yargs';
 import * as redis from 'ioredis';
 import { RoutingServer, RpcClient, RpcServer } from '@cordis/brokers';
 import { Cluster, IntentKeys } from '@cordis/gateway';
-import { RedisCache, createAmqp, Events, CORDIS_REDIS_SYMBOLS, CORDIS_AMQP_SYMBOLS, PatchedClientUser } from '@cordis/util';
+import { RedisCache, createAmqp, Events, CORDIS_REDIS_SYMBOLS, CORDIS_AMQP_SYMBOLS, PatchedAPIClientUser } from '@cordis/util';
 import { RequestBuilderOptions } from '@cordis/rest';
 import { Channel } from 'amqplib';
 import { Handler } from './Handler';
@@ -200,7 +200,7 @@ const main = async () => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
-          await handle?.(data.d, service, cache, rest, ws.user as PatchedClientUser);
+          await handle?.(data.d, service, cache, rest, ws.user as PatchedAPIClientUser);
         } catch (e) {
           log('packet error')(e.stack ?? e.toString(), `${shard} -> ${data.t}`);
         }

@@ -5,16 +5,15 @@ import { Gateway } from './services/Gateway';
 import {
   userAvatar,
   defaultUserAvatar,
-  AvatarOptions,
   displayedUserAvatar
 } from './functions/cdn';
-import { CordisUser } from './Types';
+import { User, UserAvatarOptions } from './Types';
 
 interface FactoryMeta {
   functions: FunctionManager;
   rest: Rest;
   gateway: Gateway;
-  users: RedisStore<CordisUser>;
+  users: RedisStore<User>;
 }
 
 type ExtractMetaParameter<T extends (...args: any) => any> = (...args: ArrayHead<Parameters<T>>) => ReturnType<T>;
@@ -41,7 +40,7 @@ type BuiltInFunctions = {
     ? ExtractMetaParameter<BuiltInFunctionsRaw[K]>
     : BuiltInFunctionsRaw[K];
 } & {
-  displayedUserAvatar: (user: AvatarOptions & { discriminator: string }, options?: ImageOptions | null) => string;
+  displayedUserAvatar: (user: UserAvatarOptions & { discriminator: string }, options?: ImageOptions | null) => string;
 };
 
 class FunctionManager {

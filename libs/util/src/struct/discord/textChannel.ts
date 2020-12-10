@@ -1,15 +1,15 @@
 import { APIChannel, ChannelType } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
-import { default as patchGuildChannel, PatchedGuildChannel } from './guildChannel';
+import { default as patchGuildChannel, PatchedAPIGuildChannel } from './guildChannel';
 
-export interface PatchedTextChannel extends RequiredProp<
-Omit<PatchedGuildChannel, 'type'>,
+export interface PatchedAPITextChannel extends RequiredProp<
+Omit<PatchedAPIGuildChannel, 'type'>,
 'topic' | 'nsfw' | 'last_message_id' | 'last_pin_timestamp'
 > {
   type: ChannelType.GUILD_TEXT;
 }
 
-export default <T extends PatchedTextChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
+export default <T extends PatchedAPITextChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
   const { data: newChannel, old: oldChannel } = patchGuildChannel(n, o as any);
 
   const data = oldChannel ?? newChannel;
@@ -30,7 +30,7 @@ export default <T extends PatchedTextChannel | null | undefined>(n: Partial<APIC
   data.last_pin_timestamp = last_pin_timestamp ?? data.last_pin_timestamp ?? null;
 
   return {
-    data: data as PatchedTextChannel,
+    data: data as PatchedAPITextChannel,
     old: oldChannel
   };
 };

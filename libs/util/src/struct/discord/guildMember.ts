@@ -1,10 +1,10 @@
 import { APIGuildMember } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
-import { default as patchUser, PatchedUser } from './user';
+import { default as patchUser, PatchedAPIUser } from './user';
 
-export interface PatchedGuildMember extends RequiredProp<APIGuildMember, 'mute' | 'deaf'> {}
+export interface PatchedAPIGuildMember extends RequiredProp<APIGuildMember, 'mute' | 'deaf'> {}
 
-export default <T extends PatchedGuildMember | null | undefined>(n: Partial<APIGuildMember>, o?: T) => {
+export default <T extends PatchedAPIGuildMember | null | undefined>(n: Partial<APIGuildMember>, o?: T) => {
   const data = o ?? n;
 
   /* eslint-disable @typescript-eslint/naming-convention */
@@ -20,8 +20,8 @@ export default <T extends PatchedGuildMember | null | undefined>(n: Partial<APIG
   /* eslint-enable @typescript-eslint/naming-convention */
 
   const extras = {
-    oldUser: null as PatchedUser | null,
-    newUser: null as PatchedUser | null,
+    oldUser: null as PatchedAPIUser | null,
+    newUser: null as PatchedAPIUser | null,
     roles: [] as unknown as [string[], string[]]
   };
 
@@ -45,7 +45,7 @@ export default <T extends PatchedGuildMember | null | undefined>(n: Partial<APIG
   }
 
   return {
-    data: data as PatchedGuildMember,
+    data: data as PatchedAPIGuildMember,
     old: o as T,
     ...extras
   };

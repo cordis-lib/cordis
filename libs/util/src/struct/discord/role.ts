@@ -1,9 +1,9 @@
 import { APIRole } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
 
-export interface PatchedRole extends RequiredProp<APIRole, 'hoist' | 'permissions' | 'managed' | 'mentionable'> {}
+export interface PatchedAPIRole extends RequiredProp<APIRole, 'hoist' | 'permissions' | 'managed' | 'mentionable'> {}
 
-export default <T extends PatchedRole | null | undefined>(n: Partial<APIRole>, o?: T) => {
+export default <T extends PatchedAPIRole | null | undefined>(n: Partial<APIRole>, o?: T) => {
   const data = o ?? n;
 
   const {
@@ -25,7 +25,7 @@ export default <T extends PatchedRole | null | undefined>(n: Partial<APIRole>, o
   data.mentionable = mentionable ?? data.mentionable ?? false;
 
   return {
-    data: data as PatchedRole,
+    data: data as PatchedAPIRole,
     old: o as T
   };
 };
