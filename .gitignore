@@ -1,5 +1,6 @@
 dist
 types
+!libs/util/src/types
 
 node_modules
 
