@@ -1,5 +1,5 @@
 import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, PatchedAPIMessage, PatchedReaction } from '@cordis/util';
-import { GatewayMessageReactionAddDispatch } from 'discord-api-types';
+import { GatewayMessageReactionAddDispatch, APIEmoji } from 'discord-api-types';
 import { Handler } from '../Handler';
 
 const messageReactionAdd: Handler<GatewayMessageReactionAddDispatch['d']> = async (data, service, cache, _, botUser) => {
@@ -16,7 +16,9 @@ const messageReactionAdd: Handler<GatewayMessageReactionAddDispatch['d']> = asyn
   } else {
     reaction = {
       count: 1,
-      emoji: data.emoji,
+      emoji: data.guild_id
+        ? await cache.get<APIEmoji>(CORDIS_REDIS_SYMBOLS.cache.emojis(data.guild_id), (data.emoji.id ?? data.emoji.name)!) ?? data.emoji
+        : data.emoji,
       me: data.user_id === botUser.id,
       users: [data.user_id]
     };

@@ -2,8 +2,6 @@ import {
   APIEmoji,
   APIGuild,
   APIReaction,
-  GatewayInviteCreateDispatch,
-  GatewayInviteDeleteDispatch,
   GatewayReadyDispatch,
   GatewayTypingStartDispatch,
   GatewayVoiceServerUpdateDispatch,
@@ -15,6 +13,7 @@ import {
   PatchedAPIClientUser,
   PatchedAPIGuild,
   PatchedAPIGuildMember,
+  PatchedAPIInvite,
   PatchedAPIMessage,
   PatchedAPIPresence,
   PatchedAPIRole,
@@ -67,8 +66,8 @@ export interface Events {
   messageReactionRemoveEmoji: { reaction: PatchedReaction; message: PatchedAPIMessage | null; messageId: string };
   messageReactionRemoveAll: { reactions: PatchedReaction[]; message: PatchedAPIMessage | null; messageId: string };
 
-  inviteCreate: { guild: PatchedAPIGuild; invite: GatewayInviteCreateDispatch['d'] };
-  inviteDelete: { guild: PatchedAPIGuild; invite: GatewayInviteDeleteDispatch['d'] };
+  inviteCreate: PatchedAPIInvite;
+  inviteDelete: PatchedAPIInvite;
 
   presenceUpdate: { n: PatchedAPIPresence; o?: PatchedAPIPresence | null };
   ready: GatewayReadyDispatch['d'] & { user: PatchedAPIClientUser };

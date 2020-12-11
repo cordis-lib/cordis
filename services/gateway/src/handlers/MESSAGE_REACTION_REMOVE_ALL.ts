@@ -12,4 +12,3 @@ const messageReactionRemoveAll: Handler<GatewayMessageReactionRemoveAllDispatch[
 };
 
 export default messageReactionRemoveAll;
-
