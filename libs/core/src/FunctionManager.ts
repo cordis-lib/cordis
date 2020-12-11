@@ -1,13 +1,12 @@
 import { ArrayHead, ArrayTail, ImageOptions, RedisStore } from '@cordis/util';
-import { isUser, isCordisUser, sanatizeUser, resolveUser, resolveUserId, isCordisClientUser, sanatizeClientUser } from './functions/user';
 import { Rest } from './services/Rest';
 import { Gateway } from './services/Gateway';
-import {
-  userAvatar,
-  defaultUserAvatar,
-  displayedUserAvatar
-} from './functions/cdn';
+
 import { User, UserAvatarOptions } from './Types';
+import * as cdn from './functions/cdn';
+import * as http from './functions/http';
+import * as invite from './functions/invite';
+import * as user from './functions/user';
 
 interface FactoryMeta {
   functions: FunctionManager;
@@ -18,22 +17,10 @@ interface FactoryMeta {
 
 type ExtractMetaParameter<T extends (...args: any) => any> = (...args: ArrayHead<Parameters<T>>) => ReturnType<T>;
 
-interface BuiltInFunctionsRaw {
-  isUser: typeof isUser;
-  isCordisUser: typeof isCordisUser;
-  isCordisClientUser: typeof isCordisClientUser;
-  sanatizeUser: typeof sanatizeUser;
-  sanatizeClientUser: typeof sanatizeClientUser;
-  resolveUser: typeof resolveUser;
-  resolveUserId: typeof resolveUserId;
-
-  userAvatar: typeof userAvatar;
-  defaultUserAvatar: typeof defaultUserAvatar;
-  displayedUserAvatar: typeof displayedUserAvatar;
-}
+type BuiltInFunctionsRaw = typeof cdn & typeof http & typeof invite & typeof user;
 
 // ? This check used to be done in ExtractMetaParameter<T> but unfortunately that meant that every function's return type was mutated by
-// ? ReturnType<T>. Initially, this seemed fine, however, as it appears, type-guard functions such as isUser simply resolved to boolean
+// ? ReturnType<T>. Initially, this seemed fine, however, as it appears, type-guard functions such as isAPIUser simply resolved to boolean
 // ? Currently, this will only work as long as a type guard function doesn't depend on the meta parameter, which shouldn't ever happen anyway
 type BuiltInFunctions = {
   [K in keyof Omit<BuiltInFunctionsRaw, 'displayedUserAvatar'>]: ArrayTail<Parameters<BuiltInFunctionsRaw[K]>> extends FactoryMeta
@@ -52,7 +39,7 @@ class FunctionManager {
     this._registerBuiltIns();
   }
 
-  public get cdn() {
+  public get cdn(): typeof cdn {
     return {
       userAvatar: this.retrieveFunction('userAvatar'),
       defaultUserAvatar: this.retrieveFunction('defaultUserAvatar'),
@@ -60,9 +47,9 @@ class FunctionManager {
     };
   }
 
-  public registerFunction<N extends keyof BuiltInFunctionsRaw>(name: N, fn: BuiltInFunctionsRaw[N]) {
+  public registerFunction<N extends keyof BuiltInFunctions, F extends BuiltInFunctionsRaw[N]>(name: N, fn: F) {
     // @ts-ignore
-    this._entries[name] = (...data) => fn(...[...data, this._meta]);
+    this._entries[name] = (...data: ArrayHead<Parameters<F>>) => fn(...[...data, this._meta]);
   }
 
   public retrieveFunction<N extends keyof BuiltInFunctions>(name: N): BuiltInFunctions[N] {
@@ -70,7 +57,7 @@ class FunctionManager {
   }
 
   private _registerBuiltIns() {
-    for (const builtIn of ['cdn', 'user']) {
+    for (const builtIn of ['cdn', 'http', 'invite', 'user']) {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const data = require(`./${builtIn}`);
       if ('default' in data) {

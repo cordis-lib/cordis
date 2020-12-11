@@ -46,7 +46,7 @@ export class Gateway extends EventEmitter {
   public init(options: GatewayOptions) {
     for (const key of options.keys) {
       // @ts-ignore
-      // TODO
+      // TODO compile without ts-ignore
       this.service.on(key, data => this.emit(key, ...this.events[key](data)));
     }
 

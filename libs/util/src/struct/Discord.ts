@@ -1,4 +1,4 @@
-import { APIChannel, ChannelType } from 'discord-api-types';
+import { APIChannel, APIInvite, ChannelType } from 'discord-api-types';
 
 export * from './discord/clientUser';
 export * from './discord/dmChannel';
@@ -15,7 +15,7 @@ export * from './discord/voiceChannel';
 
 import { default as patchClientUser } from './discord/clientUser';
 import { default as patchDmChannel, PatchedAPIDMChannel } from './discord/dmChannel';
-import { default as patchGuild } from './discord/guild';
+import { default as patchGuild, PatchedAPIGuild } from './discord/guild';
 import { default as patchGuildChannel, PatchedAPIGuildChannel } from './discord/guildChannel';
 import { default as patchGuildMember } from './discord/guildMember';
 import { default as patchMessage } from './discord/message';
@@ -26,7 +26,14 @@ import { default as patchTextChannel, PatchedAPITextChannel } from './discord/te
 import { default as patchUser } from './discord/user';
 import { default as patchVoiceChannel, PatchedAPIVoiceChannel } from './discord/voiceChannel';
 
-export type PatchedAPIChannel = PatchedAPIDMChannel | PatchedAPIGuildChannel | PatchedAPIStoreChannel | PatchedAPITextChannel | PatchedAPIVoiceChannel;
+export type PatchedAPIChannel =
+| PatchedAPIDMChannel
+| PatchedAPIGuildChannel
+| PatchedAPIStoreChannel
+| PatchedAPITextChannel
+| PatchedAPIVoiceChannel;
+
+export type PatchedAPIInvite = Omit<APIInvite, 'guild' | 'channel'> & { guild: PatchedAPIGuild; channel: PatchedAPIChannel };
 
 export default {
   patchClientUser,

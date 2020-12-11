@@ -75,6 +75,7 @@ export const CORDIS_REDIS_SYMBOLS = {
     channels: (guild?: string) => guild ? `${guild}_channels` : 'dm_channels',
     members: (guild: string) => `${guild}_members`,
     roles: (guild: string) => `${guild}_roles`,
+    emojis: (guild: string) => `${guild}_emojis`,
     messages: (channel: string) => `${channel}_messages`,
     reactions: (message: string) => `${message}_reactions`
   }
