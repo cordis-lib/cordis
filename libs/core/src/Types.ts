@@ -43,7 +43,7 @@ APIInvite,
 'approximate_member_count' | 'approximate_presence_count' | 'target_user' | 'target_user_type' | 'channel' | 'inviter' | 'guild'
 > {
   // TODO: Guild
-  guild: PatchedAPIGuild;
+  guild?: PatchedAPIGuild;
   code: string;
   // TODO: Channel
   channel: PatchedAPIChannel;

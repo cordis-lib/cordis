@@ -33,13 +33,13 @@ export type PatchedAPIChannel =
 | PatchedAPITextChannel
 | PatchedAPIVoiceChannel;
 
-export type PatchedAPIInvite = Omit<APIInvite, 'guild' | 'channel'> & { guild: PatchedAPIGuild; channel: PatchedAPIChannel };
+export type PatchedAPIInvite = Omit<APIInvite, 'guild' | 'channel'> & { guild?: PatchedAPIGuild; channel: PatchedAPIChannel };
 
 export default {
   patchClientUser,
   patchChannel: <T extends PatchedAPIChannel | null | undefined>(n: Partial<APIChannel>, o?: T) => {
     let res!: {
-      data: PatchedAPIGuildChannel | PatchedAPITextChannel | PatchedAPIVoiceChannel | PatchedAPIStoreChannel | PatchedAPIDMChannel;
+      data: PatchedAPIChannel;
       old: T | undefined;
     };
 

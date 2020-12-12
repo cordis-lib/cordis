@@ -21,13 +21,15 @@ const isUser = (user: any): user is User => user.flags instanceof UserFlags && u
 /**
  * Indicates wether the given value is a sanatized Cordis client user or not
  */
-const isCordisClientUser = (user: any): user is ClientUser =>
+const isClientUser = (user: any): user is ClientUser =>
   user.flags instanceof UserFlags && user.toString() === `<@${user.id}>` && 'mfaEnabled' in user && 'verified' in user;
 
 /**
  * Sanatizes a raw Discord user into a Cordis user
  */
-const sanatizeUser = (raw: PatchedAPIUser): User => {
+const sanatizeUser = (raw: PatchedAPIUser | User, { functions: { retrieveFunction } }: FactoryMeta): User => {
+  if (retrieveFunction('isUser')(raw)) return raw;
+
   const {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     public_flags,
@@ -48,10 +50,10 @@ const sanatizeUser = (raw: PatchedAPIUser): User => {
   };
 };
 
-const sanatizeClientUser = (raw: PatchedAPIClientUser): ClientUser => {
+const sanatizeClientUser = (raw: PatchedAPIClientUser, { functions: { retrieveFunction } }: FactoryMeta): ClientUser => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { mfa_enabled, verified } = raw;
-  const user = sanatizeUser(raw);
+  const user = retrieveFunction('sanatizeUser')(raw);
 
   return {
     ...user,
@@ -79,7 +81,7 @@ const resolveUserId = (user: UserResolvable, { functions: { retrieveFunction } }
 export {
   isAPIUser,
   isUser,
-  isCordisClientUser,
+  isClientUser,
   sanatizeClientUser,
   sanatizeUser,
   resolveUser,

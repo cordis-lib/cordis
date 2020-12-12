@@ -3,12 +3,14 @@ import {
   RESTGetAPIUserResult,
   RESTPatchAPICurrentUserJSONBody,
   RESTPatchAPICurrentUserResult,
-  RESTDeleteAPICurrentUserGuildResult
+  RESTDeleteAPICurrentUserGuildResult,
+  RESTGetAPIInviteResult,
+  RESTDeleteAPIInviteResult
 } from 'discord-api-types';
 import { Patcher } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
-import { User, UserResolvable } from '../Types';
+import { InviteResolvable, User, UserResolvable } from '../Types';
 
 // Begin user functions
 /**
@@ -54,9 +56,51 @@ const deleteClientGuild = (data: string, { rest }: FactoryMeta) => rest
 const createDmChannel = (user: UserResolvable | string, { functions: { retrieveFunction }, channels, rest }: FactoryMeta) => null;
 // End user functions
 
+// Begin invite functions
+// TODO Consider invite cache
+const getInvite = (invite: InviteResolvable | string, { functions: { retrieveFunction }, rest }: FactoryMeta) => {
+  const code = retrieveFunction('resolveInviteCode')(invite);
+
+  // TODO: Internal errors
+  if (!code) return null;
+
+  return rest
+    .get<RESTGetAPIInviteResult>(Routes.invite(code))
+    .then(
+      data => retrieveFunction('sanatizeInvite')({
+        ...data,
+        // TODO Guild, Channel
+        guild: data.guild ? Patcher.patchGuild(data.guild).data : undefined,
+        channel: Patcher.patchChannel(data.channel!).data
+      })
+    );
+};
+
+const deleteInvite = (invite: InviteResolvable | string, { functions: { retrieveFunction }, rest }: FactoryMeta) => {
+  const code = retrieveFunction('resolveInviteCode')(invite);
+
+  // TODO: Internal errors
+  if (!code) return null;
+
+  return rest
+    .delete<RESTDeleteAPIInviteResult>(Routes.invite(code))
+    .then(
+      data => retrieveFunction('sanatizeInvite')({
+        ...data,
+        // TODO Guild, Channel
+        guild: data.guild ? Patcher.patchGuild(data.guild).data : undefined,
+        channel: Patcher.patchChannel(data.channel!).data
+      })
+    );
+};
+// End invite functions
+
 export {
   getUser,
   patchClientUser,
   deleteClientGuild,
-  createDmChannel
+  createDmChannel,
+
+  getInvite,
+  deleteInvite
 };

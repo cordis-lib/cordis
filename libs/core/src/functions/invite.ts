@@ -14,7 +14,9 @@ const isInvite = (invite: any): invite is Invite => 'code' in invite &&
   invite.inviter.flags instanceof UserFlags && invite.inviter.toString() === `<@${invite.inviter.id}>`;
 
 // TODO: Guild, Channel
-const sanatizeInvite = (raw: PatchedAPIInvite, { functions: { retrieveFunction } }: FactoryMeta): Invite => {
+const sanatizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveFunction } }: FactoryMeta): Invite => {
+  if (retrieveFunction('isInvite')(raw)) return raw;
+
   const {
     /* eslint-disable @typescript-eslint/naming-convention */
     inviter,
@@ -49,8 +51,8 @@ const resolveInvite = (invite: InviteResolvable, { functions: { retrieveFunction
   return null;
 };
 
-const resolveInviteUrl = (invite: InviteResolvable | string, { functions: { retrieveFunction } }: FactoryMeta): string | null => {
-  if (typeof invite === 'string') return `${ENDPOINTS.invite}/${invite.replace(/(https\:\/\/)?(discord)?(\.gg)?\/?/g, '')}`;
+const resolveInviteCode = (invite: InviteResolvable | string, { functions: { retrieveFunction } }: FactoryMeta): string | null => {
+  if (typeof invite === 'string') return invite.replace(/(https\:\/\/)?(discord)?(\.gg)?\/?/g, '');
   return retrieveFunction('resolveInvite')(invite)?.code ?? null;
 };
 
@@ -59,5 +61,5 @@ export {
   isInvite,
   sanatizeInvite,
   resolveInvite,
-  resolveInviteUrl
+  resolveInviteCode
 };
