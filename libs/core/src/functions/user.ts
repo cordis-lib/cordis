@@ -5,29 +5,25 @@ import { rawData } from '../util/Symbols';
 import { User, ClientUser, UserResolvable } from '../Types';
 
 /**
- * Indicates if the given value is or isn't a discord user (sanatized or not)
+ * Indicates if the given value is or isn't a discord user
  */
-const isAPIUser = (user: any): user is PatchedAPIUser => (user.flags instanceof UserFlags && user.toString() === `<@${user.id}>`) || (
-  'id' in user &&
-  'username' in user &&
-  'discriminator' in user
-);
+const isAPIUser = (user: any): user is PatchedAPIUser => 'id' in user && 'username' in user && 'discriminator' in user;
 
 /**
- * Indicates wether the given value is a sanatized Cordis user or not
+ * Indicates wether the given value is a sanitized Cordis user or not
  */
 const isUser = (user: any): user is User => user.flags instanceof UserFlags && user.toString() === `<@${user.id}>`;
 
 /**
- * Indicates wether the given value is a sanatized Cordis client user or not
+ * Indicates wether the given value is a sanitized Cordis client user or not
  */
 const isClientUser = (user: any): user is ClientUser =>
   user.flags instanceof UserFlags && user.toString() === `<@${user.id}>` && 'mfaEnabled' in user && 'verified' in user;
 
 /**
- * Sanatizes a raw Discord user into a Cordis user
+ * sanitizes a raw Discord user into a Cordis user
  */
-const sanatizeUser = (raw: PatchedAPIUser | User, { functions: { retrieveFunction } }: FactoryMeta): User => {
+const sanitizeUser = (raw: PatchedAPIUser | User, { functions: { retrieveFunction } }: FactoryMeta): User => {
   if (retrieveFunction('isUser')(raw)) return raw;
 
   const {
@@ -50,10 +46,10 @@ const sanatizeUser = (raw: PatchedAPIUser | User, { functions: { retrieveFunctio
   };
 };
 
-const sanatizeClientUser = (raw: PatchedAPIClientUser, { functions: { retrieveFunction } }: FactoryMeta): ClientUser => {
+const sanitizeClientUser = (raw: PatchedAPIClientUser, { functions: { retrieveFunction } }: FactoryMeta): ClientUser => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { mfa_enabled, verified } = raw;
-  const user = retrieveFunction('sanatizeUser')(raw);
+  const user = retrieveFunction('sanitizeUser')(raw);
 
   return {
     ...user,
@@ -68,7 +64,7 @@ const sanatizeClientUser = (raw: PatchedAPIClientUser, { functions: { retrieveFu
  */
 const resolveUser = (user: UserResolvable, { functions: { retrieveFunction } }: FactoryMeta): User | null => {
   if (retrieveFunction('isUser')(user)) return user;
-  if (retrieveFunction('isAPIUser')(user)) return retrieveFunction('sanatizeUser')(user);
+  if (retrieveFunction('isAPIUser')(user)) return retrieveFunction('sanitizeUser')(user);
   return null;
 };
 
@@ -82,8 +78,8 @@ export {
   isAPIUser,
   isUser,
   isClientUser,
-  sanatizeClientUser,
-  sanatizeUser,
+  sanitizeClientUser,
+  sanitizeUser,
   resolveUser,
   resolveUserId
 };

@@ -1,25 +1,25 @@
-import { ArrayHead, ArrayTail, ImageOptions, RedisStore } from '@cordis/util';
+import { ArrayHead, ArrayTail, ImageOptions } from '@cordis/util';
 import { Rest } from './services/Rest';
 import { Gateway } from './services/Gateway';
+import { UserAvatarOptions } from './Types';
 
-import { User, UserAvatarOptions } from './Types';
 import * as cdn from './functions/cdn';
 import * as channel from './functions/channel';
 import * as guild from './functions/guild';
 import * as http from './functions/http';
 import * as invite from './functions/invite';
+import * as role from './functions/role';
 import * as user from './functions/user';
 
 interface FactoryMeta {
   functions: FunctionManager;
   rest: Rest;
   gateway: Gateway;
-  users: RedisStore<User>;
 }
 
 type ExtractMetaParameter<T extends (...args: any) => any> = (...args: ArrayHead<Parameters<T>>) => ReturnType<T>;
 
-type BuiltInFunctionsRaw = typeof cdn & typeof channel & typeof guild & typeof http & typeof invite & typeof user;
+type BuiltInFunctionsRaw = typeof cdn & typeof channel & typeof guild & typeof http & typeof invite & typeof role & typeof user;
 
 // ? This check used to be done in ExtractMetaParameter<T> but unfortunately that meant that every function's return type was mutated by
 // ? ReturnType<T>. Initially, this seemed fine, however, as it appears, type-guard functions such as isAPIUser simply resolved to boolean

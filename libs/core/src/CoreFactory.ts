@@ -3,9 +3,7 @@ import { Rest } from './services/Rest';
 import { Gateway } from './services/Gateway';
 import { Redis } from 'ioredis';
 import { BuiltInFunctions, FunctionManager } from './FunctionManager';
-import { CORDIS_AMQP_SYMBOLS, CORDIS_REDIS_SYMBOLS, Events, RedisStore } from '@cordis/util';
-import { rawData } from './util/Symbols';
-import { User } from './Types';
+import { CORDIS_AMQP_SYMBOLS, Events } from '@cordis/util';
 
 /**
  * This is the core factory, it constructs a root object with all of the context needed for all of the other functions to work
@@ -17,17 +15,11 @@ const coreFactory = (
   worker = true
 ) => {
   const rest = new Rest(channel);
-  const users: RedisStore<User> = new RedisStore({
-    redis,
-    hash: CORDIS_REDIS_SYMBOLS.cache.users,
-    convertorOut: data => functions.sanatizeUser(data),
-    convertorIn: data => data[rawData]
-  });
 
   // eslint-disable-next-line prefer-const
   let gateway!: Gateway;
 
-  const functionManager = new FunctionManager({ rest, users, gateway });
+  const functionManager = new FunctionManager({ rest, gateway });
   gateway = new Gateway(channel, redis, functionManager);
 
   const functions = new Proxy<FunctionManager & BuiltInFunctions>(functionManager as any, {

@@ -4,13 +4,14 @@ import {
   PatchedAPIClientUser,
   PatchedAPIGuild,
   PatchedAPIInvite,
+  PatchedAPIRole,
   PatchedAPIUser,
   SnowflakeEntity
 } from '@cordis/util';
 import {
-  APIGuildWelcomeScreen,
+  APIGuildMember,
+  APIGuildPreview,
   APIInvite,
-  GatewayVoiceState,
   GuildDefaultMessageNotifications,
   GuildExplicitContentFilter,
   GuildMFALevel,
@@ -22,6 +23,22 @@ import {
 import { rawData } from './util/Symbols';
 import { UserFlagKeys, UserFlags } from './util/UserFlags';
 
+interface VoiceState {
+  guildId: string | null;
+  channelId: string | null;
+  userId: string;
+  // TODO: Members
+  member: APIGuildMember | null;
+  sessionId: string;
+  deaf: boolean;
+  mute: boolean;
+  selfDeaf: boolean;
+  selfMute: boolean;
+  selfStream: boolean;
+  selfVideo: boolean;
+  suppress: boolean;
+}
+
 // Begin cdn types
 interface UserAvatarOptions {
   id: string;
@@ -30,6 +47,23 @@ interface UserAvatarOptions {
 // End cdn types
 
 // Begin guild types
+interface GuildWelcomeScreenChannel {
+  channelId: string;
+  emojiId: string | null;
+  emojiName: string | null;
+}
+
+interface GuildWelcomeScreen {
+  description: string | null;
+  welcomeChannels: GuildWelcomeScreenChannel[];
+}
+
+interface GuildPreview extends Omit<APIGuildPreview, 'discovery_splash' | 'approximate_member_count' | 'approximate_presence_count'> {
+  discoverySplash: string | null;
+  approximateMemberCount: number;
+  approximatePresenceCount: number;
+}
+
 interface Guild extends SnowflakeEntity, Omit<
 PatchedAPIGuild,
 'verification_level' | 'owner_id' | 'afk_channel_id' |
@@ -60,11 +94,9 @@ PatchedAPIGuild,
   rulesChannelId: string | null;
   joinedTimestamp: string | null;
   joinedAt: Date | null;
-  // TODO: proper structure
-  welcomeScreen: APIGuildWelcomeScreen | null;
+  welcomeScreen: GuildWelcomeScreen | null;
   memberCount: number;
-  // TODO: voice states
-  voiceStates: Omit<GatewayVoiceState, 'guild_id'>[] | null;
+  voiceStates: Omit<VoiceState, 'guildId'>[];
   maxPresences: number | null;
   maxMembers: number;
   premiumTier: GuildPremiumTier;
@@ -80,6 +112,44 @@ PatchedAPIGuild,
 
 type GuildResolvable = PatchedAPIGuild | Guild;
 // End guild types
+
+// Begin invite types
+interface Invite extends Omit<
+APIInvite,
+'approximate_member_count' | 'approximate_presence_count' | 'target_user' | 'target_user_type' | 'channel' | 'inviter' | 'guild'
+> {
+  guild: Guild | null;
+  code: string;
+  // TODO: Channel
+  channel: PatchedAPIChannel;
+  inviter: User;
+  memberCount: number | null;
+  presenceCount: number | null;
+  target: User | null;
+  targetType: InviteTargetUserType | null;
+  readonly url: string;
+  toString(): string;
+  [rawData]: PatchedAPIInvite;
+}
+
+type InviteResolvable = PatchedAPIInvite | Invite;
+// End invite types
+
+// Begin role types
+interface RoleTags {
+  botId: string | null;
+  premiumSubscriber: boolean;
+  integrationId: string | null;
+}
+
+interface Role extends Omit<PatchedAPIRole, 'tags'>, SnowflakeEntity {
+  tags: RoleTags;
+  toString(): string;
+  [rawData]: PatchedAPIRole;
+}
+
+type RoleResolvable = PatchedAPIRole | Role;
+// End role types
 
 // Begin user types
 interface User extends Omit<PatchedAPIUser, 'public_flags'>, SnowflakeEntity {
@@ -99,47 +169,32 @@ interface ClientUser extends Omit<PatchedAPIClientUser, 'public_flags' | 'mfa_en
 
 type UserResolvable = PatchedAPIUser | User;
 // End user types
-
-// Begin invite types
-interface Invite extends Omit<
-APIInvite,
-'approximate_member_count' | 'approximate_presence_count' | 'target_user' | 'target_user_type' | 'channel' | 'inviter' | 'guild'
-> {
-  // TODO: Guild
-  guild: PatchedAPIGuild | null;
-  code: string;
-  // TODO: Channel
-  channel: PatchedAPIChannel;
-  inviter: User;
-  memberCount: number | null;
-  presenceCount: number | null;
-  target: User | null;
-  targetType: InviteTargetUserType | null;
-  readonly url: string;
-  toString(): string;
-  [rawData]: PatchedAPIInvite;
-}
-
-type InviteResolvable = PatchedAPIInvite | Invite;
-// End invite types
-
 interface CoreEvents {
   ready: [ClientUser];
   userUpdate: [User, User];
 }
 
 export {
+  VoiceState,
+
   UserAvatarOptions,
 
+  GuildWelcomeScreenChannel,
+  GuildWelcomeScreen,
+  GuildPreview,
   Guild,
   GuildResolvable,
+
+  Invite,
+  InviteResolvable,
 
   User,
   ClientUser,
   UserResolvable,
 
-  Invite,
-  InviteResolvable,
+  RoleTags,
+  Role,
+  RoleResolvable,
 
   CoreEvents
 };

@@ -7,7 +7,7 @@ const isAPIGuild = (guild: any): guild is Guild => 'name' in guild && 'owner_id'
 
 const isGuild = (guild: any): guild is Guild => 'name' in guild && guild.name === guild.toString() && 'ownerId' in guild;
 
-const sanatizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunction } }: FactoryMeta): Guild => {
+const sanitizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunction } }: FactoryMeta): Guild => {
   if (retrieveFunction('isGuild')(raw)) return raw;
 
   const {
@@ -65,8 +65,24 @@ const sanatizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunc
     memberCount: member_count,
     joinedTimestamp: joined_at,
     joinedAt: joined_at ? new Date(joined_at) : null,
-    welcomeScreen: welcome_screen,
-    voiceStates: voice_states,
+    welcomeScreen: {
+      description: welcome_screen?.description ?? null,
+      welcomeChannels: welcome_screen?.welcome_channels
+        .map(screen => ({ channelId: screen.channel_id, emojiId: screen.emoji_id, emojiName: screen.emoji_name })) ?? []
+    },
+    voiceStates: voice_states?.map(state => ({
+      channelId: state.channel_id,
+      userId: state.user_id,
+      member: state.member ?? null,
+      sessionId: state.session_id,
+      deaf: state.deaf,
+      mute: state.mute,
+      selfDeaf: state.self_deaf,
+      selfMute: state.self_mute,
+      selfStream: state.self_stream ?? false,
+      selfVideo: state.self_video,
+      suppress: state.suppress
+    })) ?? [],
     maxPresences: max_presences,
     maxMembers: max_members,
     premiumTier: premium_tier,
@@ -85,7 +101,7 @@ const sanatizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunc
 
 const resolveGuild = (guild: GuildResolvable, { functions: { retrieveFunction } }: FactoryMeta): Guild | null => {
   if (retrieveFunction('isGuild')(guild)) return guild;
-  if (retrieveFunction('isAPIGuild')(guild)) return retrieveFunction('sanatizeGuild')(guild);
+  if (retrieveFunction('isAPIGuild')(guild)) return retrieveFunction('sanitizeGuild')(guild);
   return null;
 };
 
@@ -95,7 +111,7 @@ const resolveGuildId = (guild: GuildResolvable, { functions: { retrieveFunction 
 export {
   isAPIGuild,
   isGuild,
-  sanatizeGuild,
+  sanitizeGuild,
   resolveGuild,
   resolveGuildId
 };

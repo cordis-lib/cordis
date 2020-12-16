@@ -21,10 +21,10 @@ export interface Gateway {
 
 export class Gateway extends EventEmitter {
   public readonly events: { [K in keyof CoreEvents]: (data: Events[K]) => CoreEvents[K] } = {
-    ready: data => [(this.clientUser = this.functions.retrieveFunction('sanatizeClientUser')(data.user))],
+    ready: data => [(this.clientUser = this.functions.retrieveFunction('sanitizeClientUser')(data.user))],
     userUpdate: data => {
-      const sanatizeUser = this.functions.retrieveFunction('sanatizeUser');
-      return [sanatizeUser(data.n), sanatizeUser(data.o)];
+      const sanitizeUser = this.functions.retrieveFunction('sanitizeUser');
+      return [sanitizeUser(data.n), sanitizeUser(data.o)];
     }
   };
 

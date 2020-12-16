@@ -12,7 +12,7 @@ export interface RequestBuilderOptions {
   method: string;
   headers: Headers;
   abortIn: number;
-  query?: string;
+  query?: Record<string, any> | string;
   reason?: string;
   files?: { name: string; file: Buffer }[];
   data?: Record<any, any>;
@@ -29,10 +29,12 @@ export function discordFetch(options: RequestBuilderOptions) {
   let queryString = '';
   if (query) {
     queryString = new URLSearchParams(
-      Object
-        .entries(query)
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        .filter(([, value]) => value != null)
+      typeof query === 'string'
+        ? query
+        : Object
+          .entries(query)
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          .filter(([, value]) => value != null)
     )
       .toString();
   }

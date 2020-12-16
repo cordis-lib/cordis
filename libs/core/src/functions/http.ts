@@ -5,50 +5,77 @@ import {
   RESTPatchAPICurrentUserResult,
   RESTDeleteAPICurrentUserGuildResult,
   RESTGetAPIInviteResult,
-  RESTDeleteAPIInviteResult
+  RESTDeleteAPIInviteResult,
+  RESTGetAPIGuildResult,
+  RESTGetAPIGuildPreviewResult
 } from 'discord-api-types';
 import { Patcher } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
-import { InviteResolvable, User, UserResolvable } from '../Types';
+import { CordisCoreError } from '../util/Error';
+import { GuildPreview, GuildResolvable, InviteResolvable, UserResolvable } from '../Types';
+
+// Begin guild functions
+const getGuild = (guild: GuildResolvable | string, withCounts = false, { functions: { retrieveFunction }, rest }: FactoryMeta) => {
+  if (typeof guild !== 'string') {
+    const resolved = retrieveFunction('resolveGuildId')(guild);
+    if (!resolved) throw new CordisCoreError('entityUnresolved', 'guild id');
+    guild = resolved;
+  }
+
+  return rest
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    .get<RESTGetAPIGuildResult>(Routes.guild(guild), { query: { with_counts: withCounts } })
+    .then(data => retrieveFunction('sanitizeGuild')(Patcher.patchGuild(data).data));
+};
+
+const getGuildPreview = (
+  guild: GuildResolvable | string,
+  { functions: { retrieveFunction }, rest }: FactoryMeta
+): Promise<GuildPreview> => {
+  if (typeof guild !== 'string') {
+    const resolved = retrieveFunction('resolveGuildId')(guild);
+    if (!resolved) throw new CordisCoreError('entityUnresolved', 'guild id');
+    guild = resolved;
+  }
+
+  return rest
+    .get<RESTGetAPIGuildPreviewResult>(Routes.guildPreview(guild))
+    .then(data => ({
+      ...data,
+      discoverySplash: data.discovery_splash,
+      approximateMemberCount: data.approximate_member_count,
+      approximatePresenceCount: data.approximate_presence_count
+    }));
+};
+// End guild functions
 
 // Begin user functions
 /**
- * Attempts to fetch a user; retrieves from cache if possible
+ * Attempts to fetch a user
  */
-const getUser = async (user: UserResolvable | string, useCache = true, { functions: { retrieveFunction }, users, rest }: FactoryMeta) => {
+const getUser = (user: UserResolvable | string, { functions: { retrieveFunction }, rest }: FactoryMeta) => {
   if (typeof user !== 'string') {
     const resolved = retrieveFunction('resolveUserId')(user);
-    // TODO: Internal errors
-    if (!resolved) return null;
+    if (!resolved) throw new CordisCoreError('entityUnresolved', 'user id');
     user = resolved;
   }
 
-  let cached: User | undefined;
-  if (useCache && (cached = await users.get(user))) {
-    return cached;
-  }
-
-  const result = await rest.get<RESTGetAPIUserResult>(Routes.user(user))
-    .then(data => {
-      const { data: patched } = Patcher.patchUser(data, cached?.[rawData]);
-      return retrieveFunction('sanatizeUser')(patched);
-    });
-
-  await users.set(result.id, result);
-  return result;
+  return rest
+    .get<RESTGetAPIUserResult>(Routes.user(user))
+    .then(data => retrieveFunction('sanitizeUser')(Patcher.patchUser(data).data));
 };
 
 const patchClientUser = (data: RESTPatchAPICurrentUserJSONBody, { rest, gateway, functions }: FactoryMeta) => rest
   .patch<RESTPatchAPICurrentUserResult>(Routes.user('@me'), { data })
-  .then(res => {
-    const { data: patched } = Patcher.patchClientUser(res, gateway.clientUser![rawData]);
-    return functions.retrieveFunction('sanatizeClientUser')(patched);
-  });
+  .then(res => functions.retrieveFunction('sanitizeClientUser')(Patcher.patchClientUser(res, gateway.clientUser![rawData]).data));
 
-// TODO: guild resolvable
-const deleteClientGuild = (data: string, { rest }: FactoryMeta) => rest
-  .delete<RESTDeleteAPICurrentUserGuildResult>(Routes.userGuild(data));
+const deleteClientGuild = (data: GuildResolvable, { rest, functions: { retrieveFunction } }: FactoryMeta) => {
+  const guild = retrieveFunction('resolveGuildId')(data);
+  if (!guild) throw new CordisCoreError('entityUnresolved', 'guild id');
+
+  return rest.delete<RESTDeleteAPICurrentUserGuildResult>(Routes.userGuild(guild));
+};
 
 // @ts-ignore
 // TODO: channels
@@ -57,19 +84,16 @@ const createDmChannel = (user: UserResolvable | string, { functions: { retrieveF
 // End user functions
 
 // Begin invite functions
-// TODO Consider invite cache
 const getInvite = (invite: InviteResolvable | string, { functions: { retrieveFunction }, rest }: FactoryMeta) => {
   const code = retrieveFunction('resolveInviteCode')(invite);
 
-  // TODO: Internal errors
-  if (!code) return null;
+  if (!code) throw new CordisCoreError('entityUnresolved', 'invite code');
 
   return rest
     .get<RESTGetAPIInviteResult>(Routes.invite(code))
     .then(
-      data => retrieveFunction('sanatizeInvite')({
+      data => retrieveFunction('sanitizeInvite')({
         ...data,
-        // TODO Guild, Channel
         guild: data.guild ? Patcher.patchGuild(data.guild).data : undefined,
         channel: Patcher.patchChannel(data.channel!).data
       })
@@ -79,15 +103,13 @@ const getInvite = (invite: InviteResolvable | string, { functions: { retrieveFun
 const deleteInvite = (invite: InviteResolvable | string, { functions: { retrieveFunction }, rest }: FactoryMeta) => {
   const code = retrieveFunction('resolveInviteCode')(invite);
 
-  // TODO: Internal errors
-  if (!code) return null;
+  if (!code) throw new CordisCoreError('entityUnresolved', 'invite code');
 
   return rest
     .delete<RESTDeleteAPIInviteResult>(Routes.invite(code))
     .then(
-      data => retrieveFunction('sanatizeInvite')({
+      data => retrieveFunction('sanitizeInvite')({
         ...data,
-        // TODO Guild, Channel
         guild: data.guild ? Patcher.patchGuild(data.guild).data : undefined,
         channel: Patcher.patchChannel(data.channel!).data
       })
@@ -96,6 +118,9 @@ const deleteInvite = (invite: InviteResolvable | string, { functions: { retrieve
 // End invite functions
 
 export {
+  getGuild,
+  getGuildPreview,
+
   getUser,
   patchClientUser,
   deleteClientGuild,

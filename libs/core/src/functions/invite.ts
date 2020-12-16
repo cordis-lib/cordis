@@ -13,8 +13,8 @@ const isInvite = (invite: any): invite is Invite => 'code' in invite &&
   invite.url === `${ENDPOINTS.invite}/${invite.code}` &&
   invite.inviter.flags instanceof UserFlags && invite.inviter.toString() === `<@${invite.inviter.id}>`;
 
-// TODO: Guild, Channel
-const sanatizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveFunction } }: FactoryMeta): Invite => {
+// TODO: Channel
+const sanitizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveFunction } }: FactoryMeta): Invite => {
   if (retrieveFunction('isInvite')(raw)) return raw;
 
   const {
@@ -31,11 +31,11 @@ const sanatizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveF
 
   return {
     ...invite,
-    guild,
+    guild: guild ? retrieveFunction('sanitizeGuild')(guild) : null,
     memberCount: approximate_member_count ?? null,
     presenceCount: approximate_presence_count ?? null,
-    inviter: retrieveFunction('sanatizeUser')(Patcher.patchUser(inviter!).data),
-    target: target_user ? retrieveFunction('sanatizeUser')(Patcher.patchUser(target_user).data) : null,
+    inviter: retrieveFunction('sanitizeUser')(Patcher.patchUser(inviter!).data),
+    target: target_user ? retrieveFunction('sanitizeUser')(Patcher.patchUser(target_user).data) : null,
     targetType: target_user_type ?? null,
     get url() {
       return `${ENDPOINTS.invite}/${this.code}`;
@@ -49,7 +49,7 @@ const sanatizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveF
 
 const resolveInvite = (invite: InviteResolvable, { functions: { retrieveFunction } }: FactoryMeta): Invite | null => {
   if (retrieveFunction('isInvite')(invite)) return invite;
-  if (retrieveFunction('isAPIInvite')(invite)) return retrieveFunction('sanatizeInvite')(invite);
+  if (retrieveFunction('isAPIInvite')(invite)) return retrieveFunction('sanitizeInvite')(invite);
   return null;
 };
 
@@ -61,7 +61,7 @@ const resolveInviteCode = (invite: InviteResolvable | string, { functions: { ret
 export {
   isAPIInvite,
   isInvite,
-  sanatizeInvite,
+  sanitizeInvite,
   resolveInvite,
   resolveInviteCode
 };
