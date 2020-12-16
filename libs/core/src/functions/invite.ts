@@ -18,8 +18,9 @@ const sanatizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveF
   if (retrieveFunction('isInvite')(raw)) return raw;
 
   const {
-    /* eslint-disable @typescript-eslint/naming-convention */
     inviter,
+    guild = null,
+    /* eslint-disable @typescript-eslint/naming-convention */
     approximate_member_count,
     approximate_presence_count,
     target_user,
@@ -30,6 +31,7 @@ const sanatizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveF
 
   return {
     ...invite,
+    guild,
     memberCount: approximate_member_count ?? null,
     presenceCount: approximate_presence_count ?? null,
     inviter: retrieveFunction('sanatizeUser')(Patcher.patchUser(inviter!).data),

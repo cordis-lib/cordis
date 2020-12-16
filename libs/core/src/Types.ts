@@ -7,7 +7,18 @@ import {
   PatchedAPIUser,
   SnowflakeEntity
 } from '@cordis/util';
-import { APIInvite, InviteTargetUserType } from 'discord-api-types';
+import {
+  APIGuildWelcomeScreen,
+  APIInvite,
+  GatewayVoiceState,
+  GuildDefaultMessageNotifications,
+  GuildExplicitContentFilter,
+  GuildMFALevel,
+  GuildPremiumTier,
+  GuildSystemChannelFlags,
+  GuildVerificationLevel,
+  InviteTargetUserType
+} from 'discord-api-types';
 import { rawData } from './util/Symbols';
 import { UserFlagKeys, UserFlags } from './util/UserFlags';
 
@@ -17,6 +28,58 @@ interface UserAvatarOptions {
   avatar: string | null;
 }
 // End cdn types
+
+// Begin guild types
+interface Guild extends SnowflakeEntity, Omit<
+PatchedAPIGuild,
+'verification_level' | 'owner_id' | 'afk_channel_id' |
+'afk_timeout' | 'vanity_url_code' | 'widget_enabled' | 'widget_channel_id' |
+'default_message_notifications' | 'explicit_content_filter' |
+'system_channel_id' | 'system_channel_flags' | 'rules_channel_id' |
+'joined_at' | 'member_count' | 'voice_states' |
+'max_presences' | 'max_members' | 'premium_tier' |
+'premium_subscription_count' | 'preferred_locale' | 'public_updates_channel_id' |
+'max_video_channel_users' | 'approximate_member_count' | 'approximate_presence_count' |
+'welcome_screen' | 'application_id' | 'discovery_splash' |
+'mfa_level'
+> {
+  verificationLevel: GuildVerificationLevel;
+  vanityUrlCode: string | null;
+  discoverySplash: string | null;
+  ownerId: string;
+  afkChannelId: string | null;
+  afkTimeout: number;
+  widgetEnabled: boolean;
+  widgetChannelId: string | null;
+  defaultMessageNotifications: GuildDefaultMessageNotifications;
+  explicitContentFilter: GuildExplicitContentFilter;
+  mfaLevel: GuildMFALevel;
+  applicationId: string | null;
+  systemChannelId: string | null;
+  systemChannelFlags: GuildSystemChannelFlags;
+  rulesChannelId: string | null;
+  joinedTimestamp: string | null;
+  joinedAt: Date | null;
+  // TODO: proper structure
+  welcomeScreen: APIGuildWelcomeScreen | null;
+  memberCount: number;
+  // TODO: voice states
+  voiceStates: Omit<GatewayVoiceState, 'guild_id'>[] | null;
+  maxPresences: number | null;
+  maxMembers: number;
+  premiumTier: GuildPremiumTier;
+  premiumSubscriptionCount: number | null;
+  preferredLocale: string;
+  publicUpdatesChannelId: string | null;
+  maxVideoChannelUsers: number | null;
+  approximateMemberCount?: number;
+  approximatePresenceCount?: number;
+  toString(): string;
+  [rawData]: PatchedAPIGuild;
+}
+
+type GuildResolvable = PatchedAPIGuild | Guild;
+// End guild types
 
 // Begin user types
 interface User extends Omit<PatchedAPIUser, 'public_flags'>, SnowflakeEntity {
@@ -43,7 +106,7 @@ APIInvite,
 'approximate_member_count' | 'approximate_presence_count' | 'target_user' | 'target_user_type' | 'channel' | 'inviter' | 'guild'
 > {
   // TODO: Guild
-  guild?: PatchedAPIGuild;
+  guild: PatchedAPIGuild | null;
   code: string;
   // TODO: Channel
   channel: PatchedAPIChannel;
@@ -67,6 +130,10 @@ interface CoreEvents {
 
 export {
   UserAvatarOptions,
+
+  Guild,
+  GuildResolvable,
+
   User,
   ClientUser,
   UserResolvable,

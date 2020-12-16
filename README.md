@@ -22,5 +22,7 @@ But also services that hook into RabbitMQ using the libraries mentioned above:
 
 # Roadmap
 - Finishing `@cordis/core` is the currect absolute priority. No voice support is initially planned; but really high API coverage is.
+- 0.1.0 release
 - Unit tests for the entire toolset.
 - Front facing website and documentation.
+- [Community](https://discord.gg/37ysd5dPYk)
