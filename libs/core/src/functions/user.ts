@@ -2,7 +2,7 @@ import { UserFlags } from '../util/UserFlags';
 import { PatchedAPIUser, PatchedAPIClientUser, Snowflake } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
-import { User, ClientUser, UserResolvable } from '../Types';
+import { User, ClientUser } from '../Types';
 
 /**
  * Indicates if the given value is or isn't a discord user
@@ -59,27 +59,10 @@ const sanitizeClientUser = (raw: PatchedAPIClientUser, { functions: { retrieveFu
   };
 };
 
-/**
- * Attempts to resolve a cordis user from the given value
- */
-const resolveUser = (user: UserResolvable, { functions: { retrieveFunction } }: FactoryMeta): User | null => {
-  if (retrieveFunction('isUser')(user)) return user;
-  if (retrieveFunction('isAPIUser')(user)) return retrieveFunction('sanitizeUser')(user);
-  return null;
-};
-
-/**
- * Attempts to resolve a user id from the given value
- */
-const resolveUserId = (user: UserResolvable, { functions: { retrieveFunction } }: FactoryMeta): string | null =>
-  retrieveFunction('resolveUser')(user)?.id ?? null;
-
 export {
   isAPIUser,
   isUser,
   isClientUser,
   sanitizeClientUser,
-  sanitizeUser,
-  resolveUser,
-  resolveUserId
+  sanitizeUser
 };

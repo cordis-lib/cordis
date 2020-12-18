@@ -8,8 +8,6 @@ export * from './functions/readdirRecursive';
 export * from './functions/resolveFromESModule';
 export * from './functions/tryImport';
 
-export * from './resolvers/resolveColor';
-
 export * from './struct/Discord';
 export { default as Patcher } from './struct/Discord';
 

@@ -1,6 +1,6 @@
 import { PatchedAPIRole, Snowflake } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
-import { Role, RoleResolvable } from '../Types';
+import { Role } from '../Types';
 import { rawData } from '../util/Symbols';
 
 const isAPIRole = (role: any): role is PatchedAPIRole => 'tags' in role && role.tags.premium_subscriber == null;
@@ -33,19 +33,8 @@ const sanitizeRole = (raw: PatchedAPIRole | Role, { functions: { retrieveFunctio
   };
 };
 
-const resolveRole = (role: RoleResolvable, { functions: { retrieveFunction } }: FactoryMeta): Role | null => {
-  if (retrieveFunction('isRole')(role)) return role;
-  if (retrieveFunction('isAPIRole')(role)) return retrieveFunction('sanitizeRole')(role);
-  return null;
-};
-
-const resolveRoleId = (role: RoleResolvable, { functions: { retrieveFunction } }: FactoryMeta): string | null =>
-  retrieveFunction('resolveRole')(role)?.id ?? null;
-
 export {
   isAPIRole,
   isRole,
-  sanitizeRole,
-  resolveRole,
-  resolveRoleId
+  sanitizeRole
 };

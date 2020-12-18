@@ -24,7 +24,6 @@ export const CordisUtilTypeError = makeCordisError(
   TypeError,
   {
     badImageFormat: (format: string) => `Recieved a bad image format "${format}"`,
-    badColorType: 'Failed to resolve color, expected a string, a number, or a an array of numbers',
     noReduceEmptyStore: 'Cannot reduce an empty store without an initial value'
   }
 );
@@ -34,8 +33,6 @@ export const CordisUtilRangeError = makeCordisError(
   RangeError,
   {
     badImageSize: (size: number) => `Bad image size given ${size}`,
-    badColorRange: 'Was given a bad color range, expected > 0 & < 0xffffff',
-    badRgbArrayLength: (size: number) => `Expexted a length of 3, but got ${size}`,
     bitfieldInvalid: 'Failed to resolve bits; expected a bigint, string, a Bitfield, or an array of any of the previous'
   }
 );

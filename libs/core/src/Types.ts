@@ -9,6 +9,7 @@ import {
   SnowflakeEntity
 } from '@cordis/util';
 import {
+  APIGuildCreatePartialChannel,
   APIGuildMember,
   APIGuildPreview,
   APIInvite,
@@ -22,6 +23,7 @@ import {
 } from 'discord-api-types';
 import { rawData } from './util/Symbols';
 import { UserFlagKeys, UserFlags } from './util/UserFlags';
+import { Readable } from 'stream';
 
 interface VoiceState {
   guildId: string | null;
@@ -45,6 +47,41 @@ interface UserAvatarOptions {
   avatar: string | null;
 }
 // End cdn types
+
+// Begin http types
+interface CreateGuildData {
+  name: string;
+  region?: string;
+  icon?: FileResolvable;
+  verificationLevel?: GuildVerificationLevel;
+  defaultMessageNotifications?: GuildDefaultMessageNotifications;
+  explicitContentFilter?: GuildExplicitContentFilter;
+  roles?: RoleResolvable[];
+  // TODO channels for guild creation
+  channels?: APIGuildCreatePartialChannel[];
+  afkChannelId?: string;
+  afkTimeout?: number;
+  systemChannelId?: number;
+}
+
+interface PatchGuildData {
+  name?: string;
+  region?: string | null;
+  verificationLevel?: GuildVerificationLevel | null;
+  defaultMessageNotifications?: GuildDefaultMessageNotifications | null;
+  explicitContentFilter?: GuildExplicitContentFilter | null;
+  afkChannelId?: string | null;
+  afkTimeout?: number;
+  icon?: FileResolvable | null;
+  ownerId: string;
+  splash?: FileResolvable | null;
+  banner?: FileResolvable | null;
+  systemChannelId: string | null;
+  rulesChannelId: string | null;
+  publicUpdatesChannelId: string | null;
+  preferredLocale: string | null;
+}
+// End http types
 
 // Begin guild types
 interface GuildWelcomeScreenChannel {
@@ -109,8 +146,6 @@ PatchedAPIGuild,
   toString(): string;
   [rawData]: PatchedAPIGuild;
 }
-
-type GuildResolvable = PatchedAPIGuild | Guild;
 // End guild types
 
 // Begin invite types
@@ -131,9 +166,18 @@ APIInvite,
   toString(): string;
   [rawData]: PatchedAPIInvite;
 }
-
-type InviteResolvable = PatchedAPIInvite | Invite;
 // End invite types
+
+// Begin resolver types
+type ColorResolvable = string | number | number[];
+type BufferResolvable = Buffer | string;
+type FileResolvable = BufferResolvable | Readable;
+
+type GuildResolvable = PatchedAPIGuild | Guild;
+type InviteResolvable = PatchedAPIInvite | Invite;
+type RoleResolvable = PatchedAPIRole | Role;
+type UserResolvable = PatchedAPIUser | User;
+// End resolver types
 
 // Begin role types
 interface RoleTags {
@@ -147,8 +191,6 @@ interface Role extends Omit<PatchedAPIRole, 'tags'>, SnowflakeEntity {
   toString(): string;
   [rawData]: PatchedAPIRole;
 }
-
-type RoleResolvable = PatchedAPIRole | Role;
 // End role types
 
 // Begin user types
@@ -166,8 +208,6 @@ interface ClientUser extends Omit<PatchedAPIClientUser, 'public_flags' | 'mfa_en
   toString(): string;
   [rawData]: PatchedAPIClientUser;
 }
-
-type UserResolvable = PatchedAPIUser | User;
 // End user types
 interface CoreEvents {
   ready: [ClientUser];
@@ -179,22 +219,29 @@ export {
 
   UserAvatarOptions,
 
+  CreateGuildData,
+  PatchGuildData,
+
   GuildWelcomeScreenChannel,
   GuildWelcomeScreen,
   GuildPreview,
   Guild,
-  GuildResolvable,
 
   Invite,
+
+  ColorResolvable,
+  BufferResolvable,
+  FileResolvable,
+  GuildResolvable,
   InviteResolvable,
+  RoleResolvable,
+  UserResolvable,
 
   User,
   ClientUser,
-  UserResolvable,
 
   RoleTags,
   Role,
-  RoleResolvable,
 
   CoreEvents
 };

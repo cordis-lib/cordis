@@ -1,7 +1,7 @@
 import { ENDPOINTS, PatchedAPIInvite, Patcher } from '@cordis/util';
 import { APIInvite } from 'discord-api-types';
 import { FactoryMeta } from '../FunctionManager';
-import { Invite, InviteResolvable } from '../Types';
+import { Invite } from '../Types';
 import { rawData } from '../util/Symbols';
 import { UserFlags } from '../util/UserFlags';
 
@@ -47,21 +47,8 @@ const sanitizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveF
   };
 };
 
-const resolveInvite = (invite: InviteResolvable, { functions: { retrieveFunction } }: FactoryMeta): Invite | null => {
-  if (retrieveFunction('isInvite')(invite)) return invite;
-  if (retrieveFunction('isAPIInvite')(invite)) return retrieveFunction('sanitizeInvite')(invite);
-  return null;
-};
-
-const resolveInviteCode = (invite: InviteResolvable | string, { functions: { retrieveFunction } }: FactoryMeta): string | null => {
-  if (typeof invite === 'string') return invite.replace(/(https\:\/\/)?(discord)?(\.gg)?\/?/g, '');
-  return retrieveFunction('resolveInvite')(invite)?.code ?? null;
-};
-
 export {
   isAPIInvite,
   isInvite,
-  sanitizeInvite,
-  resolveInvite,
-  resolveInviteCode
+  sanitizeInvite
 };

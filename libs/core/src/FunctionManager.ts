@@ -8,6 +8,7 @@ import * as channel from './functions/channel';
 import * as guild from './functions/guild';
 import * as http from './functions/http';
 import * as invite from './functions/invite';
+import * as resolve from './functions/resolve';
 import * as role from './functions/role';
 import * as user from './functions/user';
 
@@ -19,7 +20,15 @@ interface FactoryMeta {
 
 type ExtractMetaParameter<T extends (...args: any) => any> = (...args: ArrayHead<Parameters<T>>) => ReturnType<T>;
 
-type BuiltInFunctionsRaw = typeof cdn & typeof channel & typeof guild & typeof http & typeof invite & typeof role & typeof user;
+type BuiltInFunctionsRaw =
+& typeof cdn
+& typeof channel
+& typeof guild
+& typeof http
+& typeof invite
+& typeof resolve
+& typeof role
+& typeof user;
 
 // ? This check used to be done in ExtractMetaParameter<T> but unfortunately that meant that every function's return type was mutated by
 // ? ReturnType<T>. Initially, this seemed fine, however, as it appears, type-guard functions such as isAPIUser simply resolved to boolean

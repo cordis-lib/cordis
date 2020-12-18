@@ -1,6 +1,6 @@
 import { PatchedAPIGuild, Snowflake } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
-import { Guild, GuildResolvable } from '../Types';
+import { Guild } from '../Types';
 import { rawData } from '../util/Symbols';
 
 const isAPIGuild = (guild: any): guild is Guild => 'name' in guild && 'owner_id' in guild && 'member_count' in guild;
@@ -99,19 +99,8 @@ const sanitizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunc
   };
 };
 
-const resolveGuild = (guild: GuildResolvable, { functions: { retrieveFunction } }: FactoryMeta): Guild | null => {
-  if (retrieveFunction('isGuild')(guild)) return guild;
-  if (retrieveFunction('isAPIGuild')(guild)) return retrieveFunction('sanitizeGuild')(guild);
-  return null;
-};
-
-const resolveGuildId = (guild: GuildResolvable, { functions: { retrieveFunction } }: FactoryMeta): string | null =>
-  retrieveFunction('resolveGuild')(guild)?.id ?? null;
-
 export {
   isAPIGuild,
   isGuild,
-  sanitizeGuild,
-  resolveGuild,
-  resolveGuildId
+  sanitizeGuild
 };
