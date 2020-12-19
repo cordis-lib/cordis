@@ -24,7 +24,7 @@ import {
   InviteResolvable,
   PatchGuildData,
   UserResolvable
-} from '../Types';
+} from '../types';
 import { Patcher } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';

@@ -5,7 +5,7 @@ import { Redis } from 'ioredis';
 import { EventEmitter } from 'events';
 import { GatewayCommands } from './GatewayCommands';
 import { GatewaySendPayload } from 'discord-api-types';
-import { ClientUser, CoreEvents } from '../Types';
+import { ClientUser, CoreEvents } from '../types';
 import { FunctionManager } from '../FunctionManager';
 
 export interface GatewayOptions {

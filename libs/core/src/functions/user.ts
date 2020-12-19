@@ -2,7 +2,7 @@ import { UserFlags } from '../util/UserFlags';
 import { PatchedAPIUser, PatchedAPIClientUser, Snowflake } from '@cordis/util';
 import { rawData } from '../util/Symbols';
 import type { FactoryMeta } from '../FunctionManager';
-import type { User, ClientUser } from '../Types';
+import type { User, ClientUser } from '../types';
 
 /**
  * Indicates if the given value is or isn't a discord user

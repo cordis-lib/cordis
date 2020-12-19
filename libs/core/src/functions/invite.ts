@@ -3,7 +3,7 @@ import { rawData } from '../util/Symbols';
 import { UserFlags } from '../util/UserFlags';
 import type { APIInvite } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
-import type { Invite } from '../Types';
+import type { Invite } from '../types';
 
 const isAPIInvite = (invite: any): invite is APIInvite => 'code' in invite && 'url' in invite && 'inviter' in invite;
 

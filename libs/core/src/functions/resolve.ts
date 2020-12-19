@@ -16,7 +16,7 @@ import {
   BufferResolvable,
   FileResolvable,
   AuditLogEntryTargetType
-} from '../Types';
+} from '../types';
 import type { FactoryMeta } from '../FunctionManager';
 import type { AuditLogEvent } from 'discord-api-types';
 

@@ -1,6 +1,6 @@
 import { Rest } from './services/Rest';
 import { Gateway } from './services/Gateway';
-import { UserAvatarOptions } from './Types';
+import { UserAvatarOptions } from './types';
 
 import type { ArrayHead, ArrayTail, ImageOptions } from '@cordis/util';
 import type * as functions from './functions';

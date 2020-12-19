@@ -1,7 +1,7 @@
 export * from './util/Error';
 export * from './util/UserFlags';
 
-export * from './Types';
+export * from './types';
 
 import CoreFactory from './CoreFactory';
 

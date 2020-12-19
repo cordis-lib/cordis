@@ -1,7 +1,7 @@
 import { Patcher, Snowflake } from '@cordis/util';
 import type { APIGuildIntegration } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
-import type { Integration } from '../Types';
+import type { Integration } from '../types';
 
 const isAPIWIntegration = (integration: any): integration is APIGuildIntegration => 'id' in integration &&
 'name' in integration &&

@@ -1,7 +1,7 @@
 import { Patcher, Snowflake } from '@cordis/util';
 import { APIWebhook, WebhookType } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
-import type { Webhook } from '../Types';
+import type { Webhook } from '../types';
 
 const isAPIWebhook = (webhook: any): webhook is APIWebhook => 'token' in webhook &&
 'channel_id' in webhook &&
