@@ -32,7 +32,7 @@ export interface PatchedReaction extends APIReaction {
 export interface Events {
   channelCreate: { guild?: PatchedAPIGuild; channel: PatchedAPIChannel };
   channelDelete: { guild?: PatchedAPIGuild; channel: PatchedAPIChannel };
-  channelPinsUpdate: { guild?: PatchedAPIGuild; channel: PatchedAPIChannel; lastPinTimestamp?: string };
+  channelPinsUpdate: { guild?: PatchedAPIGuild; channel: PatchedAPIChannel; lastPinTimestamp?: string | null };
   channelUpdate: Updated<PatchedAPIChannel> & { guild?: PatchedAPIGuild };
 
   emojiCreate: { guild: PatchedAPIGuild; emoji: APIEmoji };

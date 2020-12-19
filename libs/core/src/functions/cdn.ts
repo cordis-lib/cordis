@@ -1,6 +1,6 @@
 import { ENDPOINTS, ImageOptions, makeDiscordCdnUrl } from '@cordis/util';
-import { FactoryMeta } from '../FunctionManager';
-import { UserAvatarOptions } from '../Types';
+import type { FactoryMeta } from '../FunctionManager';
+import type { UserAvatarOptions } from '../Types';
 
 /**
  * Gets a CDN URL to a user's avatar

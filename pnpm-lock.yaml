@@ -4,9 +4,9 @@ importers:
       '@commitlint/cli': 11.0.0
       '@commitlint/config-angular': 11.0.0
       '@strictsoftware/typedoc-plugin-monorepo': 0.3.1_typedoc@0.19.2
-      '@typescript-eslint/eslint-plugin': 4.10.0_b73eed484bdfc88edd18eb0024b8c446
-      '@typescript-eslint/parser': 4.10.0_eslint@7.15.0+typescript@4.1.3
-      eslint: 7.15.0
+      '@typescript-eslint/eslint-plugin': 4.10.0_6b61a0c92e8c4cfbede913a9a92460e2
+      '@typescript-eslint/parser': 4.10.0_eslint@7.16.0+typescript@4.1.3
+      eslint: 7.16.0
       eslint-config-marine: 7.2.0
       husky: 4.3.6
       lint-staged: 10.5.3
@@ -21,7 +21,7 @@ importers:
       '@strictsoftware/typedoc-plugin-monorepo': ^0.3.1
       '@typescript-eslint/eslint-plugin': ^4.10.0
       '@typescript-eslint/parser': ^4.10.0
-      eslint: ^7.15.0
+      eslint: ^7.16.0
       eslint-config-marine: ^7.2.0
       husky: ^4.3.6
       lint-staged: ^10.5.3
@@ -53,7 +53,7 @@ importers:
       '@cordis/brokers': 'link:../brokers'
       '@cordis/util': 'link:../util'
       amqplib: 0.6.0
-      discord-api-types: 0.7.0
+      discord-api-types: 0.11.1
       ioredis: 4.19.4
       tslib: 2.0.3
     devDependencies:
@@ -70,7 +70,7 @@ importers:
       '@types/ioredis': ^4.17.9
       '@types/node': ^14.14.14
       amqplib: ^0.6.0
-      discord-api-types: ^0.7.0
+      discord-api-types: ^0.11.1
       ioredis: ^4.19.4
       tslib: ^2.0.3
       typescript: ^4.1.3
@@ -78,7 +78,7 @@ importers:
     dependencies:
       '@cordis/util': 'link:../util'
       common-tags: 1.8.0
-      discord-api-types: 0.7.0
+      discord-api-types: 0.11.1
       node-fetch: 2.6.1
       tslib: 2.0.3
       ws: 7.4.1
@@ -97,7 +97,7 @@ importers:
       '@types/node-fetch': ^2.5.7
       '@types/ws': ^7.4.0
       common-tags: ^1.8.0
-      discord-api-types: ^0.7.0
+      discord-api-types: ^0.11.1
       erlpack: 'github:discordapp/erlpack'
       node-fetch: ^2.6.1
       tslib: ^2.0.3
@@ -126,7 +126,7 @@ importers:
       typescript: ^4.1.3
   libs/util:
     dependencies:
-      discord-api-types: 0.7.0
+      discord-api-types: 0.11.1
       tslib: 2.0.3
     devDependencies:
       '@types/amqplib': 0.5.16
@@ -136,7 +136,7 @@ importers:
     specifiers:
       '@types/amqplib': ^0.5.16
       '@types/node': ^14.14.14
-      discord-api-types: ^0.7.0
+      discord-api-types: ^0.11.1
       ioredis: ^4.19.4
       tslib: ^2.0.3
       typescript: ^4.1.3
@@ -497,13 +497,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-f+fD/fQAo3BCbCDlrUpznF1A5Zp9rB0noS5vnoormHSIPFKL0Z2DcUJ3Gxp5ytH4uLRNxy7AwYUC9exZzqGMAw==
-  /@typescript-eslint/eslint-plugin/4.10.0_b73eed484bdfc88edd18eb0024b8c446:
+  /@typescript-eslint/eslint-plugin/4.10.0_6b61a0c92e8c4cfbede913a9a92460e2:
     dependencies:
-      '@typescript-eslint/experimental-utils': 4.10.0_eslint@7.15.0+typescript@4.1.3
-      '@typescript-eslint/parser': 4.10.0_eslint@7.15.0+typescript@4.1.3
+      '@typescript-eslint/experimental-utils': 4.10.0_eslint@7.16.0+typescript@4.1.3
+      '@typescript-eslint/parser': 4.10.0_eslint@7.16.0+typescript@4.1.3
       '@typescript-eslint/scope-manager': 4.10.0
       debug: 4.3.1
-      eslint: 7.15.0
+      eslint: 7.16.0
       functional-red-black-tree: 1.0.1
       regexpp: 3.1.0
       semver: 7.3.4
@@ -521,13 +521,13 @@ packages:
         optional: true
     resolution:
       integrity: sha512-h6/V46o6aXpKRlarP1AiJEXuCJ7cMQdlpfMDrcllIgX3dFkLwEBTXAoNP98ZoOmqd1xvymMVRAI4e7yVvlzWEg==
-  /@typescript-eslint/experimental-utils/4.10.0_eslint@7.15.0+typescript@4.1.3:
+  /@typescript-eslint/experimental-utils/4.10.0_eslint@7.16.0+typescript@4.1.3:
     dependencies:
       '@types/json-schema': 7.0.6
       '@typescript-eslint/scope-manager': 4.10.0
       '@typescript-eslint/types': 4.10.0
       '@typescript-eslint/typescript-estree': 4.10.0_typescript@4.1.3
-      eslint: 7.15.0
+      eslint: 7.16.0
       eslint-scope: 5.1.1
       eslint-utils: 2.1.0
     dev: true
@@ -538,13 +538,13 @@ packages:
       typescript: '*'
     resolution:
       integrity: sha512-opX+7ai1sdWBOIoBgpVJrH5e89ra1KoLrJTz0UtWAa4IekkKmqDosk5r6xqRaNJfCXEfteW4HXQAwMdx+jjEmw==
-  /@typescript-eslint/parser/4.10.0_eslint@7.15.0+typescript@4.1.3:
+  /@typescript-eslint/parser/4.10.0_eslint@7.16.0+typescript@4.1.3:
     dependencies:
       '@typescript-eslint/scope-manager': 4.10.0
       '@typescript-eslint/types': 4.10.0
       '@typescript-eslint/typescript-estree': 4.10.0_typescript@4.1.3
       debug: 4.3.1
-      eslint: 7.15.0
+      eslint: 7.16.0
       typescript: 4.1.3
     dev: true
     engines:
@@ -678,12 +678,6 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-JWF7ocqNrp8u9oqpgV+wH5ftbt+cfvv+PTjOvKLT3AdYly/LmORARfEVT1iyjwN+4MqE5UmVKoAdIBqeoCHgLA==
-  /ansi-regex/4.1.0:
-    dev: true
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-1apePfXM1UOSqw0o9IiFAovVz9M5S1Dg+4TrDwfMewQ6p/rmMueb7tWZjQ1rx4Loy1ArBggoqGpfqqdI4rondg==
   /ansi-regex/5.0.0:
     engines:
       node: '>=8'
@@ -726,12 +720,6 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-iYUI2iIm84DfkEcoRWhJwVAaSw0=
-  /astral-regex/1.0.0:
-    dev: true
-    engines:
-      node: '>=4'
-    resolution:
-      integrity: sha512-+Ryf6g3BKoRc7jfp7ad8tM4TtMiaWvbF/1/sQcZPkkS7ag3D5nMBCe2UfOTONtAkaG0tO0ij3C5Lwmf1EiyjHg==
   /astral-regex/2.0.0:
     dev: true
     engines:
@@ -1041,12 +1029,12 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==
-  /discord-api-types/0.7.0:
+  /discord-api-types/0.11.1:
     dev: false
     engines:
       node: '>=12'
     resolution:
-      integrity: sha512-MA6/w+FCQIALYXyadZOfimMeltaWcY2IU2l4CJ6XJiKmEC3utcq17Jx7TBTAKsTMflRX47zdb8ojujjAqMuK5w==
+      integrity: sha512-ESGUMAcOY+fZFjK1JxhEXMhDjQzr8bYYrinDlvdsxs9BGhUkiQlZnGW1mk65r9V5WR9+RiyK57mg7QCC5MWsMQ==
   /doctrine/3.0.0:
     dependencies:
       esutils: 2.0.3
@@ -1063,10 +1051,6 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==
-  /emoji-regex/7.0.3:
-    dev: true
-    resolution:
-      integrity: sha512-CwBLREIQ7LvYFB0WyRvwhq5N5qPhc6PMjD6bYggFlI5YyDgl+0vxq5VHbMOFqLg7hfWzmu8T5Z1QofhmTIhItA==
   /emoji-regex/8.0.0:
     resolution:
       integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==
@@ -1137,7 +1121,7 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-QudtT6av5WXels9WjIM7qz1XD1cWGvX4gGXvp/zBn9nXG02D0utdU3Em2m/QjTnrsk6bBjmCygl3rmj118msQQ==
-  /eslint/7.15.0:
+  /eslint/7.16.0:
     dependencies:
       '@babel/code-frame': 7.12.11
       '@eslint/eslintrc': 0.2.2
@@ -1173,7 +1157,7 @@ packages:
       semver: 7.3.4
       strip-ansi: 6.0.0
       strip-json-comments: 3.1.1
-      table: 5.4.6
+      table: 6.0.4
       text-table: 0.2.0
       v8-compile-cache: 2.2.0
     dev: true
@@ -1181,7 +1165,7 @@ packages:
       node: ^10.12.0 || >=12.0.0
     hasBin: true
     resolution:
-      integrity: sha512-Vr64xFDT8w30wFll643e7cGrIkPEU50yIiI36OdSIDoSGguIeaLzBo0vpGvzo9RECUqq7htURfwEtKqwytkqzA==
+      integrity: sha512-iVWPS785RuDA4dWuhhgXTNrGxHHK3a8HLSMBgbbU59ruJDubUraXN8N5rn7kb8tG6sjg74eE0RA3YWT51eusEw==
   /espree/7.3.1:
     dependencies:
       acorn: 7.4.1
@@ -1519,6 +1503,7 @@ packages:
   /highlight.js/9.18.5:
     deprecated: Support has ended for 9.x series. Upgrade to @latest
     dev: true
+    requiresBuild: true
     resolution:
       integrity: sha512-a5bFyofd/BHCX52/8i8uJkjr9DYwXIPnM/plwI6W7ezItLGqzt7X2G2nXuYSfsIJdkwwj/g9DG1LkcGJI/dDoA==
   /hosted-git-info/2.8.8:
@@ -1643,12 +1628,6 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-qIwCU1eR8C7TfHahueqXc8gz+MI=
-  /is-fullwidth-code-point/2.0.0:
-    dev: true
-    engines:
-      node: '>=4'
-    resolution:
-      integrity: sha1-o7MKXE8ZkYMWeqq5O+764937ZU8=
   /is-fullwidth-code-point/3.0.0:
     engines:
       node: '>=8'
@@ -2482,16 +2461,6 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
-  /slice-ansi/2.1.0:
-    dependencies:
-      ansi-styles: 3.2.1
-      astral-regex: 1.0.0
-      is-fullwidth-code-point: 2.0.0
-    dev: true
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-Qu+VC3EwYLldKa1fCxuuvULvSJOKEgk9pi8dZeCVK7TqBfUNTH4sFkk4joj8afVSfAYgJoSOetjx9QWOJ5mYoQ==
   /slice-ansi/3.0.0:
     dependencies:
       ansi-styles: 4.3.0
@@ -2559,16 +2528,6 @@ packages:
       node: '>=0.6.19'
     resolution:
       integrity: sha512-a1uQGz7IyVy9YwhqjZIZu1c8JO8dNIe20xBmSS6qu9kv++k3JGzCVmprbNN5Kn+BgzD5E7YYwg1CcjuJMRNsvg==
-  /string-width/3.1.0:
-    dependencies:
-      emoji-regex: 7.0.3
-      is-fullwidth-code-point: 2.0.0
-      strip-ansi: 5.2.0
-    dev: true
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-vafcv6KjVZKSgz06oM/H6GDBrAtz8vdhQakGjFIvNrHA6y3HCF1CInLy+QLq8dTJPQ1b+KDUqDFctkdRW44e1w==
   /string-width/4.2.0:
     dependencies:
       emoji-regex: 8.0.0
@@ -2604,14 +2563,6 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha512-rHqiFh1elqCQ9WPLIC8I0Q/g/wj5J1eMkyoiD6eoQApWHP0FtlK7rqnhmabL5VUY9JQCcqwwvlOaSuutekgyrw==
-  /strip-ansi/5.2.0:
-    dependencies:
-      ansi-regex: 4.1.0
-    dev: true
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA==
   /strip-ansi/6.0.0:
     dependencies:
       ansi-regex: 5.0.0
@@ -2655,17 +2606,17 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==
-  /table/5.4.6:
+  /table/6.0.4:
     dependencies:
       ajv: 6.12.6
       lodash: 4.17.20
-      slice-ansi: 2.1.0
-      string-width: 3.1.0
+      slice-ansi: 4.0.0
+      string-width: 4.2.0
     dev: true
     engines:
-      node: '>=6.0.0'
+      node: '>=10.0.0'
     resolution:
-      integrity: sha512-wmEc8m4fjnob4gt5riFRtTu/6+4rSe12TpAELNSqHMfF3IqnA+CH37USM6/YR3qRZv7e56kAEAtd6nKZaxe0Ug==
+      integrity: sha512-sBT4xRLdALd+NFBvwOz8bw4b15htyythha+q+DVZqy2RS08PPC8O2sZFgJYEY7bJvbCFKccs+WIZ/cd+xxTWCw==
   /text-extensions/1.9.0:
     dev: true
     engines:

@@ -33,7 +33,7 @@
   "dependencies": {
     "@cordis/util": "workspace:0.1.0",
     "common-tags": "^1.8.0",
-    "discord-api-types": "^0.7.0",
+    "discord-api-types": "^0.11.1",
     "node-fetch": "^2.6.1",
     "tslib": "^2.0.3",
     "ws": "^7.4.1"

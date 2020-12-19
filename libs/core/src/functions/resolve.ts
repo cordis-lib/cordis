@@ -1,3 +1,8 @@
+import { CordisCoreError, CordisCoreRangeError, CordisCoreTypeError } from '../util/Error';
+import fetch from 'node-fetch';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { Readable } from 'stream';
 import {
   GuildResolvable,
   Guild,
@@ -9,14 +14,11 @@ import {
   User,
   ColorResolvable,
   BufferResolvable,
-  FileResolvable
+  FileResolvable,
+  AuditLogEntryTargetType
 } from '../Types';
-import { CordisCoreError, CordisCoreRangeError, CordisCoreTypeError } from '../util/Error';
-import { FactoryMeta } from '../FunctionManager';
-import fetch from 'node-fetch';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { Readable } from 'stream';
+import type { FactoryMeta } from '../FunctionManager';
+import type { AuditLogEvent } from 'discord-api-types';
 
 const resolveColor = (color: ColorResolvable) => {
   if (Array.isArray(color)) {
@@ -59,6 +61,19 @@ const resolveFileAsBuffer = async (file: FileResolvable, { functions: { retrieve
   const data = [];
   for await (const chunk of res) data.push(chunk);
   return Buffer.concat(data);
+};
+
+const resolveAuditLogEntryTargetType = (data: AuditLogEvent): AuditLogEntryTargetType => {
+  if (data < 10) return AuditLogEntryTargetType.guild;
+  if (data < 20) return AuditLogEntryTargetType.channel;
+  if (data < 30) return AuditLogEntryTargetType.user;
+  if (data < 40) return AuditLogEntryTargetType.role;
+  if (data < 50) return AuditLogEntryTargetType.invite;
+  if (data < 60) return AuditLogEntryTargetType.webhook;
+  if (data < 70) return AuditLogEntryTargetType.emoji;
+  if (data < 80) return AuditLogEntryTargetType.message;
+  if (data < 90) return AuditLogEntryTargetType.integration;
+  return AuditLogEntryTargetType.unknown;
 };
 
 const resolveGuild = (guild: GuildResolvable, { functions: { retrieveFunction } }: FactoryMeta): Guild | null => {
@@ -111,6 +126,8 @@ export {
   resolveBase64,
   resolveFile,
   resolveFileAsBuffer,
+
+  resolveAuditLogEntryTargetType,
 
   resolveGuild,
   resolveGuildId,

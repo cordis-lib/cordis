@@ -1,6 +1,6 @@
 import { PatchedAPIGuild, Snowflake } from '@cordis/util';
-import { FactoryMeta } from '../FunctionManager';
-import { Guild } from '../Types';
+import type { FactoryMeta } from '../FunctionManager';
+import type { Guild } from '../Types';
 import { rawData } from '../util/Symbols';
 
 const isAPIGuild = (guild: any): guild is Guild => 'name' in guild && 'owner_id' in guild && 'member_count' in guild;

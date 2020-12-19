@@ -12,10 +12,13 @@ import {
   RESTPostAPIGuildsResult,
   RESTPatchAPIGuildJSONBody,
   RESTPatchAPIGuildResult,
-  RESTGetAPIGuildRolesResult
+  RESTGetAPIGuildRolesResult,
+  RESTGetAPIAuditLogResult,
+  RESTGetAPIAuditLogQuery
 } from 'discord-api-types';
 import {
   CreateGuildData,
+  GetGuildAuditLogQuery,
   GuildPreview,
   GuildResolvable,
   InviteResolvable,
@@ -26,6 +29,39 @@ import { Patcher } from '@cordis/util';
 import { FactoryMeta } from '../FunctionManager';
 import { rawData } from '../util/Symbols';
 import { CordisCoreError } from '../util/Error';
+
+// Begin audit log functions
+const getAuditLog = (
+  guild: GuildResolvable | string,
+  query: GetGuildAuditLogQuery | RESTGetAPIAuditLogQuery,
+  { functions: { retrieveFunction }, rest }: FactoryMeta
+) => {
+  if (typeof guild !== 'string') {
+    const resolved = retrieveFunction('resolveGuildId')(guild);
+    if (!resolved) throw new CordisCoreError('entityUnresolved', 'guild id');
+    guild = resolved;
+  }
+
+  const isRaw = (data: GetGuildAuditLogQuery | RESTGetAPIAuditLogQuery): data is RESTGetAPIAuditLogQuery =>
+    'user_id' in data ||
+    'action_type' in data;
+
+  const final: RESTGetAPIAuditLogQuery = isRaw(query)
+    ? query
+    : {
+      /* eslint-disable @typescript-eslint/naming-convention */
+      action_type: query.actionType,
+      before: query.before,
+      limit: query.limit,
+      user_id: query.userId
+      /* eslint-enable @typescript-eslint/naming-convention */
+    };
+
+  return rest
+    .get<RESTGetAPIAuditLogResult>(Routes.guildAuditLog(guild), { query: final })
+    .then(data => retrieveFunction('sanitizeAuditLog')(data));
+};
+// End audit log functions
 
 // Begin guild functions
 const createGuild = async (data: CreateGuildData | RESTPostAPIGuildsJSONBody, { functions: { retrieveFunction }, rest }: FactoryMeta) => {
@@ -50,7 +86,8 @@ const createGuild = async (data: CreateGuildData | RESTPostAPIGuildsJSONBody, { 
       channels: data.channels,
       afk_channel_id: data.afkChannelId,
       afk_timeout: data.afkTimeout,
-      system_channel_id: data.systemChannelId
+      system_channel_id: data.systemChannelId,
+      system_channel_flags: data.systemChannelFlags
       /* eslint-enable @typescript-eslint/naming-convention */
     };
 
@@ -123,8 +160,8 @@ const patchGuild = async (
     'public_updates_channel_id' in data ||
     'preferred_locale' in data;
 
-  // TODO wait for discord-api-types to release the patch https://github.com/discordjs/discord-api-types/pull/48
   // @ts-ignore
+  // TODO wait for discord-api-types fix
   const final: RESTPatchAPIGuildJSONBody = isRaw(data)
     ? data
     : {
@@ -141,6 +178,7 @@ const patchGuild = async (
       splash: data.splash ? await retrieveFunction('resolveImage')(data.splash) : undefined,
       banner: data.banner ? await retrieveFunction('resolveImage')(data.banner) : undefined,
       system_channel_id: data.systemChannelId,
+      system_channel_flags: data.systemChannelFlags,
       rules_channel_id: data.rulesChannelId,
       public_updates_channel_id: data.publicUpdatesChannelId,
       preferred_locale: data.preferredLocale
@@ -249,6 +287,8 @@ const getRoles = (guild: GuildResolvable | string, { functions: { retrieveFuncti
 // End role functions
 
 export {
+  getAuditLog,
+
   createGuild,
   getGuild,
   getGuildPreview,

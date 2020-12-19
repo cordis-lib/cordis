@@ -1,7 +1,7 @@
 import { PatchedAPIRole, Snowflake } from '@cordis/util';
-import { FactoryMeta } from '../FunctionManager';
-import { Role } from '../Types';
 import { rawData } from '../util/Symbols';
+import type { FactoryMeta } from '../FunctionManager';
+import type { Role } from '../Types';
 
 const isAPIRole = (role: any): role is PatchedAPIRole => 'tags' in role && role.tags.premium_subscriber == null;
 

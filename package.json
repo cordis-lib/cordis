@@ -27,7 +27,7 @@
     "@strictsoftware/typedoc-plugin-monorepo": "^0.3.1",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
     "@typescript-eslint/parser": "^4.10.0",
-    "eslint": "^7.15.0",
+    "eslint": "^7.16.0",
     "eslint-config-marine": "^7.2.0",
     "husky": "^4.3.6",
     "lint-staged": "^10.5.3",

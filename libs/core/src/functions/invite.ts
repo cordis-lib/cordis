@@ -1,9 +1,9 @@
 import { ENDPOINTS, PatchedAPIInvite, Patcher } from '@cordis/util';
-import { APIInvite } from 'discord-api-types';
-import { FactoryMeta } from '../FunctionManager';
-import { Invite } from '../Types';
 import { rawData } from '../util/Symbols';
 import { UserFlags } from '../util/UserFlags';
+import type { APIInvite } from 'discord-api-types';
+import type { FactoryMeta } from '../FunctionManager';
+import type { Invite } from '../Types';
 
 const isAPIInvite = (invite: any): invite is APIInvite => 'code' in invite && 'url' in invite && 'inviter' in invite;
 
