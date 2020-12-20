@@ -18,7 +18,7 @@ APIGuildIntegration,
   expireBehavior: IntegrationExpireBehavior | null;
   expireGracePeriod: number | null;
   user: User | null;
-  syncedTimestamp: string | null;
+  syncedTimestamp: number | null;
   syncedAt: Date | null;
   subscriberCount: number | null;
   revoked: boolean;

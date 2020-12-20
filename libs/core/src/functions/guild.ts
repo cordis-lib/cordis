@@ -44,6 +44,8 @@ const sanitizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunc
   /* eslint-enable @typescript-eslint/naming-convention */
   } = raw;
 
+  const joinedAt = joined_at ? new Date(joined_at) : null;
+
   return {
     ...guild,
     ...Snowflake.getCreationData(guild.id),
@@ -63,8 +65,8 @@ const sanitizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunc
     systemChannelFlags: system_channel_flags,
     rulesChannelId: rules_channel_id,
     memberCount: member_count,
-    joinedTimestamp: joined_at,
-    joinedAt: joined_at ? new Date(joined_at) : null,
+    joinedTimestamp: joinedAt?.getTime() ?? null,
+    joinedAt,
     welcomeScreen: {
       description: welcome_screen?.description ?? null,
       welcomeChannels: welcome_screen?.welcome_channels

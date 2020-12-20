@@ -29,6 +29,8 @@ const sanitizeIntegration = (raw: APIGuildIntegration | Integration, { functions
     ...integration
   } = raw;
 
+  const syncedAt = synced_at ? new Date(synced_at) : null;
+
   return {
     ...integration,
     ...Snowflake.getCreationData(integration.id),
@@ -38,8 +40,8 @@ const sanitizeIntegration = (raw: APIGuildIntegration | Integration, { functions
     expireBehavior: expire_behavior ?? null,
     expireGracePeriod: expire_grace_period ?? null,
     user: user ? (retrieveFunction('sanitizeUser')(Patcher.patchUser(user).data)) : null,
-    syncedTimestamp: synced_at ?? null,
-    syncedAt: synced_at ? new Date(synced_at) : null,
+    syncedTimestamp: syncedAt?.getTime() ?? null,
+    syncedAt,
     subscriberCount: subscriber_count ?? null,
     revoked: revoked ?? false,
     application: application

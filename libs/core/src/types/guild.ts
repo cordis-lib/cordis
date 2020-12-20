@@ -56,7 +56,7 @@ PatchedAPIGuild,
   systemChannelId: string | null;
   systemChannelFlags: GuildSystemChannelFlags;
   rulesChannelId: string | null;
-  joinedTimestamp: string | null;
+  joinedTimestamp: number | null;
   joinedAt: Date | null;
   welcomeScreen: GuildWelcomeScreen | null;
   memberCount: number;

@@ -1,5 +1,6 @@
 export * from './auditLogs';
 export * from './cdn';
+export * from './channel';
 export * from './generic';
 export * from './guild';
 export * from './http';

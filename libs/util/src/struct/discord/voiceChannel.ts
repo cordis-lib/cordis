@@ -1,7 +1,8 @@
 import { APIChannel, ChannelType } from 'discord-api-types';
+import { RequiredProp } from '../../types/RequiredProp';
 import { default as patchGuildChannel, PatchedAPIGuildChannel } from './guildChannel';
 
-export interface PatchedAPIVoiceChannel extends Omit<PatchedAPIGuildChannel, 'type'> {
+export interface PatchedAPIVoiceChannel extends RequiredProp<Omit<PatchedAPIGuildChannel, 'type'>, 'bitrate' | 'user_limit'> {
   type: ChannelType.GUILD_VOICE;
 }
 
