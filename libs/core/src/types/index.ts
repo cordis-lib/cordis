@@ -8,7 +8,7 @@ export * from './http';
 export * from './integration';
 export * from './invite';
 export * from './message';
-export * from './resolver';
+export * from './resolve';
 export * from './role';
 export * from './user';
 export * from './webhook';
