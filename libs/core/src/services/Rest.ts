@@ -3,6 +3,7 @@ import { RequestBuilderOptions } from '@cordis/rest';
 import * as amqp from 'amqplib';
 import { CORDIS_AMQP_SYMBOLS } from '../../../rest/node_modules/@cordis/util/types';
 
+// TODO: Cleanup
 export class Rest {
   public service: RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>;
 

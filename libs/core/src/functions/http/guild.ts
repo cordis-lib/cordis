@@ -30,7 +30,7 @@ const createGuild = async (data: CreateGuildData | RESTPostAPIGuildsJSONBody, { 
       verification_level: data.verificationLevel,
       default_message_notifications: data.defaultMessageNotifications,
       explicit_content_filter: data.explicitContentFilter,
-      roles: data.roles?.map(r => retrieveFunction('sanitizeRole')(r)),
+      roles: data.roles,
       channels: data.channels,
       afk_channel_id: data.afkChannelId,
       afk_timeout: data.afkTimeout,
@@ -108,8 +108,6 @@ const patchGuild = async (
     'public_updates_channel_id' in data ||
     'preferred_locale' in data;
 
-  // @ts-ignore
-  // TODO wait for discord-api-types fix
   const final: RESTPatchAPIGuildJSONBody = isRaw(data)
     ? data
     : {

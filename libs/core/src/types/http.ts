@@ -1,12 +1,13 @@
+import { PatchedAPIRole } from '@cordis/util';
 import type {
-  APIGuildCreatePartialChannel,
   AuditLogEvent,
   GuildDefaultMessageNotifications,
   GuildExplicitContentFilter,
   GuildSystemChannelFlags,
   GuildVerificationLevel
 } from 'discord-api-types';
-import type { FileResolvable, RoleResolvable } from './resolver';
+import type { BaseGuildChannel } from './channel';
+import type { FileResolvable } from './resolver';
 
 interface GetGuildAuditLogQuery {
   userId?: string;
@@ -22,9 +23,8 @@ interface CreateGuildData {
   verificationLevel?: GuildVerificationLevel;
   defaultMessageNotifications?: GuildDefaultMessageNotifications;
   explicitContentFilter?: GuildExplicitContentFilter;
-  roles?: RoleResolvable[];
-  // TODO channels for guild creation
-  channels?: APIGuildCreatePartialChannel[];
+  roles?: PatchedAPIRole[];
+  channels?: (Partial<Omit<BaseGuildChannel, 'name' | 'guildId'>> & { name: string })[];
   afkChannelId?: string;
   afkTimeout?: number;
   systemChannelId?: number;
@@ -44,7 +44,7 @@ interface PatchGuildData {
   splash?: FileResolvable | null;
   banner?: FileResolvable | null;
   systemChannelId?: string | null;
-  systemChannelFlags?: number | null;
+  systemChannelFlags?: number;
   rulesChannelId?: string | null;
   publicUpdatesChannelId?: string | null;
   preferredLocale?: string | null;

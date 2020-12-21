@@ -124,7 +124,7 @@ const main = async () => {
       'description': 'The intents to use for the gateway connection(s)',
       'type': 'string',
       'array': true,
-      'default': ['all']
+      'default': ['guildMessages']
     })
     .help();
 
@@ -170,8 +170,10 @@ const main = async () => {
   const total = argv['shard-count'] ?? shards;
   const count = total / argv['cluster-count'];
 
+  console.log(total, count);
+
   ws.wsTotalShardCount = total;
-  ws.shardCount = total / count;
+  ws.shardCount = count;
   ws.clusterId = argv['cluster-id'];
 
   await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.shardCount, total);

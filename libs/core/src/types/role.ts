@@ -1,4 +1,5 @@
 import type { PatchedAPIRole, SnowflakeEntity } from '@cordis/util';
+import type { Permissions } from '../util/Permissions';
 import type { rawData } from '../util/Symbols';
 
 interface RoleTags {
@@ -7,8 +8,9 @@ interface RoleTags {
   integrationId: string | null;
 }
 
-interface Role extends Omit<PatchedAPIRole, 'tags'>, SnowflakeEntity {
+interface Role extends Omit<PatchedAPIRole, 'tags' | 'permissions'>, SnowflakeEntity {
   tags: RoleTags;
+  permissions: Permissions;
   toString(): string;
   [rawData]: PatchedAPIRole;
 }

@@ -1,6 +1,6 @@
 // ? No place to really put these
 
-import type { APIGuildMember } from 'discord-api-types';
+import type { GuildMember } from './guildMember';
 import type { ClientUser, User } from './user';
 
 interface VoiceState {
@@ -8,7 +8,7 @@ interface VoiceState {
   channelId: string | null;
   userId: string;
   // TODO: Members
-  member: APIGuildMember | null;
+  member: GuildMember | null;
   sessionId: string;
   deaf: boolean;
   mute: boolean;

@@ -1,6 +1,7 @@
-import type { PatchedAPIChannel, PatchedAPIInvite } from '@cordis/util';
+import type { PatchedAPIInvite } from '@cordis/util';
 import type { APIInvite, InviteTargetUserType } from 'discord-api-types';
 import type { rawData } from '../util/Symbols';
+import type { Channel } from './channel';
 import type { Guild } from './guild';
 import type { User } from './user';
 
@@ -10,8 +11,7 @@ APIInvite,
 > {
   guild: Guild | null;
   code: string;
-  // TODO: Channel
-  channel: PatchedAPIChannel;
+  channel: Channel;
   inviter: User;
   memberCount: number | null;
   presenceCount: number | null;

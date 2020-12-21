@@ -2,7 +2,7 @@ import { APIGuildMember } from 'discord-api-types';
 import { RequiredProp } from '../../types/RequiredProp';
 import { default as patchUser, PatchedAPIUser } from './user';
 
-export interface PatchedAPIGuildMember extends RequiredProp<APIGuildMember, 'mute' | 'deaf'> {}
+export interface PatchedAPIGuildMember extends RequiredProp<APIGuildMember, 'mute' | 'deaf' | 'roles'> {}
 
 export default <T extends PatchedAPIGuildMember | null | undefined>(n: Partial<APIGuildMember>, o?: T) => {
   const data = o ?? n;
@@ -38,9 +38,10 @@ export default <T extends PatchedAPIGuildMember | null | undefined>(n: Partial<A
   data.premium_since = premium_since ?? data.premium_since;
   data.mute = mute ?? data.mute ?? false;
   data.deaf = deaf ?? data.deaf ?? false;
+  data.roles = roles ?? data.roles ?? [];
 
   if (roles) {
-    extras.roles.push(data.roles ?? [], roles);
+    extras.roles.push(data.roles, roles);
     data.roles = roles;
   }
 

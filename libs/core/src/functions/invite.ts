@@ -13,12 +13,12 @@ const isInvite = (invite: any): invite is Invite => 'code' in invite &&
   invite.url === `${ENDPOINTS.invite}/${invite.code}` &&
   invite.inviter.flags instanceof UserFlags && invite.inviter.toString() === `<@${invite.inviter.id}>`;
 
-// TODO: Channel
 const sanitizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveFunction } }: FactoryMeta): Invite => {
   if (retrieveFunction('isInvite')(raw)) return raw;
 
   const {
     inviter,
+    channel,
     guild = null,
     /* eslint-disable @typescript-eslint/naming-convention */
     approximate_member_count,
@@ -31,6 +31,7 @@ const sanitizeInvite = (raw: PatchedAPIInvite | Invite, { functions: { retrieveF
 
   return {
     ...invite,
+    channel: retrieveFunction('sanitizeChannel')(Patcher.patchChannel(channel).data),
     guild: guild ? retrieveFunction('sanitizeGuild')(guild) : null,
     memberCount: approximate_member_count ?? null,
     presenceCount: approximate_presence_count ?? null,

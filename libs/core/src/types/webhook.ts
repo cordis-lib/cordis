@@ -1,5 +1,6 @@
 import { SnowflakeEntity } from '@cordis/util';
-import { APIPartialChannel, APIWebhook, WebhookType } from 'discord-api-types';
+import { APIWebhook, WebhookType } from 'discord-api-types';
+import type { NewsChannel } from './channel';
 import type { Guild } from './guild';
 import type { User } from './user';
 
@@ -11,8 +12,7 @@ APIWebhook,
   channelId: string;
   user: User | null;
   sourceGuild: Guild | null;
-  // TODO channels
-  sourceChannel: APIPartialChannel | null;
+  sourceChannel: NewsChannel | null;
   applicationId: string | null;
 }
 

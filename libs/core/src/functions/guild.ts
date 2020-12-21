@@ -72,10 +72,14 @@ const sanitizeGuild = (raw: PatchedAPIGuild | Guild, { functions: { retrieveFunc
       welcomeChannels: welcome_screen?.welcome_channels
         .map(screen => ({ channelId: screen.channel_id, emojiId: screen.emoji_id, emojiName: screen.emoji_name })) ?? []
     },
+    // TODO: Guild member functions
+    // @ts-ignore
     voiceStates: voice_states?.map(state => ({
       channelId: state.channel_id,
       userId: state.user_id,
-      member: state.member ?? null,
+      // TODO: Guild member functions
+      // @ts-ignore
+      member: state.member ? retrieveFunction('sanitizeGuildMember')(state.member) : null,
       sessionId: state.session_id,
       deaf: state.deaf,
       mute: state.mute,

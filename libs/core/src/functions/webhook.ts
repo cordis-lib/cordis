@@ -1,7 +1,7 @@
 import { Patcher, Snowflake } from '@cordis/util';
 import { APIWebhook, WebhookType } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
-import type { Webhook } from '../types';
+import type { NewsChannel, Webhook } from '../types';
 
 const isAPIWebhook = (webhook: any): webhook is APIWebhook => 'token' in webhook &&
 'channel_id' in webhook &&
@@ -44,7 +44,9 @@ const sanitizeWebhook = (raw: APIWebhook | Webhook, { functions: { retrieveFunct
     channelId: channel_id,
     user: user ? (retrieveFunction('sanitizeUser')(Patcher.patchUser(user).data)) : null,
     sourceGuild: source_guild ? retrieveFunction('sanitizeGuild')(Patcher.patchGuild(source_guild).data) : null,
-    sourceChannel: source_channel ?? null,
+    sourceChannel: source_channel
+      ? retrieveFunction('sanitizeChannel')(Patcher.patchChannel(source_channel).data) as NewsChannel
+      : null,
     applicationId: application_id
   };
 };
