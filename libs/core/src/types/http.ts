@@ -7,7 +7,7 @@ import type {
   GuildVerificationLevel
 } from 'discord-api-types';
 import type { BaseGuildChannel } from './channel';
-import type { FileResolvable } from './resolver';
+import type { FileResolvable } from './resolve';
 
 interface GetGuildAuditLogQuery {
   userId?: string;
