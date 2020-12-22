@@ -4,7 +4,7 @@ import { RequiredProp } from '../../types/RequiredProp';
 export interface PatchedAPIMessage extends RequiredProp<
 APIMessage,
 'type' | 'pinned' | 'tts' | 'embeds' | 'attachments' | 'edited_timestamp' |
-'reactions' | 'mentions' | 'webhook_id' | 'flags' | 'message_reference'> {}
+'reactions' | 'mentions' | 'webhook_id' | 'flags'> {}
 
 export default <T extends PatchedAPIMessage | null | undefined>(n: Partial<APIMessage>, o?: T) => {
   const data = o ?? n;

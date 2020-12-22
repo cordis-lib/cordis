@@ -7,7 +7,6 @@ interface VoiceState {
   guildId: string | null;
   channelId: string | null;
   userId: string;
-  // TODO: Members
   member: GuildMember | null;
   sessionId: string;
   deaf: boolean;

@@ -1,6 +1,5 @@
 import type {
   APIAttachment,
-  APIEmoji,
   APIMessageActivity,
   APIMessageApplication,
   APIReaction,
@@ -11,7 +10,6 @@ import type {
   StickerFormatType
 } from 'discord-api-types';
 import type { PatchedAPIMessage, SnowflakeEntity } from '@cordis/util';
-import type { Channel } from './channel';
 import type { GuildMember } from './guildMember';
 import type { User } from './user';
 
@@ -58,13 +56,13 @@ PatchedAPIMessage,
   editedTimestamp: number | null;
   editedAt: Date | null;
   mentionEveryone: boolean;
-  mentionedUsers: Map<string, User & { member?: GuildMember }>;
+  mentionedUsers: Map<string, User & { member: GuildMember | null }>;
   mentionedRoles: string[];
-  mentionedChannels: Map<string, Channel | { id: string; guildId: string; type: ChannelType; name: string }>;
+  mentionedChannels: Map<string, { id: string; guildId: string; type: ChannelType; name: string }>;
   attachments: MessageAttachment[];
   // TODO: embeds
 
-  reactions: Omit<APIReaction, 'emoji'> & { emoji: Omit<APIEmoji, 'require_colons'> };
+  reactions: Map<string, APIReaction>;
   pinned: boolean;
   webhookId: string;
   type: MessageType;
@@ -73,7 +71,8 @@ PatchedAPIMessage,
   messageReference: MessageReference | null;
   flags: MessageFlags;
   stickers: Map<string, Sticker>;
-  referencedMessage: MessageReference | null;
+  referencedMessage: Message | null;
+  toString(): string;
 }
 
 export {
