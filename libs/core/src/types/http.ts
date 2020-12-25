@@ -1,12 +1,14 @@
 import { PatchedAPIRole } from '@cordis/util';
 import type {
   AuditLogEvent,
+  ChannelType,
   GuildDefaultMessageNotifications,
   GuildExplicitContentFilter,
   GuildSystemChannelFlags,
   GuildVerificationLevel
 } from 'discord-api-types';
 import type { BaseGuildChannel } from './channel';
+import type { Overwrite } from './generic';
 import type { FileResolvable } from './resolve';
 
 interface GetGuildAuditLogQuery {
@@ -14,6 +16,19 @@ interface GetGuildAuditLogQuery {
   actionType?: AuditLogEvent;
   before?: string;
   limit?: number;
+}
+
+interface PatchChannelData {
+  name: string;
+  type: ChannelType.GUILD_TEXT | ChannelType.GUILD_NEWS;
+  position?: number | null;
+  topic?: string | null;
+  nsfw?: boolean | null;
+  rateLimitPerUser?: number | null;
+  bitrate?: number | null;
+  userLimit?: number | null;
+  permissionOverwrites?: Overwrite[] | null;
+  parentId?: string | null;
 }
 
 interface CreateGuildData {
@@ -52,6 +67,9 @@ interface PatchGuildData {
 
 export {
   GetGuildAuditLogQuery,
+
+  PatchChannelData,
+
   CreateGuildData,
   PatchGuildData
 };

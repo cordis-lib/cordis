@@ -18,19 +18,22 @@ const getAuditLog = (
     'user_id' in data ||
     'action_type' in data;
 
-  const final: RESTGetAPIAuditLogQuery = isRaw(query)
-    ? query
-    : {
-      /* eslint-disable @typescript-eslint/naming-convention */
-      action_type: query.actionType,
-      before: query.before,
-      limit: query.limit,
-      user_id: query.userId
-      /* eslint-enable @typescript-eslint/naming-convention */
-    };
-
   return rest
-    .get<RESTGetAPIAuditLogResult>(Routes.guildAuditLog(guild), { query: final })
+    .get<RESTGetAPIAuditLogResult, never, RESTGetAPIAuditLogQuery>(
+    Routes.guildAuditLog(guild),
+    {
+      query: isRaw(query)
+        ? query
+        : {
+        /* eslint-disable @typescript-eslint/naming-convention */
+          action_type: query.actionType,
+          before: query.before,
+          limit: query.limit,
+          user_id: query.userId
+        /* eslint-enable @typescript-eslint/naming-convention */
+        }
+    }
+  )
     .then(data => retrieveFunction('sanitizeAuditLog')(data));
 };
 

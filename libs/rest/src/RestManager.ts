@@ -21,7 +21,7 @@ export interface RestManagerOptions {
   /**
    * Method that can be called to get a store to use to keep track of rate limits
    */
-  store: (name: string) => Store<Partial<RatelimitData>, boolean>;
+  store: (name: string) => Store<Partial<RatelimitData>, boolean, any>;
 }
 
 export interface RestManager {
@@ -53,7 +53,7 @@ export class RestManager extends EventEmitter {
   public readonly retries: number;
   public readonly abortIn: number;
   public readonly apiVersion: number;
-  public readonly store: Store<Partial<RatelimitData>, boolean>;
+  public readonly store: Store<Partial<RatelimitData>, boolean, any>;
 
   /**
    * Current active rate limiting Buckets
@@ -87,8 +87,11 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
-  public get(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
-    return this.make({
+  public get<T, D = Record<any, any>, Q = Record<any, any>>(
+    path: string,
+    options?: Partial<Omit<RequestBuilderOptions<D, Q>, 'path' | 'method'>>
+  ) {
+    return this.make<T, D, Q>({
       path,
       method: 'get',
       ...options
@@ -100,8 +103,11 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
-  public delete(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
-    return this.make({
+  public delete<T, D = Record<any, any>, Q = Record<any, any>>(
+    path: string,
+    options?: Partial<Omit<RequestBuilderOptions<D, Q>, 'path' | 'method'>>
+  ) {
+    return this.make<T, D, Q>({
       path,
       method: 'delete',
       ...options
@@ -113,8 +119,11 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
-  public put(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
-    return this.make({
+  public put<T, D = Record<any, any>, Q = Record<any, any>>(
+    path: string,
+    options?: Partial<Omit<RequestBuilderOptions<D, Q>, 'path' | 'method'>>
+  ) {
+    return this.make<T, D, Q>({
       path,
       method: 'put',
       ...options
@@ -126,8 +135,11 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
-  public post(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
-    return this.make({
+  public post<T, D = Record<any, any>, Q = Record<any, any>>(
+    path: string,
+    options?: Partial<Omit<RequestBuilderOptions<D, Q>, 'path' | 'method'>>
+  ) {
+    return this.make<T, D, Q>({
       path,
       method: 'post',
       ...options
@@ -139,8 +151,11 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
-  public patch(path: string, options: Partial<Omit<RequestBuilderOptions, 'path' | 'method'>>) {
-    return this.make({
+  public patch<T, D = Record<any, any>, Q = Record<any, any>>(
+    path: string,
+    options?: Partial<Omit<RequestBuilderOptions<D, Q>, 'path' | 'method'>>
+  ) {
+    return this.make<T, D, Q>({
       path,
       method: 'patch',
       ...options
@@ -151,7 +166,7 @@ export class RestManager extends EventEmitter {
    * Makes a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public make(options: Partial<RequestBuilderOptions> & { path: string }) {
+  public make<T, D = Record<any, any>, Q = Record<any, any>>(options: Partial<RequestBuilderOptions<D>> & { path: string }): Promise<T> {
     options.method = options.method ?? 'get';
     options.api = options.api ?? `${ENDPOINTS.api}/v${this.apiVersion}`;
     options.abortIn = options.abortIn ?? this.abortIn;
@@ -170,6 +185,6 @@ export class RestManager extends EventEmitter {
     options.headers.set('Authorization', `Bot ${this.auth}`);
     options.headers.set('User-Agent', userAgent);
 
-    return bucket.make(options as RequestBuilderOptions);
+    return bucket.make<T, D, Q>(options as RequestBuilderOptions<D>);
   }
 }

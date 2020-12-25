@@ -1,13 +1,12 @@
-import { Rest } from './services/Rest';
-import { Gateway } from './services/Gateway';
-import { UserAvatarOptions } from './types';
-
+import type { RestManager } from '@cordis/rest';
+import type { Gateway } from './services/Gateway';
+import type { UserAvatarOptions } from './types';
 import type { ArrayHead, ArrayTail, ImageOptions } from '@cordis/util';
 import type * as functions from './functions';
 
 interface FactoryMeta {
   functions: FunctionManager;
-  rest: Rest;
+  rest: RestManager;
   gateway: Gateway;
 }
 

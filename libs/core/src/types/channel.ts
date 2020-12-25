@@ -1,5 +1,6 @@
 import type { SnowflakeEntity } from '@cordis/util';
-import type { APIPartialChannel, APIOverwrite, ChannelType } from 'discord-api-types';
+import type { APIPartialChannel, ChannelType } from 'discord-api-types';
+import type { Overwrite } from './generic';
 import type { User } from './user';
 
 interface BaseChannel extends Omit<APIPartialChannel, 'name' | 'type'>, SnowflakeEntity {
@@ -11,7 +12,7 @@ interface BaseGuildChannel extends BaseChannel {
   name: string;
   position: number;
   parentId: string | null;
-  permissionOverwrites: APIOverwrite[];
+  permissionOverwrites: Overwrite[];
 }
 
 interface DMChannel extends BaseChannel {

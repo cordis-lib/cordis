@@ -17,7 +17,6 @@ It is cut up in multiple packages/libraries:
 
 But also services that hook into RabbitMQ using the libraries mentioned above:
 
-- `@cordis/rest-service`
 - `@cordis/gateway-service`
 
 # Roadmap

@@ -6,16 +6,16 @@ import { URLSearchParams } from 'url';
 /**
  * Presents the base options that may be needed for making a request to Discord
  */
-export interface RequestBuilderOptions {
+export interface RequestBuilderOptions<D = Record<any, any>, Q = Record<any, any>> {
   api: string;
   path: string;
   method: string;
   headers: Headers;
   abortIn: number;
-  query?: Record<string, any> | string;
+  query?: Q | string;
   reason?: string;
   files?: { name: string; file: Buffer }[];
-  data?: Record<any, any>;
+  data?: D;
   failures?: number;
 }
 

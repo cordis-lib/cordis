@@ -15,7 +15,11 @@ import {
   ColorResolvable,
   BufferResolvable,
   FileResolvable,
-  AuditLogEntryTargetType
+  AuditLogEntryTargetType,
+  ChannelResolvable,
+  Channel,
+  MessageResolvable,
+  Message
 } from '../types';
 import type { FactoryMeta } from '../FunctionManager';
 import type { AuditLogEvent } from 'discord-api-types';
@@ -76,6 +80,15 @@ const resolveAuditLogEntryTargetType = (data: AuditLogEvent): AuditLogEntryTarge
   return AuditLogEntryTargetType.unknown;
 };
 
+const resolveChannel = (channel: ChannelResolvable, { functions: { retrieveFunction } }: FactoryMeta): Channel | null => {
+  if (retrieveFunction('isChannel')(channel)) return channel;
+  if (retrieveFunction('isAPIChannel')(channel)) return retrieveFunction('sanitizeChannel')(channel);
+  return null;
+};
+
+const resolveChannelId = (channel: ChannelResolvable, { functions: { retrieveFunction } }: FactoryMeta): string | null =>
+  retrieveFunction('resolveChannel')(channel)?.id ?? null;
+
 const resolveGuild = (guild: GuildResolvable, { functions: { retrieveFunction } }: FactoryMeta): Guild | null => {
   if (retrieveFunction('isGuild')(guild)) return guild;
   if (retrieveFunction('isAPIGuild')(guild)) return retrieveFunction('sanitizeGuild')(guild);
@@ -95,6 +108,15 @@ const resolveInviteCode = (invite: InviteResolvable | string, { functions: { ret
   if (typeof invite === 'string') return invite.replace(/(https\:\/\/)?(discord)?(\.gg)?\/?/g, '');
   return retrieveFunction('resolveInvite')(invite)?.code ?? null;
 };
+
+const resolveMessage = (message: MessageResolvable, { functions: { retrieveFunction } }: FactoryMeta): Message | null => {
+  if (retrieveFunction('isMessage')(message)) return message;
+  if (retrieveFunction('isAPIMessage')(message)) return retrieveFunction('sanitizeMessage')(message);
+  return null;
+};
+
+const resolveMessageId = (message: MessageResolvable, { functions: { retrieveFunction } }: FactoryMeta): string | null =>
+  retrieveFunction('resolveMessage')(message)?.id ?? null;
 
 const resolveRole = (role: RoleResolvable, { functions: { retrieveFunction } }: FactoryMeta): Role | null => {
   if (retrieveFunction('isRole')(role)) return role;
@@ -129,11 +151,17 @@ export {
 
   resolveAuditLogEntryTargetType,
 
+  resolveChannel,
+  resolveChannelId,
+
   resolveGuild,
   resolveGuildId,
 
   resolveInvite,
   resolveInviteCode,
+
+  resolveMessage,
+  resolveMessageId,
 
   resolveRole,
   resolveRoleId,

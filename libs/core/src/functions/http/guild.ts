@@ -20,27 +20,30 @@ const createGuild = async (data: CreateGuildData | RESTPostAPIGuildsJSONBody, { 
     'afk_timeout' in data ||
     'system_channel_id' in data;
 
-  const final: RESTPostAPIGuildsJSONBody = isRaw(data)
-    ? data
-    : {
-      name: data.name,
-      region: data.region,
-      icon: data.icon ? await retrieveFunction('resolveImage')(data.icon) : undefined,
-      /* eslint-disable @typescript-eslint/naming-convention */
-      verification_level: data.verificationLevel,
-      default_message_notifications: data.defaultMessageNotifications,
-      explicit_content_filter: data.explicitContentFilter,
-      roles: data.roles,
-      channels: data.channels,
-      afk_channel_id: data.afkChannelId,
-      afk_timeout: data.afkTimeout,
-      system_channel_id: data.systemChannelId,
-      system_channel_flags: data.systemChannelFlags
-      /* eslint-enable @typescript-eslint/naming-convention */
-    };
-
   return rest
-    .post<RESTPostAPIGuildsResult>(Routes.guilds(), { data: final })
+    .post<RESTPostAPIGuildsResult, RESTPostAPIGuildsJSONBody>(
+    Routes.guilds(),
+    {
+      data: isRaw(data)
+        ? data
+        : {
+          name: data.name,
+          region: data.region,
+          icon: data.icon ? await retrieveFunction('resolveImage')(data.icon) : undefined,
+          /* eslint-disable @typescript-eslint/naming-convention */
+          verification_level: data.verificationLevel,
+          default_message_notifications: data.defaultMessageNotifications,
+          explicit_content_filter: data.explicitContentFilter,
+          roles: data.roles,
+          channels: data.channels,
+          afk_channel_id: data.afkChannelId,
+          afk_timeout: data.afkTimeout,
+          system_channel_id: data.systemChannelId,
+          system_channel_flags: data.systemChannelFlags
+        /* eslint-enable @typescript-eslint/naming-convention */
+        }
+    }
+  )
     .then(
       data => retrieveFunction('sanitizeGuild')(
         Patcher.patchGuild(data).data
@@ -108,31 +111,34 @@ const patchGuild = async (
     'public_updates_channel_id' in data ||
     'preferred_locale' in data;
 
-  const final: RESTPatchAPIGuildJSONBody = isRaw(data)
-    ? data
-    : {
-      name: data.name,
-      region: data.region,
-      /* eslint-disable @typescript-eslint/naming-convention */
-      verification_level: data.verificationLevel,
-      default_message_notifications: data.defaultMessageNotifications,
-      explicit_content_filter: data.explicitContentFilter,
-      afk_channel_id: data.afkChannelId,
-      afk_timeout: data.afkTimeout,
-      icon: data.icon ? await retrieveFunction('resolveImage')(data.icon) : undefined,
-      owner_id: data.ownerId,
-      splash: data.splash ? await retrieveFunction('resolveImage')(data.splash) : undefined,
-      banner: data.banner ? await retrieveFunction('resolveImage')(data.banner) : undefined,
-      system_channel_id: data.systemChannelId,
-      system_channel_flags: data.systemChannelFlags,
-      rules_channel_id: data.rulesChannelId,
-      public_updates_channel_id: data.publicUpdatesChannelId,
-      preferred_locale: data.preferredLocale
-    /* eslint-enable @typescript-eslint/naming-convention */
-    };
-
   return rest
-    .post<RESTPatchAPIGuildResult>(Routes.guild(guild), { data: final })
+    .post<RESTPatchAPIGuildResult, RESTPatchAPIGuildJSONBody>(
+    Routes.guild(guild),
+    {
+      data: isRaw(data)
+        ? data
+        : {
+          name: data.name,
+          region: data.region,
+          /* eslint-disable @typescript-eslint/naming-convention */
+          verification_level: data.verificationLevel,
+          default_message_notifications: data.defaultMessageNotifications,
+          explicit_content_filter: data.explicitContentFilter,
+          afk_channel_id: data.afkChannelId,
+          afk_timeout: data.afkTimeout,
+          icon: data.icon ? await retrieveFunction('resolveImage')(data.icon) : undefined,
+          owner_id: data.ownerId,
+          splash: data.splash ? await retrieveFunction('resolveImage')(data.splash) : undefined,
+          banner: data.banner ? await retrieveFunction('resolveImage')(data.banner) : undefined,
+          system_channel_id: data.systemChannelId,
+          system_channel_flags: data.systemChannelFlags,
+          rules_channel_id: data.rulesChannelId,
+          public_updates_channel_id: data.publicUpdatesChannelId,
+          preferred_locale: data.preferredLocale
+          /* eslint-enable @typescript-eslint/naming-convention */
+        }
+    }
+  )
     .then(
       data => retrieveFunction('sanitizeGuild')(
         Patcher.patchGuild(data).data

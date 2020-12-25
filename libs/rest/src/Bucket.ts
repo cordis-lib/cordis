@@ -35,7 +35,7 @@ export class Bucket {
   /**
    * The request queue
    */
-  public queue = new AsyncQueue<unknown>();
+  public queue = new AsyncQueue<any>();
 
   /**
    * @param manager The rest manager instance being used by this bucket
@@ -51,7 +51,7 @@ export class Bucket {
    * @param req Request options
    * @param urgent Wether this request should be given priority or not
    */
-  public make(req: RequestBuilderOptions, urgent = false) {
+  public make<T, D, Q>(req: RequestBuilderOptions<D, Q>, urgent = false): Promise<T> {
     return this.queue.run(() => this._make(req), urgent);
   }
 
@@ -66,7 +66,7 @@ export class Bucket {
       (state.remaining === 0 && Date.now() < (state.resetAt ?? 0)) ||
       state.global
     ) {
-      const waitingFor = state.resetAt ?? Date.now() - Date.now();
+      const waitingFor = (state.resetAt ?? Date.now()) - Date.now();
       this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, true, waitingFor);
       await halt(waitingFor);
     }

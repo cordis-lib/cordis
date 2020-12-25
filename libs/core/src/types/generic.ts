@@ -1,5 +1,8 @@
 // ? No place to really put these
 
+import { BitFieldResolvable } from '@cordis/util';
+import { OverwriteType } from 'discord-api-types';
+import { PermissionKey, Permissions } from '../util/Permissions';
 import type { GuildMember } from './guildMember';
 import type { ClientUser, User } from './user';
 
@@ -18,6 +21,13 @@ interface VoiceState {
   suppress: boolean;
 }
 
+interface Overwrite {
+  id: string;
+  type: OverwriteType;
+  allow: Permissions | BitFieldResolvable<PermissionKey>;
+  deny: Permissions | BitFieldResolvable<PermissionKey>;
+}
+
 interface CoreEvents {
   ready: [ClientUser];
   userUpdate: [User, User];
@@ -25,6 +35,7 @@ interface CoreEvents {
 
 export {
   VoiceState,
+  Overwrite,
   CoreEvents
 };
 

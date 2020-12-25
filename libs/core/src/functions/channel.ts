@@ -2,6 +2,7 @@ import { PatchedAPIChannel, Patcher, Snowflake } from '@cordis/util';
 import { ChannelType } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
 import type { CategoryChannel, Channel, VoiceChannel } from '../types';
+import { Permissions } from '../util/Permissions';
 
 const isAPIChannel = (channel: any): channel is PatchedAPIChannel =>
   'id' in channel &&
@@ -24,7 +25,11 @@ const sanitizeChannel = (raw: PatchedAPIChannel | Channel, { functions: { retrie
     name: raw.name!,
     position: raw.position!,
     parentId: raw.parent_id ?? null,
-    permissionOverwrites: raw.permission_overwrites ?? []
+    permissionOverwrites: raw.permission_overwrites?.map(o => ({
+      ...o,
+      allow: new Permissions(BigInt(o.allow)),
+      deny: new Permissions(BigInt(o.deny))
+    })) ?? []
   };
 
   /* eslint-disable @typescript-eslint/naming-convention */
