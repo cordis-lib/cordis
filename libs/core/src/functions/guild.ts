@@ -1,4 +1,4 @@
-import { PatchedAPIGuild, Snowflake } from '@cordis/util';
+import { PatchedAPIGuild, Snowflake } from '@cordis/common';
 import type { FactoryMeta } from '../FunctionManager';
 import type { Guild } from '../types';
 import { rawData } from '../util/Symbols';

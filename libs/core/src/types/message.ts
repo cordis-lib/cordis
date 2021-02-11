@@ -9,7 +9,7 @@ import type {
   MessageType,
   StickerFormatType
 } from 'discord-api-types';
-import type { PatchedAPIMessage, SnowflakeEntity } from '@cordis/util';
+import type { PatchedAPIMessage, SnowflakeEntity } from '@cordis/common';
 import type { GuildMember } from './guildMember';
 import type { User } from './user';
 

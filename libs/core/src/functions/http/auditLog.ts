@@ -1,12 +1,12 @@
 import { RESTGetAPIAuditLogQuery, RESTGetAPIAuditLogResult, Routes } from 'discord-api-types';
 import { CordisCoreError } from '../../util/Error';
+import { container } from 'tsyringe';
 import type { FactoryMeta } from '../../FunctionManager';
 import type { GetGuildAuditLogQuery, GuildResolvable } from '../../types';
 
 const getAuditLog = (
   guild: GuildResolvable | string,
-  query: GetGuildAuditLogQuery | RESTGetAPIAuditLogQuery,
-  { functions: { retrieveFunction }, rest }: FactoryMeta
+  query: GetGuildAuditLogQuery | RESTGetAPIAuditLogQuery
 ) => {
   if (typeof guild !== 'string') {
     const resolved = retrieveFunction('resolveGuildId')(guild);

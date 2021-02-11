@@ -1,4 +1,4 @@
-import { Patcher, Snowflake } from '@cordis/util';
+import { Patcher, Snowflake } from '@cordis/common';
 import type { APIGuildIntegration } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
 import type { Integration } from '../types';

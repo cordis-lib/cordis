@@ -1,5 +1,5 @@
 import { Routes, RESTGetAPIGuildRolesResult } from 'discord-api-types';
-import { Patcher } from '@cordis/util';
+import { Patcher } from '@cordis/common';
 import { CordisCoreError } from '../../util/Error';
 import type { GuildResolvable } from '../../types';
 import type { FactoryMeta } from '../../FunctionManager';

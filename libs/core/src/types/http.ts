@@ -1,4 +1,4 @@
-import { PatchedAPIRole } from '@cordis/util';
+import { PatchedAPIRole } from '@cordis/common';
 import type {
   AuditLogEvent,
   ChannelType,

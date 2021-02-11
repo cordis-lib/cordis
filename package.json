@@ -6,7 +6,9 @@
   "scripts": {
     "lint": "pnpm recursive run lint --filter @cordis/*",
     "build": "pnpm recursive run build --filter @cordis/*",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "test": "jest",
+    "test:ci": "jest --ci --no-stack-trace --verbose"
   },
   "repository": {
     "type": "git",
@@ -22,88 +24,35 @@
   },
   "homepage": "https://github.com/cordisjs/cordis#readme",
   "devDependencies": {
-    "@commitlint/cli": "^11.0.0",
-    "@commitlint/config-angular": "^11.0.0",
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@babel/preset-typescript": "^7.12.13",
     "@strictsoftware/typedoc-plugin-monorepo": "^0.3.1",
-    "@typescript-eslint/eslint-plugin": "^4.10.0",
-    "@typescript-eslint/parser": "^4.10.0",
-    "eslint": "^7.16.0",
+    "@types/jest": "^26.0.20",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "babel-jest": "^26.6.3",
+    "babel-plugin-const-enum": "^1.0.1",
+    "babel-plugin-replace-ts-export-assignment": "^0.0.2",
+    "eslint": "^7.19.0",
     "eslint-config-marine": "^7.2.0",
-    "husky": "^4.3.6",
+    "husky": "^4.3.8",
+    "jest": "^26.6.3",
     "lint-staged": "^10.5.3",
     "typedoc": "^0.19.2",
     "typedoc-plugin-as-member-of": "^1.0.2",
-    "typedoc-plugin-markdown": "^3.1.1",
+    "typedoc-plugin-markdown": "^3.4.5",
     "typedoc-plugin-no-inherit": "^1.2.0",
-    "typescript": "^4.1.3"
-  },
-  "renovate": {
-    "extends": [
-      "teal"
-    ],
-    "baseBranch": "next"
-  },
-  "eslintConfig": {
-    "extends": "marine/node",
-    "rules": {
-      "@typescript-eslint/indent": [
-        "error",
-        2
-      ],
-      "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/restrict-template-expressions": "off",
-      "@typescript-eslint/no-base-to-string": "off",
-      "@typescript-eslint/no-throw-literal": "off",
-      "one-var": "off",
-      "no-eq-null": "off",
-      "no-useless-constructor": "off",
-      "no-negated-condition": "off",
-      "promise/prefer-await-to-then": "off",
-      "promise/prefer-await-to-callbacks": "off",
-      "radix": "off",
-      "no-multi-assign": "off"
-    }
+    "typescript": "^4.2.0-dev.20210206"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
     "*.ts": [
       "eslint --fix"
     ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-angular"
-    ],
-    "rules": {
-      "scope-case": [
-        2,
-        "always",
-        "pascal-case"
-      ],
-      "type-enum": [
-        2,
-        "always",
-        [
-          "chore",
-          "build",
-          "ci",
-          "docs",
-          "feat",
-          "fix",
-          "perf",
-          "refactor",
-          "revert",
-          "style",
-          "test",
-          "types",
-          "wip"
-        ]
-      ]
-    }
   }
 }

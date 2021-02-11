@@ -1,4 +1,4 @@
-import { makeCordisError } from '@cordis/util';
+import makeCordisError from '@cordis/error';
 import { WebsocketConnectionStatus } from './websocket/WebsocketConnection';
 
 /* eslint-disable @typescript-eslint/naming-convention */

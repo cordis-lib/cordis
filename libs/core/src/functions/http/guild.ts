@@ -7,7 +7,7 @@ import {
   RESTPostAPIGuildsResult,
   Routes
 } from 'discord-api-types';
-import { Patcher } from '@cordis/util';
+import { Patcher } from '@cordis/common';
 import { CordisCoreError } from '../../util/Error';
 import type { CreateGuildData, GuildPreview, GuildResolvable, PatchGuildData } from '../../types';
 import type { FactoryMeta } from '../../FunctionManager';

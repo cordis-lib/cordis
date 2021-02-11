@@ -1,4 +1,4 @@
-import type { PatchedAPIRole, SnowflakeEntity } from '@cordis/util';
+import type { PatchedAPIRole, SnowflakeEntity } from '@cordis/common';
 import type { Permissions } from '../util/Permissions';
 import type { rawData } from '../util/Symbols';
 

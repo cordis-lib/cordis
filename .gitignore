@@ -1,7 +1,7 @@
-dist
-types
-!libs/core/src/types
-!libs/util/src/types
+/**/dist
+/**/types
+!/**/src/types
+coverage
 
 node_modules
 

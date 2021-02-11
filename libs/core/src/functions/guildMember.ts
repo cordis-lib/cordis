@@ -1,4 +1,4 @@
-import { PatchedAPIGuildMember, Patcher, Snowflake } from '@cordis/util';
+import { PatchedAPIGuildMember, Patcher, Snowflake } from '@cordis/common';
 import type { APIUser } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
 import type { GuildMember, User } from '../types';

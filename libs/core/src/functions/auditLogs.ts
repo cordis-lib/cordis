@@ -6,7 +6,7 @@ import {
   OptionPropReflectingAuditLogEvents,
   AuditLog
 } from '../types';
-import { Patcher, Snowflake } from '@cordis/util';
+import { Patcher, Snowflake } from '@cordis/common';
 import { APIAuditLog, APIAuditLogEntry, AuditLogEvent, AuditLogOptionsType } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
 

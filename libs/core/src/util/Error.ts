@@ -1,4 +1,4 @@
-import { makeCordisError } from '@cordis/util';
+import { makeCordisError } from '@cordis/common';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const CordisCoreError = makeCordisError(

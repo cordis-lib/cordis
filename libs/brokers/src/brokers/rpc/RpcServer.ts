@@ -1,26 +1,41 @@
 import { Broker } from '../Broker';
+import type * as amqp from 'amqplib';
+
+export interface RpcServerInitOptions<S, C> {
+  name: string;
+  cb: (content: C) => S | Promise<S>;
+}
 
 export class RpcServer<S, C> extends Broker {
   public serverQueue?: string;
 
-  public async init(serverQueue: string, cb: (content: C) => S | Promise<S>) {
-    this.serverQueue = await this.channel.assertQueue(serverQueue, { durable: false }).then(d => d.queue);
+  public constructor(channel: amqp.Channel) {
+    super(channel);
+  }
+
+  public async init({ name, cb }: RpcServerInitOptions<S, C>) {
+    this.serverQueue = await this.channel.assertQueue(name, { durable: false }).then(d => d.queue);
 
     await this.channel.prefetch(1);
-    await this._consumeQueue(this.serverQueue, async (content: C, properties) => {
-      let reply: S;
-      let isError: boolean;
 
-      try {
-        reply = await cb(content);
-        isError = false;
-      } catch (e) {
-        this.emit('error', e);
-        reply = e.message ?? e.toString();
-        isError = true;
-      }
+    await this.util.consumeQueue({
+      queue: this.serverQueue,
+      cb: async (content: C, msg) => {
+        let value: S | null;
+        let error: boolean;
 
-      this._replyToMsg(properties, reply, isError);
-    }, false);
+        try {
+          value = await cb(content);
+          error = false;
+        } catch (e) {
+          this.emit('error', e);
+          value = null;
+          error = true;
+        }
+
+        this.util.reply(msg, { value, error });
+      },
+      noAck: true
+    });
   }
 }

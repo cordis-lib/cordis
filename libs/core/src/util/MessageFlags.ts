@@ -1,4 +1,4 @@
-import { BitField, BitFieldResolvable } from '@cordis/util';
+import { BitField, BitFieldResolvable } from '@cordis/common';
 
 const MESSAGE_FLAGS = {
   crossposted: BitField.bigintify(0),

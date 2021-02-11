@@ -1,4 +1,4 @@
-import type { PatchedAPIChannel, PatchedAPIGuild, PatchedAPIInvite, PatchedAPIMessage, PatchedAPIRole, PatchedAPIUser } from '@cordis/util';
+import type { PatchedAPIChannel, PatchedAPIGuild, PatchedAPIInvite, PatchedAPIMessage, PatchedAPIRole, PatchedAPIUser } from '@cordis/common';
 import type { Readable } from 'stream';
 import type { Channel } from './channel';
 import type { Guild } from './guild';

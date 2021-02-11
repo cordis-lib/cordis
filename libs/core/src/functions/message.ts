@@ -1,6 +1,6 @@
 import type { Message } from '../types';
 import type { FactoryMeta } from '../FunctionManager';
-import { PatchedAPIMessage, Patcher, Snowflake } from '@cordis/util';
+import { PatchedAPIMessage, Patcher, Snowflake } from '@cordis/common';
 
 const isAPIMessage = (message: any): message is PatchedAPIMessage => 'nick' in message &&
 'roles' in message &&

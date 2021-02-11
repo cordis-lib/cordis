@@ -1,4 +1,4 @@
-import type { PatchedAPIGuildMember, SnowflakeEntity } from '@cordis/util';
+import type { PatchedAPIGuildMember, SnowflakeEntity } from '@cordis/common';
 import type { User } from './user';
 
 interface GuildMember extends SnowflakeEntity, Omit<PatchedAPIGuildMember, 'user' | 'joined_at' | 'premium_since' | 'pending'> {

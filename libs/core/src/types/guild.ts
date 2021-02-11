@@ -7,7 +7,7 @@ import type {
   GuildSystemChannelFlags,
   GuildVerificationLevel
 } from 'discord-api-types';
-import type { PatchedAPIGuild, SnowflakeEntity } from '@cordis/util';
+import type { PatchedAPIGuild, SnowflakeEntity } from '@cordis/common';
 import type { rawData } from '../util/Symbols';
 import type { VoiceState } from './generic';
 

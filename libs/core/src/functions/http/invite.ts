@@ -1,5 +1,5 @@
 import { RESTDeleteAPIInviteResult, RESTGetAPIInviteResult, Routes } from 'discord-api-types';
-import { Patcher } from '@cordis/util';
+import { Patcher } from '@cordis/common';
 import { CordisCoreError } from '../../util/Error';
 import type { FactoryMeta } from '../../FunctionManager';
 import type { InviteResolvable } from '../../types';

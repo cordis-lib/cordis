@@ -1,4 +1,4 @@
-import { BitField, BitFieldResolvable } from '@cordis/util';
+import { BitField, BitFieldResolvable } from '@cordis/common';
 
 const PERMISSIONS = {
   createInstantInvite: BitField.bigintify(0),

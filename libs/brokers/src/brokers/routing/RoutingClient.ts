@@ -1,53 +1,43 @@
 import { Broker } from '../Broker';
-import * as amqp from 'amqplib';
-import { Redis } from 'ioredis';
-import { CordisBrokerTypeError } from '../../error';
-import { CORDIS_REDIS_SYMBOLS } from '@cordis/util';
+import type * as amqp from 'amqplib';
 
-export interface RoutingClient<K extends string, S extends Record<K, any>> {
-  on<LK extends K>(event: LK, listener: (data: S[LK]) => any): this;
-  once<LK extends K>(event: LK, listener: (data: S[LK]) => any): this;
-  emit<LK extends K>(event: LK, data: S[LK]): boolean;
+export interface RoutingClientInitOtions {
+  name: string;
+  topicBased?: boolean;
+  keys: string[];
+  queue?: string;
 }
 
-export class RoutingClient<K extends string, S extends Record<K, any>> extends Broker {
-  public exchange?: string;
-  public topicBased?: boolean;
-  public redis?: Redis;
+// ? Have to retype the error events as a hack, unfortunately
+export interface RoutingClient<K extends string, T extends Record<K, any>> extends Broker {
+  on(event: 'error', listener: (error: any) => any): this;
+  on<LK extends K>(event: LK, listener: (data: T[LK]) => any): this;
 
-  public constructor(channel: amqp.Channel, redis?: Redis) {
+  once(event: 'error', listener: (error: any) => any): this;
+  once<LK extends K>(event: LK, listener: (data: T[LK]) => any): this;
+
+  emit(event: 'error', error: any): boolean;
+  emit<LK extends K>(event: LK, data: T[LK]): boolean;
+}
+
+export class RoutingClient<K extends string, T extends Record<K, any>> extends Broker {
+  public constructor(channel: amqp.Channel) {
     super(channel);
-    this.redis = redis;
   }
 
-  public async init(
-    exchange: string,
-    keys: string | string[],
-    topicBased = false,
-    balance = false
-  ) {
-    if (balance && !this.redis) {
-      process.emitWarning(new CordisBrokerTypeError('invalidBalance'));
-      balance = false;
-    }
+  /* istanbul ignore next */
+  public async init({ name, topicBased = false, keys, queue = '' }: RoutingClientInitOtions) {
+    const exchange = await this.channel.assertExchange(name, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
 
-    keys = [...new Set(Array.isArray(keys) ? keys : [keys])].sort();
-    const identifier = keys.map(e => e.toUpperCase()).join('-');
+    const data = await this.channel.assertQueue(queue, { durable: true, exclusive: queue === '' });
+    queue = data.queue;
 
-    this.topicBased = topicBased;
-    this.exchange = await this.channel.assertExchange(exchange, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
+    for (const key of keys) await this.channel.bindExchange(queue, exchange, key);
 
-    const intendedQueueName = balance
-      ? (await this.redis!.hget(CORDIS_REDIS_SYMBOLS.internal.amqp.queues(this.exchange), identifier) ?? '')
-      : '';
-    const { queue } = await this.channel.assertQueue(intendedQueueName, { durable: true, exclusive: !balance });
-
-    if (balance && intendedQueueName === '') {
-      await this.redis!.hset(CORDIS_REDIS_SYMBOLS.internal.amqp.queues(this.exchange), identifier, queue);
-    }
-
-    for (const key of keys) await this.channel.bindExchange(queue, this.exchange, key);
-
-    await this._consumeQueue(queue, (content: { type: K; data: S[K] }) => this.emit(content.type, content.data), false);
+    await this.util.consumeQueue({
+      queue,
+      cb: (content: { type: K; data: T[K] }) => this.emit(content.type, content.data),
+      noAck: true
+    });
   }
 }

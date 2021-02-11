@@ -1,4 +1,4 @@
-import { CORDIS_AMQP_SYMBOLS, Patcher } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, Patcher } from '@cordis/common';
 import { APIUser } from 'discord-api-types';
 import { Handler } from '../Handler';
 

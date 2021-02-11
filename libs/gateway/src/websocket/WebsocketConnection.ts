@@ -2,8 +2,10 @@ import WS = require('ws');
 import { Cluster } from './Cluster';
 import { CordisGatewayError, CordisGatewayTypeError } from '../error';
 import * as Util from '../util';
-// Need to ensure that the zlib namespace is only being used as a type so it is NOT required in the transpiled javascript
-import * as zlib from 'zlib-sync';
+import { halt } from '@cordis/common';
+import { Queue } from '@cordis/queue';
+import { Intents, INTENTS, IntentKeys } from '../Intents';
+import { stripIndent } from 'common-tags';
 import {
   GatewaySendPayload,
   GatewayReceivePayload,
@@ -12,9 +14,7 @@ import {
   GatewayCloseCodes,
   GatewayDispatchEvents
 } from 'discord-api-types';
-import { AsyncQueue, halt } from '@cordis/util';
-import { Intents, INTENTS, IntentKeys } from '../Intents';
-import { stripIndent } from 'common-tags';
+import type * as zlib from 'zlib-sync';
 
 /**
  * The current status of the shard
@@ -94,7 +94,7 @@ export interface WebsocketConnectionOptions {
   /**
    * The intents to use
    */
-  intents: Intents | IntentKeys | IntentKeys[] | number | bigint;
+  intents: Intents | IntentKeys | IntentKeys[] | bigint;
 }
 
 export interface WebsocketConnectionDestroyOptions {
@@ -132,28 +132,10 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
     flush: Util.zlib?.Z_SYNC_FLUSH
   };
 
-  // Options
-  public readonly openTimeout: number;
-  public readonly helloTimeout: number;
-  public readonly reconnectTimeout: number;
-  public readonly discordReadyTimeout: number;
-  public readonly guildTimeout: number;
-  public readonly encoding: Util.Encoding;
-  public readonly compress: boolean;
-  public readonly largeThreshold: number;
-  public readonly intents: number;
-
-  // State
-  public connection?: WS;
-  public status = WebsocketConnectionStatus.idle;
-
-  public inflate: zlib.Inflate | null = null;
-  public guilds: Set<string> = new Set();
-
   private readonly _intervals: { [key: string]: NodeJS.Timeout | null } = {};
   private readonly _timeouts: { [key: string]: NodeJS.Timeout | null } = {};
 
-  private readonly _commandQueue = new AsyncQueue<void>();
+  private readonly _commandQueue = new Queue();
 
   /**
    * Sequence for the last packet recieved, used for resuming
@@ -180,6 +162,24 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
 
   private _connectedAt = -1;
 
+  // Options
+  public readonly openTimeout: number;
+  public readonly helloTimeout: number;
+  public readonly reconnectTimeout: number;
+  public readonly discordReadyTimeout: number;
+  public readonly guildTimeout: number;
+  public readonly encoding: Util.Encoding;
+  public readonly compress: boolean;
+  public readonly largeThreshold: number;
+  public readonly intents: bigint;
+
+  // State
+  public connection?: WS;
+  public status = WebsocketConnectionStatus.idle;
+
+  public inflate: zlib.Inflate | null = null;
+  public guilds: Set<string> = new Set();
+
   public constructor(
     public readonly cluster: Cluster,
     public readonly id: number,
@@ -205,7 +205,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
     this.guildTimeout = guildTimeout;
     this.largeThreshold = largeThreshold;
     if (typeof intents === 'number') intents = BigInt(intents);
-    this.intents = new Intents(intents).valueOf(true);
+    this.intents = new Intents(intents).valueOf();
 
     // If the latter is JSON it means erlpack is not present
     if (encoding === 'etf' && Util.defaultEncoding === 'json') {
@@ -737,12 +737,12 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
         {
           token: [REDACTED],
           properties: {
-            $os: ${Util.CONSTANTS.properties.$os};
-            $browser: ${Util.CONSTANTS.properties.$browser};
-            $device: ${Util.CONSTANTS.properties.$device};
+            $os: ${Util.CONSTANTS.properties.$os},
+            $browser: ${Util.CONSTANTS.properties.$browser},
+            $device: ${Util.CONSTANTS.properties.$device}
           },
           shard: [${this.id}, ${this.cluster.shardsSpawned}],
-          large_threshold: ${this.largeThreshold}
+          large_threshold: ${this.largeThreshold},
           intents: ${this.intents}
         }
     `);
@@ -752,10 +752,9 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
       d: {
         token: this.cluster.auth,
         properties: Util.CONSTANTS.properties,
-        shard: [this.id, this.cluster.wsTotalShardCount as number],
-        // eslint-disable-next-line @typescript-eslint/naming-convention
+        shard: [this.id, this.cluster.totalShardCount as number],
         large_threshold: this.largeThreshold,
-        intents: this.intents
+        intents: Number(this.intents)
       }
     }, true);
   }

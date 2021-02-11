@@ -13,7 +13,7 @@ It is cut up in multiple packages/libraries:
 - `@cordis/core`, a library for interfacing with the Cordis services
 - `@cordis/rest`, containing a REST manager for the Discord API, including a rate limiting system and various utilities
 - `@cordis/gateway`, containing a very flexible way of connecting to Discord's gateway
-- `@cordis/util`, utilities for interacting with Discord or just generally useful functions/structures
+- `@cordis/common`, utilities for interacting with Discord or just generally useful functions/structures
 
 But also services that hook into RabbitMQ using the libraries mentioned above:
 

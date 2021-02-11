@@ -1,4 +1,4 @@
-import { ENDPOINTS, tryImport } from '@cordis/util';
+import { ENDPOINTS } from '@cordis/common';
 import { GatewayReceivePayload } from 'discord-api-types';
 import { TextDecoder } from 'util';
 
@@ -15,12 +15,24 @@ export const restartingCloseCode = 1000;
 /**
  * Installed erlpack instance, if any
  */
-export const erlpack = tryImport<typeof import('erlpack')>('erlpack');
+export let erlpack: typeof import('erlpack') | null;
+
+try {
+  erlpack = require('erlpack');
+} catch {
+  erlpack = null;
+}
 
 /**
  * Installed zlib instance, if any
  */
-export const zlib = tryImport<typeof import('zlib-sync')>('zlib-sync');
+export let zlib: typeof import('zlib-sync') | null;
+
+try {
+  zlib = require('zlib-sync');
+} catch {
+  zlib = null;
+}
 
 /**
  * Default encoding to use

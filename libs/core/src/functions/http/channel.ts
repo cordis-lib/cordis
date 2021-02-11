@@ -9,7 +9,7 @@ import {
   Routes
 } from 'discord-api-types';
 import { CordisCoreError } from '../../util/Error';
-import { Patcher } from '@cordis/util';
+import { Patcher } from '@cordis/common';
 import { Permissions } from '../../util/Permissions';
 import type { ChannelResolvable, MessageResolvable, PatchChannelData } from '../../types';
 import type { FactoryMeta } from '../../FunctionManager';

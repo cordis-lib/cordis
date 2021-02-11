@@ -1,5 +1,5 @@
 import { UserFlags } from '../util/UserFlags';
-import { PatchedAPIUser, PatchedAPIClientUser, Snowflake } from '@cordis/util';
+import { PatchedAPIUser, PatchedAPIClientUser, Snowflake } from '@cordis/common';
 import { rawData } from '../util/Symbols';
 import type { FactoryMeta } from '../FunctionManager';
 import type { User, ClientUser } from '../types';

@@ -1,15 +1,15 @@
 import { RestManager } from './RestManager';
-import { discordFetch, RequestBuilderOptions } from './Fetch';
+import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { Response } from 'node-fetch';
 import { HTTPError, MESSAGES } from './HTTPError';
-import { AsyncQueue, halt } from '@cordis/util';
+import { Queue } from '@cordis/queue';
+import { halt } from '@cordis/common';
 
 export interface RatelimitData {
   global: boolean;
   limit: number;
+  timeout: number;
   remaining: number;
-  resetAfter: number;
-  resetAt: number;
 }
 
 /**
@@ -35,7 +35,7 @@ export class Bucket {
   /**
    * The request queue
    */
-  public queue = new AsyncQueue<any>();
+  public queue = new Queue<any>();
 
   /**
    * @param manager The rest manager instance being used by this bucket
@@ -51,7 +51,7 @@ export class Bucket {
    * @param req Request options
    * @param urgent Wether this request should be given priority or not
    */
-  public make<T, D, Q>(req: RequestBuilderOptions<D, Q>, urgent = false): Promise<T> {
+  public make<T, D, Q>(req: DiscordFetchOptions<D, Q>, urgent = false): Promise<T> {
     return this.queue.run(() => this._make(req), urgent);
   }
 
@@ -59,22 +59,28 @@ export class Bucket {
    * Handles rate limiting and responses
    * @param req Reqyest options
    */
-  private async _make(req: RequestBuilderOptions): Promise<any> {
-    const state = await this.manager.store.get(this.route) ?? {};
+  private async _make(req: DiscordFetchOptions): Promise<any> {
+    await this.mutex.claim(this.route);
 
-    if (
-      (state.remaining === 0 && Date.now() < (state.resetAt ?? 0)) ||
-      state.global
-    ) {
-      const waitingFor = (state.resetAt ?? Date.now()) - Date.now();
+    const state = await this.manager.store.get(this.route) ?? {};
+    const globalState = await this.manager.store.get('global') ?? {};
+
+    if (state.remaining === 0 && state.resetAt && Date.now() < state.resetAt) {
+      const waitingFor = state.resetAt - Date.now();
       this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, true, waitingFor);
       await halt(waitingFor);
+    } else if (globalState.active && globalState.resetAt && Date.now() < globalState.resetAt) {
+      const waitingFor = globalState.resetAt - Date.now();
+      this.manager.emit('ratelimit', this.route, 'GLOBAL', true, waitingFor);
+      await halt(waitingFor);
+
+      globalState.active = false;
+      await this.manager.store.set('global', globalState);
     }
 
     this.manager.emit('request', req);
     const res = await discordFetch(req);
 
-    state.global = res.headers.get('x-ratelimit-global') === 'true';
     state.limit = Number(res.headers.get('x-ratelimit-limit'));
     state.remaining = Number(res.headers.get('x-ratelimit-remaining'));
     state.resetAfter = Number(res.headers.get('x-ratelimit-reset-after')) * 1000;
@@ -83,14 +89,20 @@ export class Bucket {
     await this.manager.store.set(this.route, state);
 
     if (res.status === 429) {
-      const period = await res.json().then(d => d.retry_after * 1000);
+      const data = await res.json();
+      const period = data.retry_after * 1000;
+
       this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, false, period);
 
-      state.resetAfter = period;
-      state.resetAt = Date.now() + period;
-      state.global = false;
+      if (data.global) {
+        globalState.active = true;
+        globalState.resetAfter = period;
+        globalState.resetAt = Date.now() + period;
 
-      await halt(period * 1000);
+        await this.manager.store.set('global', globalState);
+      }
+
+      await halt(period);
       return this._retry(req, res);
     } else if (res.status >= 500 && res.status < 600) {
       return this._retry(req, res);
@@ -112,7 +124,7 @@ export class Bucket {
    * @param req Request options
    * @param res Response given
    */
-  private _retry(req: RequestBuilderOptions, res: Response) {
+  private _retry(req: DiscordFetchOptions, res: Response) {
     if (req.failures) req.failures++;
     else req.failures = 1;
 

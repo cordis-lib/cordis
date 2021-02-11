@@ -1,8 +1,10 @@
-import { CORDIS_AMQP_SYMBOLS, Patcher } from '@cordis/util';
-import { GatewayReadyDispatch } from 'discord-api-types';
-import { Handler } from '../Handler';
+import { GatewayReadyDispatchData } from 'discord-api-types/v8';
+import { kService, kUser } from '../Symbols';
+import { container } from 'tsyringe';
 
-const ready: Handler<GatewayReadyDispatch['d']> = (data, service) => {
+const ready = (data: GatewayReadyDispatchData) => {
+  const service = container.resolve(kService);
+
   const { data: user } = Patcher.patchClientUser(data.user);
   service.publish({ ...data, user }, CORDIS_AMQP_SYMBOLS.gateway.events.ready);
 };

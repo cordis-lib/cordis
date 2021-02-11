@@ -1,4 +1,4 @@
-import { ENDPOINTS, PatchedAPIInvite, Patcher } from '@cordis/util';
+import { ENDPOINTS, PatchedAPIInvite, Patcher } from '@cordis/common';
 import { rawData } from '../util/Symbols';
 import { UserFlags } from '../util/UserFlags';
 import type { APIInvite } from 'discord-api-types';

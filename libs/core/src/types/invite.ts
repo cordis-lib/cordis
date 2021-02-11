@@ -1,4 +1,4 @@
-import type { PatchedAPIInvite } from '@cordis/util';
+import type { PatchedAPIInvite } from '@cordis/common';
 import type { APIInvite, InviteTargetUserType } from 'discord-api-types';
 import type { rawData } from '../util/Symbols';
 import type { Channel } from './channel';

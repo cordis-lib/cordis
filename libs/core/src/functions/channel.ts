@@ -1,4 +1,4 @@
-import { PatchedAPIChannel, Patcher, Snowflake } from '@cordis/util';
+import { PatchedAPIChannel, Patcher, Snowflake } from '@cordis/common';
 import { ChannelType } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
 import type { CategoryChannel, Channel, VoiceChannel } from '../types';

@@ -1,0 +1,22 @@
+{
+  "extends": "marine/node",
+  "rules": {
+    "@typescript-eslint/indent": [
+      "error",
+      2
+    ],
+    "@typescript-eslint/no-require-imports": "off",
+    "@typescript-eslint/restrict-template-expressions": "off",
+    "@typescript-eslint/no-base-to-string": "off",
+    "@typescript-eslint/no-throw-literal": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "one-var": "off",
+    "no-eq-null": "off",
+    "no-useless-constructor": "off",
+    "no-negated-condition": "off",
+    "promise/prefer-await-to-then": "off",
+    "promise/prefer-await-to-callbacks": "off",
+    "radix": "off",
+    "no-multi-assign": "off"
+  }
+}

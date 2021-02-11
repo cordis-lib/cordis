@@ -1,4 +1,4 @@
-import type { SnowflakeEntity } from '@cordis/util';
+import type { SnowflakeEntity } from '@cordis/common';
 import type { APIGuildIntegration, APIGuildIntegrationApplication, IntegrationExpireBehavior } from 'discord-api-types';
 import type { User } from './user';
 

@@ -1,32 +1,31 @@
 import fetch, { Headers } from 'node-fetch';
-import AbortController from 'abort-controller';
-import FormData = require('form-data');
+import FormData from 'form-data';
 import { URLSearchParams } from 'url';
+import type { AbortSignal } from 'abort-controller';
 
 /**
  * Presents the base options that may be needed for making a request to Discord
  */
-export interface RequestBuilderOptions<D = Record<any, any>, Q = Record<any, any>> {
+export interface DiscordFetchOptions<D = Record<any, any>, Q = Record<any, any>> {
   api: string;
   path: string;
   method: string;
   headers: Headers;
-  abortIn: number;
+  abortSignal: AbortSignal;
   query?: Q | string;
   reason?: string;
   files?: { name: string; file: Buffer }[];
   data?: D;
-  failures?: number;
 }
 
 /**
  * Makes a request, doing a lot of special things to satisfy Discord's requirements
  * @param options Options for the request
  */
-export function discordFetch(options: RequestBuilderOptions) {
-  let { api, path, method, query, reason, headers, files, data, abortIn } = options;
+export const discordFetch = (options: DiscordFetchOptions) => {
+  let { api, path, method, headers, abortSignal, query, reason, files, data } = options;
 
-  let queryString = '';
+  let queryString: string | null = null;
   if (query) {
     queryString = new URLSearchParams(
       typeof query === 'string'
@@ -35,12 +34,10 @@ export function discordFetch(options: RequestBuilderOptions) {
           .entries(query)
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           .filter(([, value]) => value != null)
-    )
-      .toString();
+    ).toString();
   }
 
-  path = `${path}${queryString && `?${queryString}`}`;
-  const url = `${api}${path}`;
+  const url = `${api}${path}${queryString ? `?${queryString}` : ''}`;
 
   if (reason) headers.set('X-Audit-Log-Reason', encodeURIComponent(reason));
 
@@ -55,13 +52,10 @@ export function discordFetch(options: RequestBuilderOptions) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), abortIn);
-
   return fetch(url, {
     method: method,
     headers,
     body: body!,
-    signal: controller.signal
-  }).finally(() => clearTimeout(timeout));
-}
+    signal: abortSignal
+  });
+};

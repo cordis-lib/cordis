@@ -1,7 +1,7 @@
 import { RpcClient } from '@cordis/brokers';
-import { CORDIS_AMQP_SYMBOLS } from '@cordis/util';
-import * as amqp from 'amqplib';
-import { GatewaySendPayload } from 'discord-api-types';
+import { CORDIS_AMQP_SYMBOLS } from '@cordis/common';
+import type * as amqp from 'amqplib';
+import type { GatewaySendPayload } from 'discord-api-types';
 
 export class GatewayCommands {
   public service: RpcClient<void, GatewaySendPayload>;

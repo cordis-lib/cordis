@@ -2,6 +2,8 @@
 
 ## About
 Cordis' REST utilities for the Discord API
+
+Note: Props to https://github.com/spec-tacles/spectacles.js for the Mutex logic.
 ___
 
 ## Example usage
@@ -12,7 +14,7 @@ const main = async () => {
   const rest = new RestManager('token');
 
   const someUser = await rest.get('/users/223703707118731264');
-  const someOtherGuy = await rest.make({
+  const someOtherUser = await rest.make({
     path: '/users/198536269586890752',
     method: 'get'
   });

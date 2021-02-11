@@ -3,7 +3,7 @@ import type {
   PatchedAPIClientUser,
   PatchedAPIUser,
   SnowflakeEntity
-} from '@cordis/util';
+} from '@cordis/common';
 import type { rawData } from '../util/Symbols';
 import type { UserFlagKeys, UserFlags } from '../util/UserFlags';
 

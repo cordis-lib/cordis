@@ -9,4 +9,6 @@ export * from './brokers/routing/RoutingServer';
 export * from './brokers/rpc/RpcClient';
 export * from './brokers/rpc/RpcServer';
 
+export * from './amqp';
+
 export * from './error';

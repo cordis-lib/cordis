@@ -1,4 +1,4 @@
-import { ENDPOINTS, ImageOptions, makeDiscordCdnUrl } from '@cordis/util';
+import { ENDPOINTS, ImageOptions, makeDiscordCdnUrl } from '@cordis/common';
 import type { FactoryMeta } from '../FunctionManager';
 import type { UserAvatarOptions } from '../types';
 

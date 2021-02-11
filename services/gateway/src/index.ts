@@ -1,12 +1,17 @@
+import 'reflect-metadata';
 import * as yargs from 'yargs';
-import * as redis from 'ioredis';
-import { RoutingServer, RpcClient, RpcServer } from '@cordis/brokers';
+import { RoutingServer, RpcServer } from '@cordis/brokers';
+import { RestManager } from '@cordis/rest';
 import { Cluster, IntentKeys } from '@cordis/gateway';
-import { RedisCache, createAmqp, Events, CORDIS_REDIS_SYMBOLS, CORDIS_AMQP_SYMBOLS, PatchedAPIClientUser } from '@cordis/util';
-import { RequestBuilderOptions } from '@cordis/rest';
-import { Channel } from 'amqplib';
-import { Handler } from './Handler';
-import { GatewaySendPayload } from 'discord-api-types';
+import { createAmqp } from '@cordis/amqp';
+import { CORDIS_AMQP_SYMBOLS, SYMBOLS } from '@cordis/common';
+import { container } from 'tsyringe';
+import { kRest, kService } from './Symbols';
+import Redis from 'ioredis';
+import { RedisStore } from '@cordis/redis-store';
+import type { GatewaySendPayload, GatewayDispatchPayload } from 'discord-api-types/v8';
+
+type GatewayData = { [K in GatewayDispatchPayload['t']]: (GatewayDispatchPayload & { t: K })['d'] };
 
 const main = async () => {
   const { argv } = yargs
@@ -29,17 +34,11 @@ const main = async () => {
       type: 'number',
       required: false
     })
-    .option('cluster-count', {
-      'global': true,
-      'description': 'How many clusters you intend to spawn',
-      'type': 'number',
-      'default': 1
-    })
-    .option('cluster-id', {
+    .option('total-shard-count', {
       global: true,
-      description: 'What identifier this cluster has',
-      demandOption: 'A cluster ID is required.',
-      type: 'number'
+      description: 'How many shards are being spawned across all clusters',
+      type: 'number',
+      required: false
     })
     .option('amqp-host', {
       global: true,
@@ -124,34 +123,31 @@ const main = async () => {
       'description': 'The intents to use for the gateway connection(s)',
       'type': 'string',
       'array': true,
-      'default': ['guildMessages']
+      'default': ['guilds']
     })
     .help();
 
-  const redisClient = new redis({
-    host: argv['redis-host'],
-    port: argv['redis-port'],
-    password: argv['redis-auth'],
-    db: argv['redis-db']
-  });
-
-  const cache = new RedisCache(redisClient);
-
   const log = (label: string) => (data: any, shard: any) => console.log(`[${label.toUpperCase()} -> ${shard}]: ${data}`);
 
-  let amqpChannel!: Channel;
-  await (async function registerChannel() {
-    const { channel } = (await createAmqp(
-      argv['amqp-host'] ?? 'localhost',
-      () => registerChannel(),
-      e => log('amqp error')(e, 'CLUSTER')
-    ))!;
+  const { channel: amqpChannel } = await createAmqp({
+    host: argv['amqp-host'] ?? 'localhost',
+    onError: e => console.log(`[AMQP ERROR]: ${e}`),
+    onClose: () => {
+      console.log('[AMQP EXIT]');
+      process.exit(0);
+    }
+  });
 
-    amqpChannel = channel;
-  })();
+  const redis = new Redis(process.env.REDIS_URL);
+  container.register(SYMBOLS.store, {
+    useValue: new RedisStore({
+      redis,
+      hash: ''
+    })
+  });
 
-  const service = new RoutingServer<keyof Events, Events>(amqpChannel);
-  const ws = new Cluster(
+  const service = new RoutingServer<GatewayDispatchPayload['t'], GatewayDispatchPayload['d']>(amqpChannel);
+  const cluster = new Cluster(
     argv.auth,
     {
       compress: argv['ws-compress'],
@@ -166,31 +162,25 @@ const main = async () => {
     }
   );
 
-  const { shards } = await ws.fetchGateway();
-  const total = argv['shard-count'] ?? shards;
-  const count = total / argv['cluster-count'];
+  const rest = new RestManager(argv.auth);
 
-  console.log(total, count);
+  container.register(kService, { useValue: service });
+  container.register(kRest, { useValue: rest });
 
-  ws.wsTotalShardCount = total;
-  ws.shardCount = count;
-  ws.clusterId = argv['cluster-id'];
+  const { shards } = await cluster.fetchGateway();
+  const shardCount = argv['shard-count'] ?? shards;
+  const totalShardCount = argv['total-shard-count'] ?? shards;
 
-  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.shardCount, total);
-  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.clusters.count, argv['cluster-count']);
-  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.clusters.shardCount, count);
-  await redisClient.set(CORDIS_REDIS_SYMBOLS.internal.gateway.clusters.currentlySpawning, argv['cluster-id']);
+  cluster.shardCount = shardCount;
+  cluster.totalShardCount = totalShardCount;
 
   const gatewayCommandsServer = new RpcServer<void, GatewaySendPayload>(amqpChannel);
   await gatewayCommandsServer.init(
     CORDIS_AMQP_SYMBOLS.gateway.commands,
-    req => ws.broadcast(req)
+    req => cluster.broadcast(req)
   );
 
-  const rest = new RpcClient<any, Partial<RequestBuilderOptions> & { path: string }>(amqpChannel);
-  await rest.init(CORDIS_AMQP_SYMBOLS.rest.queue);
-
-  ws
+  cluster
     .on('disconnecting', shard => log('disconnecting')(null, shard))
     .on('reconecting', shard => log('reconecting')(null, shard))
     .on('open', shard => log('open')(null, shard))
@@ -199,22 +189,30 @@ const main = async () => {
     .on(
       'dispatch',
       async (data, shard) => {
+        let handler: (data: any) => any;
+
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const { default: handle }: { default?: Handler<any> } = require(`./handlers/${data.t}`);
-          await handle?.(data.d, service, cache, rest, ws.user as PatchedAPIClientUser);
+          const res = require(`./handlers/${data.t}`);
+          handler = res.default;
+        } catch {
+          handler = () => service.publish(data.d, data.t);
+        }
+
+        try {
+          await handler(data);
         } catch (e) {
           log('packet error')(e.stack ?? e.toString(), `${shard} -> ${data.t}`);
         }
       }
     );
 
-  if (argv.debug) ws.on('debug', log('debug'));
+  if (argv.debug) cluster.on('debug', log('debug'));
 
   await service.init(CORDIS_AMQP_SYMBOLS.gateway.packets, false)
     .then(() => console.log('Service is live, waiting for the gateway to sign in...'))
     .catch(console.error);
-  await ws.connect()
+  await cluster.connect()
     .catch(console.error);
 };
 

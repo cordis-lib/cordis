@@ -1,6 +1,6 @@
 // ? No place to really put these
 
-import { BitFieldResolvable } from '@cordis/util';
+import { BitFieldResolvable } from '@cordis/common';
 import { OverwriteType } from 'discord-api-types';
 import { PermissionKey, Permissions } from '../util/Permissions';
 import type { GuildMember } from './guildMember';

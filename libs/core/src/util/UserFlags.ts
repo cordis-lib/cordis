@@ -1,4 +1,4 @@
-import { BitField, BitFieldResolvable } from '@cordis/util';
+import { BitField, BitFieldResolvable } from '@cordis/common';
 
 const USER_FLAGS = {
   discordEmployee: BitField.bigintify(0),

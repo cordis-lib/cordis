@@ -1,4 +1,4 @@
-import { SnowflakeEntity } from '@cordis/util';
+import { SnowflakeEntity } from '@cordis/common';
 import { APIWebhook, WebhookType } from 'discord-api-types';
 import type { NewsChannel } from './channel';
 import type { Guild } from './guild';

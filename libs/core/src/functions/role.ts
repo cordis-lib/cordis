@@ -1,4 +1,4 @@
-import { PatchedAPIRole, Snowflake } from '@cordis/util';
+import { PatchedAPIRole, Snowflake } from '@cordis/common';
 import { rawData } from '../util/Symbols';
 import type { FactoryMeta } from '../FunctionManager';
 import type { Role } from '../types';

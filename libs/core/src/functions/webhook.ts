@@ -1,4 +1,4 @@
-import { Patcher, Snowflake } from '@cordis/util';
+import { Patcher, Snowflake } from '@cordis/common';
 import { APIWebhook, WebhookType } from 'discord-api-types';
 import type { FactoryMeta } from '../FunctionManager';
 import type { NewsChannel, Webhook } from '../types';

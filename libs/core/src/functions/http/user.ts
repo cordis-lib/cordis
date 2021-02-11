@@ -5,7 +5,7 @@ import {
   RESTPatchAPICurrentUserResult,
   Routes
 } from 'discord-api-types';
-import { Patcher } from '@cordis/util';
+import { Patcher } from '@cordis/common';
 import { CordisCoreError } from '../../util/Error';
 import { rawData } from '../../util/Symbols';
 import type { FactoryMeta } from '../../FunctionManager';

@@ -1,18 +1,31 @@
 import { Broker } from '../Broker';
-import * as amqp from 'amqplib';
 import { CordisBrokerError } from '../../error';
+import type * as amqp from 'amqplib';
 
-export class RoutingServer<K extends string, S extends Record<K, any>> extends Broker {
+export interface RoutingServerInitOptions {
+  name: string;
+  topicBased?: boolean;
+}
+
+export class RoutingServer<K extends string, T extends Record<K, any>> extends Broker {
   public exchange?: string;
-  public topicBased?: boolean;
 
-  public async init(exchange: string, topicBased = false) {
-    this.topicBased = topicBased;
-    this.exchange = await this.channel.assertExchange(exchange, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
+  public constructor(channel: amqp.Channel) {
+    super(channel);
   }
 
-  public publish<R extends K>(content: S[R], key: R, options?: amqp.Options.Publish) {
+  public async init({ name, topicBased = false }: RoutingServerInitOptions) {
+    this.exchange = await this.channel.assertExchange(name, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
+  }
+
+  public publish<LK extends K>(content: T[LK], key: LK, options?: amqp.Options.Publish) {
     if (!this.exchange) throw new CordisBrokerError('brokerNotInit');
-    return this._publishToExchange(this.exchange, { type: key, data: content }, key, options);
+
+    return this.util.sendToExchange({
+      to: this.exchange,
+      content: { type: key, data: content },
+      key,
+      options
+    });
   }
 }

@@ -8,9 +8,14 @@ import {
   WebsocketConnectionOptions,
   WebsocketConnectionDestroyOptions
 } from './WebsocketConnection';
-import { APIUser, GatewayDispatchPayload, GatewaySendPayload, RESTGetAPIGatewayBotResult } from 'discord-api-types';
-import { CORDIS_META } from '@cordis/util';
+import { CORDIS_META } from '@cordis/common';
 import { stripIndent } from 'common-tags';
+import type {
+  APIUser,
+  GatewayDispatchPayload,
+  GatewaySendPayload,
+  RESTGetAPIGatewayBotResult
+} from 'discord-api-types';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -67,17 +72,13 @@ declare function dispatch(data: GatewayDispatchPayload, id: number): any;
 
 export interface ClusterOptions extends WebsocketConnectionOptions {
   /**
-   * The total amount of websocket shards/connections that should be spawned across all clusters
-   */
-  wsTotalShardCount: number | 'auto';
-  /**
    * How many shards to spawn for this cluster
    */
   shardCount: number | 'auto';
   /**
-   * The unique identifier for this cluster
+   * How many shards you intend to spawn across all clusters
    */
-  clusterId: number;
+  totalShardCount: number | 'auto';
 }
 
 export interface Cluster {
@@ -102,14 +103,16 @@ export interface Cluster {
  * @noInheritDoc
  */
 export class Cluster extends EventEmitter {
+  private readonly _shardOptions: Partial<WebsocketConnectionOptions>;
+  private _fetchGatewayCache?: RESTGetAPIGatewayBotResult;
+
   /**
    * An array of all of the WebsocketShards
    */
   public readonly shards: WebsocketConnection[] = [];
 
-  public clusterId: number;
-  public wsTotalShardCount: number | 'auto';
   public shardCount: number | 'auto';
+  public totalShardCount: number | 'auto';
 
   /**
    * The last time an identify payload was sent on behalf of this token
@@ -121,34 +124,6 @@ export class Cluster extends EventEmitter {
    * Client user given in the Discord ready event
    */
   public user: APIUser | null = null;
-
-  private readonly _shardOptions: Partial<WebsocketConnectionOptions>;
-
-  private _fetchGatewayCache?: RESTGetAPIGatewayBotResult;
-
-  /**
-   * @param auth The Discord token for your bot
-   * @param shardCount How many shards to spawn, leave "auto" for Discord recommended count
-   * @param _shardOptions Options to pass into each Websocket Shard
-   */
-  public constructor(
-    public readonly auth: string,
-    options: Partial<ClusterOptions> = {}
-  ) {
-    super();
-
-    const {
-      wsTotalShardCount = 'auto',
-      shardCount = wsTotalShardCount,
-      clusterId = 0,
-      ...shardOptions
-    } = options;
-
-    this.wsTotalShardCount = wsTotalShardCount;
-    this.shardCount = shardCount;
-    this.clusterId = clusterId;
-    this._shardOptions = shardOptions;
-  }
 
   /**
    * Average ping between all of the shards
@@ -173,6 +148,32 @@ export class Cluster extends EventEmitter {
   }
 
   /**
+   * @param auth The Discord token for your bot
+   * @param shardCount How many shards to spawn, leave "auto" for Discord recommended count
+   * @param _shardOptions Options to pass into each Websocket Shard
+   */
+  public constructor(
+    public readonly auth: string,
+    options: Partial<ClusterOptions> = {}
+  ) {
+    super();
+
+    const {
+      shardCount = 'auto',
+      totalShardCount = shardCount,
+      ...shardOptions
+    } = options;
+
+    this.shardCount = shardCount;
+    this.totalShardCount = totalShardCount;
+    this._shardOptions = shardOptions;
+  }
+
+  private _debug(log: string) {
+    this.emit('debug', log, -1);
+  }
+
+  /**
    * Gets the the given guild is under
    * @param guild The guild id associated with the shard you want to obtain
    */
@@ -187,20 +188,24 @@ export class Cluster extends EventEmitter {
     for (const shard of this.shards) await shard.send(payload, false);
   }
 
-  public async fetchGateway() {
-    if (this._fetchGatewayCache) return this._fetchGatewayCache;
+  public async fetchGateway(ignoreCache = false) {
+    if (this._fetchGatewayCache && !ignoreCache) return this._fetchGatewayCache;
 
     const headers = new Headers();
     headers.set('Authorization', `Bot ${this.auth}`);
     headers.set('User-Agent', `DiscordBot (${CORDIS_META.url}, ${CORDIS_META.version}) Node.js/${process.version}`);
 
     const res = await fetch(CONSTANTS.gateway, { headers }).catch(() => null);
-    const data: RESTGetAPIGatewayBotResult | null = await res?.json().catch(() => null);
 
-    if (!data) throw new CordisGatewayError('fetchGatewayFail');
+    if (res?.ok) {
+      const data: RESTGetAPIGatewayBotResult | null = await res.json().catch(() => null);
+      if (data) {
+        this._fetchGatewayCache = data;
+        return data;
+      }
+    }
 
-    this._fetchGatewayCache = data;
-    return data;
+    throw new CordisGatewayError('fetchGatewayFail');
   }
 
   /**
@@ -223,8 +228,8 @@ export class Cluster extends EventEmitter {
             Remaining: ${sessionInformation.remaining}
       `);
 
-      if (this.wsTotalShardCount === 'auto') this.wsTotalShardCount = recommendedShards;
       if (this.shardCount === 'auto') this.shardCount = recommendedShards;
+      if (this.totalShardCount === 'auto') this.totalShardCount = recommendedShards;
 
       for (let i = 0; i < this.shardCount; i++) {
         this.shards.push(new WebsocketConnection(this, i, url, this._shardOptions));
@@ -241,9 +246,5 @@ export class Cluster extends EventEmitter {
     for (const shard of this.shards) await shard.destroy(options);
 
     this.user = null;
-  }
-
-  private _debug(log: string) {
-    this.emit('debug', log, -1);
   }
 }

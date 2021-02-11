@@ -1,4 +1,4 @@
-import type { SnowflakeEntity } from '@cordis/util';
+import type { SnowflakeEntity } from '@cordis/common';
 import type { APIPartialChannel, ChannelType } from 'discord-api-types';
 import type { Overwrite } from './generic';
 import type { User } from './user';

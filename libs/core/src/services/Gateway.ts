@@ -1,12 +1,14 @@
 import { RoutingClient } from '@cordis/brokers';
-import { CORDIS_AMQP_SYMBOLS, Events } from '@cordis/util';
+import { CORDIS_AMQP_SYMBOLS, Events } from '@cordis/common';
 import * as amqp from 'amqplib';
 import { Redis } from 'ioredis';
 import { EventEmitter } from 'events';
 import { GatewayCommands } from './GatewayCommands';
-import { GatewaySendPayload } from 'discord-api-types';
-import { ClientUser, CoreEvents } from '../types';
-import { FunctionManager } from '../FunctionManager';
+import { injectable, inject } from 'tsyringe';
+import { kFunctions } from '../util/Symbols';
+import type { GatewaySendPayload } from 'discord-api-types';
+import type { ClientUser, CoreEvents } from '../types';
+import type { Functions } from '../CoreFactory';
 
 export interface GatewayOptions {
   keys: (keyof Events)[];
@@ -19,11 +21,12 @@ export interface Gateway {
   emit<E extends keyof CoreEvents, T extends CoreEvents[E]>(event: E, data: T): boolean;
 }
 
+@injectable()
 export class Gateway extends EventEmitter {
   public readonly events: { [K in keyof CoreEvents]: (data: Events[K]) => CoreEvents[K] } = {
-    ready: data => [(this.clientUser = this.functions.retrieveFunction('sanitizeClientUser')(data.user))],
+    ready: data => [(this.clientUser = this.functions.sanitizeClientUser(data.user))],
     userUpdate: data => {
-      const sanitizeUser = this.functions.retrieveFunction('sanitizeUser');
+      const { sanitizeUser } = this.functions;
       return [sanitizeUser(data.n), sanitizeUser(data.o)];
     }
   };
@@ -33,7 +36,11 @@ export class Gateway extends EventEmitter {
   public readonly service: RoutingClient<keyof CoreEvents, Events>;
   public clientUser?: ClientUser;
 
-  public constructor(channel: amqp.Channel, redis: Redis, public readonly functions: FunctionManager) {
+  public constructor(
+    channel: amqp.Channel,
+    redis: Redis,
+    @inject(kFunctions) private readonly functions: Functions
+  ) {
     super();
     this._commands = new GatewayCommands(channel);
     this.service = new RoutingClient(channel, redis);

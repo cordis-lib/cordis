@@ -1,26 +1,30 @@
 import { Broker } from '../Broker';
-import * as amqp from 'amqplib';
+import type { ConsumeQueueCallback } from '../BrokerUtil';
+import type * as amqp from 'amqplib';
 
-export class PubSubClient<S> extends Broker {
-  public queueOrExchange?: string;
-  public fanout?: boolean;
+export interface PubSubClientInitOptions<T> {
+  name: string;
+  fanout?: boolean;
+  cb: ConsumeQueueCallback<T>;
+}
 
-  public async init(
-    name: string,
-    fanout = false,
-    cb: (content?: S, properties?: amqp.MessageProperties, original?: amqp.Message) => any
-  ) {
-    this.queueOrExchange = (
-      fanout
-        ? await this.channel.assertExchange(name, 'fanout', { durable: true }).then(d => d.exchange)
-        : await this.channel.assertQueue(name, { durable: true }).then(d => d.queue)
-    );
+export class PubSubClient<T> extends Broker {
+  public constructor(channel: amqp.Channel) {
+    super(channel);
+  }
 
-    this.fanout = fanout;
+  public async init({ name, fanout = false, cb }: PubSubClientInitOptions<T>) {
+    name = fanout
+      ? await this.channel.assertExchange(name, 'fanout', { durable: true }).then(d => d.exchange)
+      : await this.channel.assertQueue(name, { durable: true }).then(d => d.queue);
 
     const queue = fanout ? await this.channel.assertQueue('', { exclusive: true }).then(d => d.queue) : name;
     if (fanout) await this.channel.bindQueue(queue, name, '');
 
-    await this._consumeQueue(name, cb, true);
+    await this.util.consumeQueue({
+      queue,
+      cb,
+      noAck: true
+    });
   }
 }
