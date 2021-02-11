@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { Redis } from 'ioredis';
 import { Mutex } from './Mutex';
 import type { RatelimitData } from '../Bucket';

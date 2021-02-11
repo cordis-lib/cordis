@@ -1,10 +1,10 @@
-import { DiscordFetchOptions } from './Fetch';
 import { Bucket, RatelimitData } from './Bucket';
-import { userAgent } from './Constants';
+import { USER_AGENT } from './Constants';
 import { EventEmitter } from 'events';
 import { Headers } from 'node-fetch';
-import { Bag, Store } from '@cordis/bag';
-import { ENDPOINTS } from '@cordis/common';
+import { Mutex, MemoryMutex } from './mutex';
+import AbortController, { AbortSignal } from 'abort-controller';
+import type { DiscordFetchOptions, AnyRecord } from './Fetch';
 
 export interface RestManagerOptions {
   /**
@@ -12,17 +12,13 @@ export interface RestManagerOptions {
    */
   retries: number;
   /**
-   * How long to wait before timing out on a request
+   * By default, how long to wait before timing out on a request
    */
-  abortIn: number;
+  abortAfter: number;
   /**
-   * What version of the api to use
+   * Mutex implementation to use for rate limiting
    */
-  apiVersion: number;
-  /**
-   * Store to use for the ratelimit data
-   */
-  store: Store<Partial<RatelimitData>>;
+  mutex: Mutex;
 }
 
 export interface RestManager {
@@ -31,14 +27,14 @@ export interface RestManager {
     event: 'response',
     listener: (request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>) => any
   ): this;
-  on(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
+  on(event: 'ratelimit', listener: (bucket: string, endpoint: string, waitingFor: number) => any): this;
 
   once(event: 'request', listener: (request: Partial<DiscordFetchOptions>) => any): this;
   once(
     event: 'response',
     listener: (request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>) => any
   ): this;
-  once(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
+  once(event: 'ratelimit', listener: (bucket: string, endpoint: string, waitingFor: number) => any): this;
 
   emit(event: 'request', request: Partial<DiscordFetchOptions>): boolean;
   emit(
@@ -47,8 +43,21 @@ export interface RestManager {
     response: any,
     ratelimit: Partial<RatelimitData>
   ): boolean;
-  emit(event: 'ratelimit', bucket: string, endpoint: string, prevented: boolean, waitingFor: number): boolean;
+  emit(event: 'ratelimit', bucket: string, endpoint: string, waitingFor: number): boolean;
 }
+
+export interface RequestOptions<D extends AnyRecord, Q extends AnyRecord> {
+  path: string;
+  method: string;
+  headers?: Headers;
+  abortSignal?: AbortSignal;
+  query?: Q | string;
+  reason?: string;
+  files?: { name: string; file: Buffer }[];
+  data?: D;
+}
+
+export type KnownMethodRequestOptions<D extends AnyRecord, Q extends AnyRecord> = Omit<RequestOptions<D, Q>, 'path' | 'method'>;
 
 export class RestManager extends EventEmitter {
   /**
@@ -57,9 +66,8 @@ export class RestManager extends EventEmitter {
   private readonly _buckets = new Map<string, Bucket>();
 
   public readonly retries: number;
-  public readonly abortIn: number;
-  public readonly apiVersion: number;
-  public readonly store: Store<Partial<RatelimitData>>;
+  public readonly abortAfter: number;
+  public readonly mutex: Mutex;
 
   /**
    * @param auth Your bot's Discord token
@@ -72,105 +80,26 @@ export class RestManager extends EventEmitter {
     super();
     const {
       retries = 3,
-      abortIn = 60 * 1000,
-      apiVersion = 8,
-      store
+      abortAfter = 6e4,
+      mutex = new MemoryMutex()
     } = options;
 
     this.retries = retries;
-    this.abortIn = abortIn;
-    this.apiVersion = apiVersion;
-    this.store = store ?? new Bag();
+    this.abortAfter = abortAfter;
+    this.mutex = mutex;
   }
 
   /**
-   * Makes a GET request to the given endpoint
-   * @param path The request target
-   * @param options Other options for the request
-   */
-  public get<T, D = Record<any, any>, Q = Record<any, any>>(
-    path: string,
-    options?: Partial<Omit<DiscordFetchOptions<D, Q>, 'path' | 'method'>>
-  ) {
-    return this.make<T, D, Q>({
-      path,
-      method: 'get',
-      ...options
-    });
-  }
-
-  /**
-   * Makes a DELETE request to the given endpoint
-   * @param path The request target
-   * @param options Other options for the request
-   */
-  public delete<T, D = Record<any, any>, Q = Record<any, any>>(
-    path: string,
-    options?: Partial<Omit<DiscordFetchOptions<D, Q>, 'path' | 'method'>>
-  ) {
-    return this.make<T, D, Q>({
-      path,
-      method: 'delete',
-      ...options
-    });
-  }
-
-  /**
-   * Makes a PUT request to the given endpoint
-   * @param path The request target
-   * @param options Other options for the request
-   */
-  public put<T, D = Record<any, any>, Q = Record<any, any>>(
-    path: string,
-    options?: Partial<Omit<DiscordFetchOptions<D, Q>, 'path' | 'method'>>
-  ) {
-    return this.make<T, D, Q>({
-      path,
-      method: 'put',
-      ...options
-    });
-  }
-
-  /**
-   * Makes a POST request to the given endpoint
-   * @param path The request target
-   * @param options Other options for the request
-   */
-  public post<T, D = Record<any, any>, Q = Record<any, any>>(
-    path: string,
-    options?: Partial<Omit<DiscordFetchOptions<D, Q>, 'path' | 'method'>>
-  ) {
-    return this.make<T, D, Q>({
-      path,
-      method: 'post',
-      ...options
-    });
-  }
-
-  /**
-   * Makes a PATCH request to the given endpoint
-   * @param path The request target
-   * @param options Other options for the request
-   */
-  public patch<T, D = Record<any, any>, Q = Record<any, any>>(
-    path: string,
-    options?: Partial<Omit<DiscordFetchOptions<D, Q>, 'path' | 'method'>>
-  ) {
-    return this.make<T, D, Q>({
-      path,
-      method: 'patch',
-      ...options
-    });
-  }
-
-  /**
-   * Makes a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
+   * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public make<T, D = Record<any, any>, Q = Record<any, any>>(options: Partial<DiscordFetchOptions<D>> & { path: string }): Promise<T> {
-    options.method = options.method ?? 'get';
-    options.api = options.api ?? `${ENDPOINTS.api}/v${this.apiVersion}`;
-    options.abortIn = options.abortIn ?? this.abortIn;
+  public make<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(options: RequestOptions<D, Q>): Promise<T> {
+    let timeout: NodeJS.Timeout;
+    if (!options.abortSignal) {
+      const controller = new AbortController();
+      timeout = setTimeout(() => controller.abort(), this.abortAfter);
+      options.abortSignal = controller.signal;
+    }
 
     const route = Bucket.makeRoute(options.method, options.path);
 
@@ -184,8 +113,90 @@ export class RestManager extends EventEmitter {
     if (!options.headers) options.headers = new Headers();
 
     options.headers.set('Authorization', `Bot ${this.auth}`);
-    options.headers.set('User-Agent', userAgent);
+    options.headers.set('User-Agent', USER_AGENT);
 
-    return bucket.make<T, D, Q>(options as DiscordFetchOptions<D>);
+    return bucket
+      .make<T, D, Q>(options as DiscordFetchOptions<D, Q>)
+      .finally(() => clearTimeout(timeout));
+  }
+
+  /**
+   * Makes a GET request to the given endpoint
+   * @param path The request target
+   * @param options Other options for the request
+   */
+  public get<T, Q extends AnyRecord = AnyRecord>(
+    path: string,
+    options?: KnownMethodRequestOptions<never, Q>
+  ): Promise<T> {
+    return this.make<T, never, Q>({
+      path,
+      method: 'get',
+      ...options
+    });
+  }
+
+  /**
+   * Makes a DELETE request to the given endpoint
+   * @param path The request target
+   * @param options Other options for the request
+   */
+  public delete<T, Q extends AnyRecord = AnyRecord>(
+    path: string,
+    options?: KnownMethodRequestOptions<never, Q>
+  ): Promise<T> {
+    return this.make<T, never, Q>({
+      path,
+      method: 'delete',
+      ...options
+    });
+  }
+
+  /**
+   * Makes a PUT request to the given endpoint
+   * @param path The request target
+   * @param options Other options for the request
+   */
+  public put<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
+    path: string,
+    options: KnownMethodRequestOptions<D, Q> & { data: D }
+  ): Promise<T> {
+    return this.make<T, D, Q>({
+      path,
+      method: 'put',
+      ...options
+    });
+  }
+
+  /**
+   * Makes a POST request to the given endpoint
+   * @param path The request target
+   * @param options Other options for the request
+   */
+  public post<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
+    path: string,
+    options: KnownMethodRequestOptions<D, Q> & { data: D }
+  ): Promise<T> {
+    return this.make<T, D, Q>({
+      path,
+      method: 'post',
+      ...options
+    });
+  }
+
+  /**
+   * Makes a PATCH request to the given endpoint
+   * @param path The request target
+   * @param options Other options for the request
+   */
+  public patch<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
+    path: string,
+    options: KnownMethodRequestOptions<D, Q> & { data: D }
+  ): Promise<T> {
+    return this.make<T, D, Q>({
+      path,
+      method: 'patch',
+      ...options
+    });
   }
 }

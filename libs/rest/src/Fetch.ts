@@ -1,13 +1,15 @@
 import fetch, { Headers } from 'node-fetch';
 import FormData from 'form-data';
 import { URLSearchParams } from 'url';
+import { ENDPOINTS } from '@cordis/common';
 import type { AbortSignal } from 'abort-controller';
+
+export type AnyRecord = Record<any, any>;
 
 /**
  * Presents the base options that may be needed for making a request to Discord
  */
-export interface DiscordFetchOptions<D = Record<any, any>, Q = Record<any, any>> {
-  api: string;
+export interface DiscordFetchOptions<D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord> {
   path: string;
   method: string;
   headers: Headers;
@@ -16,6 +18,7 @@ export interface DiscordFetchOptions<D = Record<any, any>, Q = Record<any, any>>
   reason?: string;
   files?: { name: string; file: Buffer }[];
   data?: D;
+  failures?: number;
 }
 
 /**
@@ -23,7 +26,7 @@ export interface DiscordFetchOptions<D = Record<any, any>, Q = Record<any, any>>
  * @param options Options for the request
  */
 export const discordFetch = (options: DiscordFetchOptions) => {
-  let { api, path, method, headers, abortSignal, query, reason, files, data } = options;
+  let { path, method, headers, abortSignal, query, reason, files, data } = options;
 
   let queryString: string | null = null;
   if (query) {
@@ -37,7 +40,7 @@ export const discordFetch = (options: DiscordFetchOptions) => {
     ).toString();
   }
 
-  const url = `${api}${path}${queryString ? `?${queryString}` : ''}`;
+  const url = `${ENDPOINTS.api}/v8/${path}${queryString ? `?${queryString}` : ''}`;
 
   if (reason) headers.set('X-Audit-Log-Reason', encodeURIComponent(reason));
 

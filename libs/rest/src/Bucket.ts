@@ -1,9 +1,7 @@
-import { RestManager } from './RestManager';
 import { discordFetch, DiscordFetchOptions } from './Fetch';
-import { Response } from 'node-fetch';
-import { HTTPError, MESSAGES } from './HTTPError';
-import { Queue } from '@cordis/queue';
+import { CordisRestError, HTTPError } from './Error';
 import { halt } from '@cordis/common';
+import type { RestManager } from './RestManager';
 
 export interface RatelimitData {
   global: boolean;
@@ -33,11 +31,6 @@ export class Bucket {
   }
 
   /**
-   * The request queue
-   */
-  public queue = new Queue<any>();
-
-  /**
    * @param manager The rest manager instance being used by this bucket
    * @param route The identifier of this bucket
    */
@@ -46,71 +39,49 @@ export class Bucket {
     public readonly route: string
   ) {}
 
-  /**
-   * Makes a request with the given options
-   * @param req Request options
-   * @param urgent Wether this request should be given priority or not
-   */
-  public make<T, D, Q>(req: DiscordFetchOptions<D, Q>, urgent = false): Promise<T> {
-    return this.queue.run(() => this._make(req), urgent);
+  public get mutex() {
+    return this.manager.mutex;
   }
 
   /**
-   * Handles rate limiting and responses
-   * @param req Reqyest options
+   * Makes a request to Discord
+   * @param req Request options
    */
-  private async _make(req: DiscordFetchOptions): Promise<any> {
+  public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
     await this.mutex.claim(this.route);
-
-    const state = await this.manager.store.get(this.route) ?? {};
-    const globalState = await this.manager.store.get('global') ?? {};
-
-    if (state.remaining === 0 && state.resetAt && Date.now() < state.resetAt) {
-      const waitingFor = state.resetAt - Date.now();
-      this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, true, waitingFor);
-      await halt(waitingFor);
-    } else if (globalState.active && globalState.resetAt && Date.now() < globalState.resetAt) {
-      const waitingFor = globalState.resetAt - Date.now();
-      this.manager.emit('ratelimit', this.route, 'GLOBAL', true, waitingFor);
-      await halt(waitingFor);
-
-      globalState.active = false;
-      await this.manager.store.set('global', globalState);
-    }
 
     this.manager.emit('request', req);
     const res = await discordFetch(req);
 
-    state.limit = Number(res.headers.get('x-ratelimit-limit'));
-    state.remaining = Number(res.headers.get('x-ratelimit-remaining'));
-    state.resetAfter = Number(res.headers.get('x-ratelimit-reset-after')) * 1000;
-    state.resetAt = Date.now() + state.resetAfter;
+    const global = res.headers.get('x-ratelimit-global');
+    const limit = res.headers.get('x-ratelimit-limit');
+    const remaining = res.headers.get('x-ratelimit-remaining');
+    const resetAfter = res.headers.get('x-ratelimit-reset-after');
 
-    await this.manager.store.set(this.route, state);
+    const state: Partial<RatelimitData> = {};
+    if (global) state.global = global === 'true';
+    if (limit) state.limit = Number(limit);
+    if (remaining) state.remaining = Number(remaining);
+    if (resetAfter) state.timeout = Number(resetAfter) * 1000;
+
+    await this.mutex.set(this.route, state);
 
     if (res.status === 429) {
-      const data = await res.json();
-      const period = data.retry_after * 1000;
+      const retry = res.headers.get('Retry-After');
+      const retryAfter = retry ? Number(retry) * 1000 : 0;
 
-      this.manager.emit('ratelimit', this.route, `${req.method.toUpperCase()} ${req.path}`, false, period);
+      this.manager.emit('ratelimit', this.route, req.path, retryAfter);
 
-      if (data.global) {
-        globalState.active = true;
-        globalState.resetAfter = period;
-        globalState.resetAt = Date.now() + period;
-
-        await this.manager.store.set('global', globalState);
-      }
-
-      await halt(period);
-      return this._retry(req, res);
+      await this.mutex.set(this.route, { timeout: retryAfter });
+      return this._retry(req);
     } else if (res.status >= 500 && res.status < 600) {
-      return this._retry(req, res);
+      await halt(1000);
+      return this._retry(req);
+    } else if (!res.ok) {
+      throw new HTTPError(res.clone(), await res.text());
     }
 
-    if (!res.ok) throw new HTTPError(res.clone(), await res.text());
-
-    let final: any = res;
+    let final: any;
 
     if (res.headers.get('content-type') === 'application/json') final = await res.json();
     else final = await res.blob();
@@ -124,14 +95,14 @@ export class Bucket {
    * @param req Request options
    * @param res Response given
    */
-  private _retry(req: DiscordFetchOptions, res: Response) {
+  private _retry<T>(req: DiscordFetchOptions): Promise<T> {
     if (req.failures) req.failures++;
     else req.failures = 1;
 
     if (req.failures > this.manager.retries) {
-      throw new HTTPError(res.clone(), MESSAGES.retryLimitExceeded(`${req.method.toUpperCase()} ${req.path}`, this.manager.retries));
+      throw new CordisRestError('retryLimitExceeded', `${req.method.toUpperCase()} ${req.path}`, this.manager.retries);
     }
 
-    return this._make(req);
+    return this.make(req);
   }
 }
