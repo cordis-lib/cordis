@@ -48,10 +48,12 @@ export class Bucket {
    * @param req Request options
    */
   public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
-    await this.mutex.claim(this.route);
-
     this.manager.emit('request', req);
-    const res = await discordFetch(req);
+
+    const timeout = setTimeout(() => req.controller.abort(), this.manager.abortAfter);
+    await this.mutex.claim(this.route, req.controller.signal);
+
+    const res = await discordFetch(req).finally(() => clearTimeout(timeout));
 
     const global = res.headers.get('x-ratelimit-global');
     const limit = res.headers.get('x-ratelimit-limit');
@@ -68,6 +70,7 @@ export class Bucket {
 
     if (res.status === 429) {
       const retry = res.headers.get('Retry-After');
+      /* istanbul ignore next */
       const retryAfter = retry ? Number(retry) * 1000 : 0;
 
       this.manager.emit('ratelimit', this.route, req.path, retryAfter);

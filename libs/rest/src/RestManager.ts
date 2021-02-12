@@ -3,7 +3,7 @@ import { USER_AGENT } from './Constants';
 import { EventEmitter } from 'events';
 import { Headers } from 'node-fetch';
 import { Mutex, MemoryMutex } from './mutex';
-import AbortController, { AbortSignal } from 'abort-controller';
+import AbortController from 'abort-controller';
 import type { DiscordFetchOptions, AnyRecord } from './Fetch';
 
 export interface RestManagerOptions {
@@ -50,7 +50,7 @@ export interface RequestOptions<D extends AnyRecord, Q extends AnyRecord> {
   path: string;
   method: string;
   headers?: Headers;
-  abortSignal?: AbortSignal;
+  controller?: AbortController;
   query?: Q | string;
   reason?: string;
   files?: { name: string; file: Buffer }[];
@@ -80,7 +80,7 @@ export class RestManager extends EventEmitter {
     super();
     const {
       retries = 3,
-      abortAfter = 6e4,
+      abortAfter = 15e3,
       mutex = new MemoryMutex()
     } = options;
 
@@ -94,13 +94,6 @@ export class RestManager extends EventEmitter {
    * @param options Options needed for making a request; only the path is required
    */
   public make<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(options: RequestOptions<D, Q>): Promise<T> {
-    let timeout: NodeJS.Timeout;
-    if (!options.abortSignal) {
-      const controller = new AbortController();
-      timeout = setTimeout(() => controller.abort(), this.abortAfter);
-      options.abortSignal = controller.signal;
-    }
-
     const route = Bucket.makeRoute(options.method, options.path);
 
     let bucket = this._buckets.get(route);
@@ -110,14 +103,13 @@ export class RestManager extends EventEmitter {
       this._buckets.set(route, bucket);
     }
 
-    if (!options.headers) options.headers = new Headers();
+    options.controller ??= new AbortController();
 
+    options.headers ??= new Headers();
     options.headers.set('Authorization', `Bot ${this.auth}`);
     options.headers.set('User-Agent', USER_AGENT);
 
-    return bucket
-      .make<T, D, Q>(options as DiscordFetchOptions<D, Q>)
-      .finally(() => clearTimeout(timeout));
+    return bucket.make<T, D, Q>(options as DiscordFetchOptions<D, Q>);
   }
 
   /**
@@ -125,6 +117,7 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
+  /* istanbul ignore next */
   public get<T, Q extends AnyRecord = AnyRecord>(
     path: string,
     options?: KnownMethodRequestOptions<never, Q>
@@ -141,6 +134,7 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
+  /* istanbul ignore next */
   public delete<T, Q extends AnyRecord = AnyRecord>(
     path: string,
     options?: KnownMethodRequestOptions<never, Q>
@@ -157,6 +151,7 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
+  /* istanbul ignore next */
   public put<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
     path: string,
     options: KnownMethodRequestOptions<D, Q> & { data: D }
@@ -173,6 +168,7 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
+  /* istanbul ignore next */
   public post<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
     path: string,
     options: KnownMethodRequestOptions<D, Q> & { data: D }
@@ -189,6 +185,7 @@ export class RestManager extends EventEmitter {
    * @param path The request target
    * @param options Other options for the request
    */
+  /* istanbul ignore next */
   public patch<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
     path: string,
     options: KnownMethodRequestOptions<D, Q> & { data: D }

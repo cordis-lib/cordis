@@ -31,6 +31,20 @@ test('key mirror', () => {
 });
 
 describe('make discord cdn url', () => {
+  describe('invalid options handling', () => {
+    test('invalid format', () => {
+      const root = 'e16be7c509d54bb53b1ee21fe8d8cdac';
+      // @ts-expect-error Intentionally invalid format
+      expect(() => makeDiscordCdnUrl(root, { format: 'asdf' })).toThrow(CordisUtilTypeError);
+    });
+
+    test('invalid size', () => {
+      const root = 'e16be7c509d54bb53b1ee21fe8d8cdac';
+      // @ts-expect-error Intentionally invalid size
+      expect(() => makeDiscordCdnUrl(root, { size: 1 })).toThrow(CordisUtilRangeError);
+    });
+  });
+
   test('defaults using an image', () => {
     const root = 'e16be7c509d54bb53b1ee21fe8d8cdac';
     expect(makeDiscordCdnUrl(root)).toBe(`${root}.webp`);
@@ -49,19 +63,5 @@ describe('make discord cdn url', () => {
   test('valid custom size', () => {
     const root = 'e16be7c509d54bb53b1ee21fe8d8cdac';
     expect(makeDiscordCdnUrl(root, { size: 16 })).toBe(`${root}.webp?size=16`);
-  });
-
-  describe('invalid options handling', () => {
-    test('invalid format', () => {
-      const root = 'e16be7c509d54bb53b1ee21fe8d8cdac';
-      // @ts-expect-error Intentionally invalid format
-      expect(() => makeDiscordCdnUrl(root, { format: 'asdf' })).toThrow(CordisUtilTypeError);
-    });
-
-    test('invalid size', () => {
-      const root = 'e16be7c509d54bb53b1ee21fe8d8cdac';
-      // @ts-expect-error Intentionally invalid size
-      expect(() => makeDiscordCdnUrl(root, { size: 1 })).toThrow(CordisUtilRangeError);
-    });
   });
 });

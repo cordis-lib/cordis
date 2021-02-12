@@ -2,7 +2,7 @@ import fetch, { Headers } from 'node-fetch';
 import FormData from 'form-data';
 import { URLSearchParams } from 'url';
 import { ENDPOINTS } from '@cordis/common';
-import type { AbortSignal } from 'abort-controller';
+import AbortController from 'abort-controller';
 
 export type AnyRecord = Record<any, any>;
 
@@ -13,7 +13,7 @@ export interface DiscordFetchOptions<D extends AnyRecord = AnyRecord, Q extends 
   path: string;
   method: string;
   headers: Headers;
-  abortSignal: AbortSignal;
+  controller: AbortController;
   query?: Q | string;
   reason?: string;
   files?: { name: string; file: Buffer }[];
@@ -26,7 +26,7 @@ export interface DiscordFetchOptions<D extends AnyRecord = AnyRecord, Q extends 
  * @param options Options for the request
  */
 export const discordFetch = (options: DiscordFetchOptions) => {
-  let { path, method, headers, abortSignal, query, reason, files, data } = options;
+  let { path, method, headers, controller, query, reason, files, data } = options;
 
   let queryString: string | null = null;
   if (query) {
@@ -59,6 +59,6 @@ export const discordFetch = (options: DiscordFetchOptions) => {
     method: method,
     headers,
     body: body!,
-    signal: abortSignal
+    signal: controller.signal
   });
 };

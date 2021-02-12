@@ -216,10 +216,10 @@ importers:
       form-data: 3.0.0
       node-fetch: 2.6.1
       tslib: 2.1.0
-      tsyringe: 4.4.0
     devDependencies:
       '@types/node': 14.14.25
       '@types/node-fetch': 2.5.8
+      fetch-blob: 2.1.1
       typescript: 4.2.0-dev.20210206
     specifiers:
       '@cordis/bag': workspace:0.1.0
@@ -229,10 +229,10 @@ importers:
       '@types/node': ^14.14.25
       '@types/node-fetch': ^2.5.8
       abort-controller: ^3.0.0
+      fetch-blob: ^2.1.1
       form-data: ^3.0.0
       node-fetch: ^2.6.1
       tslib: ^2.1.0
-      tsyringe: ^4.4.0
       typescript: ^4.2.0-dev.20210206
   libs/snowflake:
     dependencies:
@@ -2952,6 +2952,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-DkPJKQeY6kKwmuMretBhr7G6Vodr7bFwDYTXIkfG1gjvNpaxBTQV3PbXg6bR1c1UP4jPOX0jHUbbHANL9vRjVg==
+  /fetch-blob/2.1.1:
+    dev: true
+    engines:
+      node: ^10.17.0 || >=12.3.0
+    peerDependencies:
+      domexception: ^2.0.1
+    resolution:
+      integrity: sha512-Uf+gxPCe1hTOFXwkxYyckn8iUSk6CFXGy5VENZKifovUTZC9eUODWSBhOBS7zICGrAetKzdwLMr85KhIcePMAQ==
   /figures/3.2.0:
     dependencies:
       escape-string-regexp: 1.0.5
