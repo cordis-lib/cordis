@@ -24,7 +24,14 @@ export class RedisStore<T> implements Store<T> {
   public readonly convertorIn: (value: T) => any;
   public readonly convertorOut: (value: any) => T;
 
-  public constructor(options: BagOptions<T> & { redis: Redis; hash: string }) {
+  public constructor(
+    options: BagOptions<T> & {
+      redis: Redis;
+      hash: string;
+      convertorIn?: (value: T) => any;
+      convertorOut?: (value: any) => T;
+    }
+  ) {
     this.hash = options.hash;
     this.redis = options.redis;
     this.maxSize = options.maxSize ?? null;

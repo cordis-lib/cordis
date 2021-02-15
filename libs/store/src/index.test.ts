@@ -1,8 +1,8 @@
-import { Bag, CordisBagTypeError } from './Bag';
+import { Store, CordisStoreTypeError } from './Store';
 
 describe('constructing a bag', () => {
   test('max size', () => {
-    const bag = new Bag<number>({ maxSize: 1 });
+    const bag = new Store<number>({ maxSize: 1 });
 
     bag.set('boop', 1);
     expect(bag.size).toBe(1);
@@ -16,7 +16,7 @@ describe('constructing a bag', () => {
 
   describe('auto emptying', () => {
     test('all elements', async () => {
-      const bag = new Bag<number>({ emptyEvery: 300 });
+      const bag = new Store<number>({ emptyEvery: 300 });
       bag.set('boop', 1);
 
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -25,7 +25,7 @@ describe('constructing a bag', () => {
     });
 
     test('certain elements', async () => {
-      const bag = new Bag<number>({ emptyEvery: 300, emptyCb: v => v === 1 });
+      const bag = new Store<number>({ emptyEvery: 300, emptyCb: v => v === 1 });
       bag.set('boop', 1);
       bag.set('boop2', 2);
 
@@ -38,7 +38,7 @@ describe('constructing a bag', () => {
 });
 
 test('finding a key/value', () => {
-  const bag = new Bag<number>();
+  const bag = new Store<number>();
   bag.set('boop', 1);
   bag.set('boop2', 2);
 
@@ -47,37 +47,37 @@ test('finding a key/value', () => {
 });
 
 test('filtering a bag', () => {
-  const bag = new Bag<number>();
+  const bag = new Store<number>();
   bag.set('boop', 1);
   bag.set('boop2', 2);
 
-  expect(bag.filter((_, key) => key === 'boop2')).toStrictEqual(new Bag<number>({ entries: [['boop2', 2]] }));
+  expect(bag.filter((_, key) => key === 'boop2')).toStrictEqual(new Store<number>({ entries: [['boop2', 2]] }));
 });
 
 test('sorting a bag', () => {
-  const bag = new Bag<number>();
+  const bag = new Store<number>();
   bag.set('boop', 1);
   bag.set('boop2', 2);
 
-  expect(bag.sort((a, b) => a - b)).toStrictEqual(new Bag<number>({ entries: [['boop2', 2], ['boop', 1]] }));
+  expect(bag.sort((a, b) => a - b)).toStrictEqual(new Store<number>({ entries: [['boop2', 2], ['boop', 1]] }));
 
-  const otherBag = new Bag<number>({ entries: [['boop', 1], ['boop2', 2]] });
+  const otherBag = new Store<number>({ entries: [['boop', 1], ['boop2', 2]] });
   expect(bag).toStrictEqual(otherBag);
   expect(bag.sort()).toStrictEqual(otherBag);
 });
 
 test('mutable sort', () => {
-  const bag = new Bag<number>();
+  const bag = new Store<number>();
   bag.set('boop2', 2);
   bag.set('boop', 1);
 
-  const otherBag = new Bag<number>({ entries: [['boop', 1], ['boop2', 2]] });
+  const otherBag = new Store<number>({ entries: [['boop', 1], ['boop2', 2]] });
   expect(bag.mSort()).toStrictEqual(otherBag);
   expect(bag).toStrictEqual(otherBag);
 });
 
 test('mapping a bag', () => {
-  const bag = new Bag<number>();
+  const bag = new Store<number>();
   bag.set('boop', 1);
   bag.set('boop2', 2);
 
@@ -85,7 +85,7 @@ test('mapping a bag', () => {
 });
 
 test('emptying a bag', () => {
-  const bag = new Bag<number>();
+  const bag = new Store<number>();
   bag.set('boop', 1);
   bag.set('boop2', 2);
 
@@ -96,7 +96,7 @@ test('emptying a bag', () => {
 
 describe('reducing a bag', () => {
   test('simple addition reducer', () => {
-    const bag = new Bag<number>();
+    const bag = new Store<number>();
     bag.set('boop', 1);
     bag.set('boop2', 2);
 
@@ -104,7 +104,7 @@ describe('reducing a bag', () => {
   });
 
   test('simple addition reducer with initial value', () => {
-    const bag = new Bag<number>();
+    const bag = new Store<number>();
     bag.set('boop', 1);
     bag.set('boop2', 2);
 
@@ -113,8 +113,8 @@ describe('reducing a bag', () => {
 
   test('reduce empty bag with no initial value', () => {
     expect(
-      () => new Bag<number>().reduce((acc, v) => acc + v)
-    ).toThrow(new CordisBagTypeError('noReduceEmptyBag'));
+      () => new Store<number>().reduce((acc, v) => acc + v)
+    ).toThrow(new CordisStoreTypeError('noReduceEmptyBag'));
   });
 });
 

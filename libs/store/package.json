@@ -1,6 +1,6 @@
 {
-  "name": "@cordis/bag",
-  "description": "In-memory storage structure",
+  "name": "@cordis/store",
+  "description": "Map-based storage structure",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",

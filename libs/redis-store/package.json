@@ -26,7 +26,7 @@
     "typescript": "^4.2.0-dev.20210206"
   },
   "dependencies": {
-    "@cordis/bag": "workspace:0.1.0",
+    "@cordis/store": "workspace:0.1.0",
     "@cordis/error": "workspace:0.1.0",
     "ioredis": "^4.19.4",
     "tslib": "^2.1.0"

@@ -5,15 +5,22 @@
   "theme": "default",
   "ignoreCompilerErrors": "true",
   "preserveConstEnums": "true",
-  "exclude": ["services/**"],
+  "exclude": [
+    "services/**",
+    "**/node_modules/**",
+		"**/dist/**",
+		"**/*.test.ts"
+  ],
   "external-modulemap": ".*libs\/([^\/]+)\/.*",
-  "stripInternal": "false",
+  "stripInternal": "true",
+  "excludeNotExported": "true",
   "excludeExternals": "true",
   "media": "media",
   "readme": "README.md",
   "plugin": [
     "@strictsoftware/typedoc-plugin-monorepo",
     "typedoc-plugin-as-member-of",
-    "typedoc-plugin-no-inherit"
+    "typedoc-plugin-no-inherit",
+    "typedoc-plugin-remove-references"
   ]
 }

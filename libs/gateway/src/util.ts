@@ -1,6 +1,6 @@
 import { ENDPOINTS } from '@cordis/common';
-import { GatewayReceivePayload } from 'discord-api-types';
 import { TextDecoder } from 'util';
+import type { GatewayReceivePayload } from 'discord-api-types/v8';
 
 const TD = new TextDecoder();
 
@@ -10,7 +10,7 @@ const TD = new TextDecoder();
 export type Encoding = 'json' | 'etf';
 
 export const normalCloseCode = 1000;
-export const restartingCloseCode = 1000;
+export const restartingCloseCode = 4900;
 
 /**
  * Installed erlpack instance, if any

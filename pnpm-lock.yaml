@@ -20,6 +20,7 @@ importers:
       typedoc-plugin-as-member-of: 1.0.2_typedoc@0.19.2
       typedoc-plugin-markdown: 3.4.5_typedoc@0.19.2
       typedoc-plugin-no-inherit: 1.2.0_typedoc@0.19.2
+      typedoc-plugin-remove-references: 0.0.5
       typescript: 4.2.0-dev.20210206
     specifiers:
       '@babel/core': ^7.12.13
@@ -41,18 +42,7 @@ importers:
       typedoc-plugin-as-member-of: ^1.0.2
       typedoc-plugin-markdown: ^3.4.5
       typedoc-plugin-no-inherit: ^1.2.0
-      typescript: ^4.2.0-dev.20210206
-  libs/bag:
-    dependencies:
-      '@cordis/error': link:../error
-      tslib: 2.1.0
-    devDependencies:
-      '@types/node': 14.14.25
-      typescript: 4.2.0-dev.20210206
-    specifiers:
-      '@cordis/error': workspace:0.1.0
-      '@types/node': ^14.14.25
-      tslib: ^2.1.0
+      typedoc-plugin-remove-references: ^0.0.5
       typescript: ^4.2.0-dev.20210206
   libs/bitfield:
     dependencies:
@@ -192,26 +182,26 @@ importers:
       typescript: ^4.2.0-dev.20210206
   libs/redis-store:
     dependencies:
-      '@cordis/bag': link:../bag
       '@cordis/error': link:../error
+      '@cordis/store': link:../store
       ioredis: 4.19.4
       tslib: 2.1.0
     devDependencies:
       '@types/node': 14.14.25
       typescript: 4.2.0-dev.20210206
     specifiers:
-      '@cordis/bag': workspace:0.1.0
       '@cordis/error': workspace:0.1.0
+      '@cordis/store': workspace:0.1.0
       '@types/node': ^14.14.25
       ioredis: ^4.19.4
       tslib: ^2.1.0
       typescript: ^4.2.0-dev.20210206
   libs/rest:
     dependencies:
-      '@cordis/bag': link:../bag
       '@cordis/common': link:../common
       '@cordis/error': link:../error
       '@cordis/queue': link:../queue
+      '@cordis/store': link:../store
       abort-controller: 3.0.0
       form-data: 3.0.0
       node-fetch: 2.6.1
@@ -222,10 +212,10 @@ importers:
       fetch-blob: 2.1.1
       typescript: 4.2.0-dev.20210206
     specifiers:
-      '@cordis/bag': workspace:0.1.0
       '@cordis/common': workspace:0.1.0
       '@cordis/error': workspace:0.1.0
       '@cordis/queue': workspace:0.1.0
+      '@cordis/store': workspace:0.1.0
       '@types/node': ^14.14.25
       '@types/node-fetch': ^2.5.8
       abort-controller: ^3.0.0
@@ -241,6 +231,18 @@ importers:
       '@types/node': 14.14.25
       typescript: 4.2.0-dev.20210206
     specifiers:
+      '@types/node': ^14.14.25
+      tslib: ^2.1.0
+      typescript: ^4.2.0-dev.20210206
+  libs/store:
+    dependencies:
+      '@cordis/error': link:../error
+      tslib: 2.1.0
+    devDependencies:
+      '@types/node': 14.14.25
+      typescript: 4.2.0-dev.20210206
+    specifiers:
+      '@cordis/error': workspace:0.1.0
       '@types/node': ^14.14.25
       tslib: ^2.1.0
       typescript: ^4.2.0-dev.20210206
@@ -5905,6 +5907,10 @@ packages:
       typedoc: '>=0.16.0'
     resolution:
       integrity: sha512-jAAslwDbm5sVpA6EQIg5twYctRi/bnT9TgZ5SwbrNpCD5xCIIylPRX9KxIoi1RJliVgCIAxWbSUzzLKGwJCkeA==
+  /typedoc-plugin-remove-references/0.0.5:
+    dev: true
+    resolution:
+      integrity: sha512-DSZ7kM/Y90CgZUKt8MiDsoi4fvrJyleHydj3ncGyqDqMdhuMes2E/4I6mSmXBrVdTjYhVH6BeoOFSbj2pQ821g==
   /typedoc/0.19.2_typescript@4.2.0-dev.20210206:
     dependencies:
       fs-extra: 9.1.0

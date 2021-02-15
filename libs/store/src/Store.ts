@@ -1,39 +1,82 @@
 import makeCordisError from '@cordis/error';
-import type { Store } from './Store';
+import type { IStore, StoreSingleEntryCallback } from './IStore';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const CordisBagTypeError = makeCordisError(TypeError, {
-  noReduceEmptyBag: 'Cannot reduce an empty bag without an initial value'
+/**
+ * @internal
+ */
+export const CordisStoreTypeError = makeCordisError(TypeError, {
+  noReduceEmptyStore: 'Cannot reduce an empty store without an initial value'
 });
 
-export interface BagOptions<T> {
-  entries?: ReadonlyArray<readonly [string, T]>;
+/**
+ * Options for constructing a store
+ */
+export interface StoreOptions<T> {
+  /**
+   * Pre-existing entries to be automatically added on construction
+   */
+  entries?: ReadonlyArray<readonly [string, T]> | null;
+  /**
+   * The max size for this store - if set, the store is automatically cleared when it grows past this size
+   */
   maxSize?: number | null;
+  /**
+   * If set this store will be cleared on this interval using the {@link StoreOptions.emptyCb}
+   */
   emptyEvery?: number | null;
-  emptyCb?: (value: T, key: string) => boolean;
+  /**
+   * The callback used to filter which elements to delete - if none, everything is wiped
+   */
+  emptyCb?: StoreSingleEntryCallback<T> | null;
 }
 
 /**
- * Utility structure for holding cache in-memory, with a sync api
+ * **Sync**, in-memory implementation of the Store, using the built-in Map.
+ *
+ * Please refer to the {@link IStore} documentation for method details.
+ * @noInheritDoc
  */
-export class Bag<T> extends Map<string, T> implements Store<T> {
+export class Store<T> extends Map<string, T> implements IStore<T> {
+  /**
+   * Max size of this store
+   */
   public readonly maxSize: number | null;
+  /**
+   * How often to empty the store
+   */
   public readonly emptyEvery: number | null;
-  public readonly emptyCb: ((value: T, key: string) => boolean) | null;
+  /**
+   * The callback to use to decide which elements to delete when emptying
+   */
+  public readonly emptyCb: StoreSingleEntryCallback<T> | null;
+  /**
+   * The active timer clearing the store - stored so it is actually possible to clear it
+   */
+  public readonly emptyTimer: NodeJS.Timer | null;
 
-  public constructor(options?: BagOptions<T>) {
+  public constructor(options?: StoreOptions<T>) {
     super(options?.entries);
 
     this.maxSize = options?.maxSize ?? null;
     this.emptyEvery = options?.emptyEvery ?? null;
     this.emptyCb = options?.emptyCb ?? null;
 
-    if (this.emptyEvery) setInterval(() => this.emptyCb ? this.empty(this.emptyCb) : this.clear(), this.emptyEvery);
+    if (this.emptyEvery) this.emptyTimer = setInterval(() => this.emptyCb ? this.empty(this.emptyCb) : this.clear(), this.emptyEvery);
+    else this.emptyTimer = null;
+  }
+
+  // Documentation purposes
+  public get(key: string) {
+    return super.get(key);
   }
 
   public set(key: string, value: T) {
     if (this.maxSize && this.size >= this.maxSize) this.clear();
     return super.set(key, value);
+  }
+
+  public delete(key: string) {
+    return super.delete(key);
   }
 
   public findKey(cb: (value: T, key: string) => boolean) {
@@ -49,13 +92,13 @@ export class Bag<T> extends Map<string, T> implements Store<T> {
   }
 
   public filter(cb: (value: T, key: string) => boolean) {
-    return new Bag<T>({
+    return new Store<T>({
       entries: [...this.entries()].filter(a => cb(a[1], a[0]))
     });
   }
 
   public sort(cb: (firstV: T, secondV: T, firstK: string, secondK: string) => number = (x, y) => Number(x > y)) {
-    return new Bag<T>({
+    return new Store<T>({
       entries: [...this.entries()].sort((a, b) => cb(a[1], b[1], a[0], b[0]))
     });
   }
@@ -117,7 +160,7 @@ export class Bag<T> extends Map<string, T> implements Store<T> {
       accum = cb(accum!, value, key);
     }
 
-    if (first) throw new CordisBagTypeError('noReduceEmptyBag');
+    if (first) throw new CordisStoreTypeError('noReduceEmptyStore');
 
     return accum!;
   }
