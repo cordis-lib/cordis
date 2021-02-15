@@ -1,5 +1,5 @@
 import makeCordisError from '@cordis/error';
-import type { IStore, StoreSingleEntryCallback } from './IStore';
+import type { IStore, StoreMapCallback, StoreReduceCallback, StoreSingleEntryCallback, StoreSortCallback } from './IStore';
 
 /**
  * @internal
@@ -79,31 +79,31 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
     return super.delete(key);
   }
 
-  public findKey(cb: (value: T, key: string) => boolean) {
+  public findKey(cb: StoreSingleEntryCallback<T>) {
     for (const [key, value] of this) {
       if (cb(value, key)) return key;
     }
   }
 
-  public find(cb: (value: T, key: string) => boolean) {
+  public find(cb: StoreSingleEntryCallback<T>) {
     for (const [key, value] of this) {
       if (cb(value, key)) return value;
     }
   }
 
-  public filter(cb: (value: T, key: string) => boolean) {
+  public filter(cb: StoreSingleEntryCallback<T>) {
     return new Store<T>({
       entries: [...this.entries()].filter(a => cb(a[1], a[0]))
     });
   }
 
-  public sort(cb: (firstV: T, secondV: T, firstK: string, secondK: string) => number = (x, y) => Number(x > y)) {
+  public sort(cb: StoreSortCallback<T> = (x, y) => Number(x > y)) {
     return new Store<T>({
       entries: [...this.entries()].sort((a, b) => cb(a[1], b[1], a[0], b[0]))
     });
   }
 
-  public mSort(cb: (firstV: T, secondV: T, firstKey: string, secondKey: string) => number = (x, y) => Number(x > y)) {
+  public mSort(cb: StoreSortCallback<T> = (x, y) => Number(x > y)) {
     const sorted = this.sort(cb);
 
     this.clear();
@@ -112,7 +112,7 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
     return this;
   }
 
-  public map<R = T>(cb: (value: T, key: string) => R) {
+  public map<V = T>(cb: StoreMapCallback<V, T>) {
     const entries = this.entries();
     return Array.from({ length: this.size }, () => {
       const { value: [key, value] } = entries.next();
@@ -120,7 +120,7 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
     });
   }
 
-  public empty(cb?: (value: T, key: string) => boolean) {
+  public empty(cb?: StoreSingleEntryCallback<T>) {
     if (!cb) {
       const size = this.size;
       this.clear();
@@ -140,8 +140,8 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
     return deletes;
   }
 
-  public reduce<R = T>(cb: (acc: R, value: T, key: string) => R, initial?: R): R {
-    let accum: R;
+  public reduce<V = T>(cb: StoreReduceCallback<V, T>, initial?: V): V {
+    let accum: V;
 
     if (initial != null) {
       accum = initial;

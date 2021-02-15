@@ -114,7 +114,7 @@ describe('reducing a bag', () => {
   test('reduce empty bag with no initial value', () => {
     expect(
       () => new Store<number>().reduce((acc, v) => acc + v)
-    ).toThrow(new CordisStoreTypeError('noReduceEmptyBag'));
+    ).toThrow(new CordisStoreTypeError('noReduceEmptyStore'));
   });
 });
 
