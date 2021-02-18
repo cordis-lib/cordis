@@ -1,6 +1,18 @@
+/**
+ * Represents an item inside the queue
+ */
 export interface QueueItem<T = void> {
+  /**
+   * The actual async task that's being ran
+   */
   cb: () => Promise<T>;
+  /**
+   * The resolve method for the promise
+   */
   resolve: (item: T) => void;
+  /**
+   * The reject method for the promise
+   */
   reject: (reason?: any) => void;
 }
 
@@ -21,7 +33,7 @@ export class Queue<T = void> {
   /**
    * Queues up the given async operation for processing, yielding the result once done
    * @param cb The function to execute
-   * @param urgent Wether or not this item should be added to the top of the queue, or at the bottom, as always
+   * @param urgent Wether or not this item should be added to the top of the queue
    */
   public run(cb: () => Promise<T>, urgent = false) {
     return new Promise<T>((resolve, reject) => {
