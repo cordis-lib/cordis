@@ -24,7 +24,7 @@ jest.mock('amqplib', () => {
 });
 
 test('destroying a broker', async () => {
-  const { channel } = await createAmqp({ host: 'boop', onError: console.error, onClose: console.error });
+  const { channel } = await createAmqp('host');
   // @ts-expect-error - Constructing base broker for testing
   const broker: Broker = new Broker(channel);
   broker.consumers.add('boop');

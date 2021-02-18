@@ -61,7 +61,7 @@ let client!: RoutingClient<keyof Data, Data>;
 let server!: RoutingServer<keyof Data, Data>;
 
 beforeEach(async () => {
-  const { channel } = await createAmqp({ host: 'boop', onError: console.error, onClose: console.error });
+  const { channel } = await createAmqp('boop');
   client = new RoutingClient(channel);
   server = new RoutingServer(channel);
 });

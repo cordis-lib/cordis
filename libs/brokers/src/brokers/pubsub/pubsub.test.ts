@@ -51,12 +51,12 @@ jest.mock('amqplib', () => {
   };
 });
 
-const eventCb = jest.fn();
+const eventCb = jest.fn(() => Promise.resolve());
 let client!: PubSubClient<string>;
 let server!: PubSubServer<string>;
 
 beforeEach(async () => {
-  const { channel } = await createAmqp({ host: 'boop', onError: console.error, onClose: console.error });
+  const { channel } = await createAmqp('boop');
   client = new PubSubClient(channel);
   server = new PubSubServer(channel);
 });

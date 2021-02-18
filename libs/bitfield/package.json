@@ -1,6 +1,6 @@
 {
   "name": "@cordis/bitfield",
-  "description": "Data structure for working with bit fields",
+  "description": "Data structure for working with bitfields",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",

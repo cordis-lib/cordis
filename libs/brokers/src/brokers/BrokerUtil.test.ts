@@ -62,7 +62,7 @@ jest.mock('amqplib', () => {
 let broker!: Broker;
 
 beforeEach(async () => {
-  const { channel } = await createAmqp({ host: 'boop', onError: console.error, onClose: console.error });
+  const { channel } = await createAmqp('boop');
   // @ts-expect-error - Brokers are supposed to be implemented, but for test's sake we're just using the base class
   broker = new Broker(channel);
 });
@@ -73,12 +73,12 @@ test('generate correlation id', () => {
 
 describe('consume queue', () => {
   test('ack and no rejections', async () => {
-    const cb = jest.fn();
+    const cb = jest.fn(() => Promise.resolve());
 
     await broker.util.consumeQueue({
       queue: 'test',
       cb,
-      noAck: true
+      autoAck: true
     });
 
     const encoded = encode('test');
@@ -99,7 +99,7 @@ describe('consume queue', () => {
     await broker.util.consumeQueue({
       queue: 'test',
       cb,
-      noAck: false
+      autoAck: false
     });
 
     const encoded = encode('test');
@@ -116,11 +116,11 @@ describe('consume queue', () => {
 describe('reply', () => {
   test('it should throw with bad parameters', () => {
     // @ts-expect-error - Testing errors
-    expect(() => broker.util.reply({ properties: {} })).toThrow(CordisBrokerTypeError);
+    expect(() => broker.util.reply({ msg: { properties: {} } })).toThrow(CordisBrokerTypeError);
   });
 
   test('it should work with proper parameters', () => {
     const mockedMessage: any = { properties: { correlationId: 'test', replyTo: 'test' } };
-    expect(() => broker.util.reply(mockedMessage, { value: 'test', error: false })).not.toThrow();
+    expect(() => broker.util.reply({ msg: mockedMessage, content: 'test', error: false })).not.toThrow();
   });
 });

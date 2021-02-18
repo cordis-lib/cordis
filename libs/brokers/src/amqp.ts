@@ -1,25 +1,22 @@
 import * as amqp from 'amqplib';
 
-export interface AmqpOptions {
-  host: string;
-  onClose: () => any;
-  onError: (e: any) => any;
-}
-
+/**
+ * AMQP connection and channel
+ */
 export interface AmqpResult {
   connection: amqp.Connection;
   channel: amqp.Channel;
 }
 
-export const createAmqp = async (options: AmqpOptions): Promise<AmqpResult> => {
-  const { onClose, onError } = options;
-  const host = options.host.replace(/amqp?\:?\/?\//g, '');
+/**
+ * Creates an AMQP connection and channel
+ * @param host URL for your AMQP server
+ * @returns
+ */
+export const createAmqp = async (host: string): Promise<AmqpResult> => {
+  host = host.replace(/amqp?\:?\/?\//g, '');
 
   const connection = await amqp.connect(`amqp://${host}`);
-
-  connection
-    .on('close', onClose)
-    .on('error', onError);
 
   return {
     connection,

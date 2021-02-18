@@ -2,21 +2,42 @@ import { Broker } from '../Broker';
 import type { ConsumeQueueCallback } from '../BrokerUtil';
 import type * as amqp from 'amqplib';
 
+/**
+ * Options for initializing the pub/sub client
+ */
 export interface PubSubClientInitOptions<T> {
+  /**
+   * Name of the queue/exchange to use
+   */
   name: string;
+  /**
+   * Wether or not a fanout exchange are being used (multiple subs)
+   */
   fanout?: boolean;
+  /**
+   * Callback to run on every packet
+   */
   cb: ConsumeQueueCallback<T>;
 }
 
+/**
+ * Client for simple publish/subscribe lasyout
+ */
 export class PubSubClient<T> extends Broker {
   public constructor(channel: amqp.Channel) {
     super(channel);
   }
 
-  public async init({ name, fanout = false, cb }: PubSubClientInitOptions<T>) {
-    name = fanout
-      ? await this.channel.assertExchange(name, 'fanout', { durable: true }).then(d => d.exchange)
-      : await this.channel.assertQueue(name, { durable: true }).then(d => d.queue);
+  /**
+   * Initializes the server, making it listen to incoming packets
+   * @param options Options to use for the client
+   */
+  public async init(options: PubSubClientInitOptions<T>) {
+    const { fanout = false, cb } = options;
+
+    const name = fanout
+      ? await this.channel.assertExchange(options.name, 'fanout', { durable: true }).then(d => d.exchange)
+      : await this.channel.assertQueue(options.name, { durable: true }).then(d => d.queue);
 
     const queue = fanout ? await this.channel.assertQueue('', { exclusive: true }).then(d => d.queue) : name;
     if (fanout) await this.channel.bindQueue(queue, name, '');
@@ -24,7 +45,7 @@ export class PubSubClient<T> extends Broker {
     await this.util.consumeQueue({
       queue,
       cb,
-      noAck: true
+      autoAck: true
     });
   }
 }

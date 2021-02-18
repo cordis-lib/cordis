@@ -1,6 +1,8 @@
 import makeCordisError from '@cordis/error';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+/**
+ * @internal
+ */
 export const CordisBrokerError = makeCordisError(
   Error,
   {
@@ -10,7 +12,9 @@ export const CordisBrokerError = makeCordisError(
   }
 );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+/**
+ * @internal
+ */
 export const CordisBrokerTypeError = makeCordisError(
   TypeError,
   {

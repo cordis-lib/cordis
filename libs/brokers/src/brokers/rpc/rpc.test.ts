@@ -56,6 +56,7 @@ jest.mock('amqplib', () => {
               bindQueue: jest.fn(),
               bindExchange: jest.fn(),
               prefetch: jest.fn(),
+              reject: jest.fn(),
               sendToQueue: jest
                 .fn<any, [string, any]>()
                 .mockImplementation(
@@ -79,7 +80,7 @@ let client!: RpcClient<string, string>;
 let server!: RpcServer<string, string>;
 
 beforeEach(async () => {
-  const { channel } = await createAmqp({ host: 'boop', onError: console.error, onClose: console.error });
+  const { channel } = await createAmqp('boop');
   client = new RpcClient(channel);
   server = new RpcServer(channel);
 });
