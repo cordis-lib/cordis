@@ -1,6 +1,8 @@
 import makeCordisError from '@cordis/error';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+/**
+ * @internal
+ */
 export const CordisUtilTypeError = makeCordisError(
   TypeError,
   {
@@ -8,7 +10,9 @@ export const CordisUtilTypeError = makeCordisError(
   }
 );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+/**
+ * @internal
+ */
 export const CordisUtilRangeError = makeCordisError(
   RangeError,
   {

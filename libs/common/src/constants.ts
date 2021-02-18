@@ -1,9 +1,14 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { keyMirror } from './functions/keyMirror';
 
+/**
+ * @internal
+ */
 const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'));
 
+/**
+ * Meta properties for cordis (version, github URL)
+ */
 export const CORDIS_META: {
   url: string;
   version: string;
@@ -12,46 +17,10 @@ export const CORDIS_META: {
   version: pkg.version
 };
 
-export const CORDIS_EVENTS = keyMirror([
-  'channelCreate',
-  'channelDelete',
-  'channelPinsUpdate',
-  'channelUpdate',
-  'emojiCreate',
-  'emojiDelete',
-  'emojiUpdate',
-  'guildIntegrationsUpdate',
-  'guildBanAdd',
-  'guildBanRemove',
-  'guildCreate',
-  'guildDelete',
-  'guildUpdate',
-  'guildMemberAdd',
-  'guildMemberRemove',
-  'guildMemberUpdate',
-  'roleCreate',
-  'roleDelete',
-  'roleUpdate',
-  'messageCreate',
-  'bulkMessageDelete',
-  'messageDelete',
-  'messageUpdate',
-  'messageReactionAdd',
-  'messageReactionRemove',
-  'messageReactionRemoveEmoji',
-  'messageReactionRemoveAll',
-  'inviteCreate',
-  'inviteDelete',
-  'presenceUpdate',
-  'ready',
-  'typingStart',
-  'userUpdate',
-  'voiceServerUpdate',
-  'voiceStateUpdate',
-  'webhooksUpdate',
-  'botUserUpdate'
-]);
-
+/**
+ * Root endpoints for Discord
+ */
+// TODO: Start using discord-api-types roots once that's released. Already on main branch
 export const ENDPOINTS = {
   api: 'https://discord.com/api',
   cdn: 'https://cdn.discordapp.com',

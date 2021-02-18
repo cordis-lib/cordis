@@ -1,11 +1,29 @@
 import { CordisUtilTypeError, CordisUtilRangeError } from '../error';
 
+/**
+ * Valid image formats
+ */
 export type ImageFormat = 'webp' | 'png' | 'jpg' | 'gif';
+/**
+ * Valid image sizes
+ */
 export type ImageSize = 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048;
 
+/**
+ * Options for generating a URL
+ */
 export interface ImageOptions {
+  /**
+   * Desired format to use
+   */
   format?: ImageFormat;
+  /**
+   * Desired size for the image
+   */
   size?: ImageSize;
+  /**
+   * Wether or not automatic gif detection should be attempted
+   */
   dynamic?: boolean;
 }
 
