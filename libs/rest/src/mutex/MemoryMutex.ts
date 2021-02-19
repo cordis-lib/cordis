@@ -7,9 +7,18 @@ export interface MemoryRatelimitData extends RatelimitData {
   expiresAt: Date;
 }
 
+/**
+ * In-memory implementation of the Mutex for keeping the rate limit state in-memory
+ */
 export class MemoryMutex extends Mutex {
+  /**
+   * Map containing the current limits for each route
+   */
   private readonly _limits: Map<string, Partial<MemoryRatelimitData>> = new Map();
 
+  /**
+   * Time at which the global rate limit is going to expire, if one is active
+   */
   public global: Date | null = null;
 
   protected _getTimeout(route: string) {

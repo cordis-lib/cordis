@@ -1,6 +1,7 @@
 import makeCordisError from '@cordis/error';
 import type { Response } from 'node-fetch';
 
+/** @internal */
 export const CordisRestError = makeCordisError(
   Error,
   {
@@ -9,6 +10,9 @@ export const CordisRestError = makeCordisError(
   }
 );
 
+/**
+ * Error thrown by Discord the library cannot handle
+ */
 export class HTTPError extends Error {
   public constructor(public readonly response: Response, body: string) {
     super(`${response.statusText}: ${body}`);

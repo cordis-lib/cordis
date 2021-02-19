@@ -1,4 +1,9 @@
+<div align = "center">
+
 # @cordis/common
 
-## About
+</div>
+
+## Description
+
 A library containing cordis utility functions/types/structures.

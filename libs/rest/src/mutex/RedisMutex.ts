@@ -4,12 +4,21 @@ import { Redis } from 'ioredis';
 import { Mutex } from './Mutex';
 import type { RatelimitData } from '../Bucket';
 
+/**
+ * Redis implementation of the Mutex for keeping the rate limit state cross-worker
+ */
 export class RedisMutex extends Mutex {
-  private readonly _keys = {
+  /**
+   * Keys used for keeping data
+   */
+  protected readonly _keys = {
     remaining: (route: string) => `${route}:remaining`,
     limit: (route: string) => `${route}:limit`
   };
 
+  /**
+   * @param redis IORedis instance
+   */
   public constructor(
     public readonly redis: Redis
   ) {

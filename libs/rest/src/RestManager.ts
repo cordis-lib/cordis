@@ -6,59 +6,110 @@ import { Mutex, MemoryMutex } from './mutex';
 import AbortController from 'abort-controller';
 import type { DiscordFetchOptions, AnyRecord } from './Fetch';
 
+/**
+ * Options for constructing a rest manager
+ */
 export interface RestManagerOptions {
   /**
    * How many times to retry making a request before giving up
    */
-  retries: number;
+  retries?: number;
   /**
-   * By default, how long to wait before timing out on a request
+   * How long to wait before timing out on a request
    */
-  abortAfter: number;
+  abortAfter?: number;
   /**
    * Mutex implementation to use for rate limiting
+   * @default MemoryMutex
    */
-  mutex: Mutex;
+  mutex?: Mutex;
 }
 
 export interface RestManager {
+  /**
+   * Fired when a request is being started (pre-ratelimit checking)
+   * @event
+   */
   on(event: 'request', listener: (request: Partial<DiscordFetchOptions>) => any): this;
+  /**
+   * Fired when Discord responds to a request
+   * @event
+   */
   on(
     event: 'response',
     listener: (request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>) => any
   ): this;
-  on(event: 'ratelimit', listener: (bucket: string, endpoint: string, waitingFor: number) => any): this;
+  /**
+   * Fired when a rate limit is (about to be) hit.
+   * @event
+   */
+  on(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
+  /** @internal */
   once(event: 'request', listener: (request: Partial<DiscordFetchOptions>) => any): this;
+  /** @internal */
   once(
     event: 'response',
     listener: (request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>) => any
   ): this;
-  once(event: 'ratelimit', listener: (bucket: string, endpoint: string, waitingFor: number) => any): this;
+  /** @internal */
+  once(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
+  /** @internal */
   emit(event: 'request', request: Partial<DiscordFetchOptions>): boolean;
-  emit(
-    event: 'response',
-    request: Partial<DiscordFetchOptions>,
-    response: any,
-    ratelimit: Partial<RatelimitData>
-  ): boolean;
-  emit(event: 'ratelimit', bucket: string, endpoint: string, waitingFor: number): boolean;
+  /** @internal */
+  emit(event: 'response', request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>): boolean;
+  /** @internal */
+  emit(event: 'ratelimit', bucket: string, endpoint: string, prevented: boolean, waitingFor: number): boolean;
 }
 
+/**
+ * Options used for making a request
+ */
 export interface RequestOptions<D extends AnyRecord, Q extends AnyRecord> {
+  /**
+   * Path you're requesting
+   */
   path: string;
+  /**
+   * Method you're using
+   */
   method: string;
+  /**
+   * Extra HTTP headers to use - most of those are handled internally, but in case the library falls behind you can always use this
+   */
   headers?: Headers;
+  /**
+   * Custom abort controller if you want to be able to cancel a request your own way - a timeout is set internally anyway
+   */
   controller?: AbortController;
+  /**
+   * GET query
+   */
   query?: Q | string;
+  /**
+   * Reason for the action - sets the X-Audit-Log-Reason header, as requested by Discord - seen in audit logs
+   */
   reason?: string;
+  /**
+   * Files to send, if any
+   */
   files?: { name: string; file: Buffer }[];
+  /**
+   * Body to send, if any
+   */
   data?: D;
 }
 
+/**
+ * Options used for making a request using one of the helpers named after a HTTP method, e.g. {@link RestManager.get}
+ */
 export type KnownMethodRequestOptions<D extends AnyRecord, Q extends AnyRecord> = Omit<RequestOptions<D, Q>, 'path' | 'method'>;
 
+/**
+ * Base REST class used for making requests
+ * @noInheritDoc
+ */
 export class RestManager extends EventEmitter {
   /**
    * Current active rate limiting Buckets
@@ -75,7 +126,7 @@ export class RestManager extends EventEmitter {
    */
   public constructor(
     public readonly auth: string,
-    options: Partial<RestManagerOptions> = {}
+    options: RestManagerOptions = {}
   ) {
     super();
     const {
@@ -108,6 +159,7 @@ export class RestManager extends EventEmitter {
     options.headers ??= new Headers();
     options.headers.set('Authorization', `Bot ${this.auth}`);
     options.headers.set('User-Agent', USER_AGENT);
+    if (options.reason) options.headers.set('X-Audit-Log-Reason', encodeURIComponent(options.reason));
 
     return bucket.make<T, D, Q>(options as DiscordFetchOptions<D, Q>);
   }

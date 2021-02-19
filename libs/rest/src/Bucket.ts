@@ -3,6 +3,9 @@ import { CordisRestError, HTTPError } from './Error';
 import { halt } from '@cordis/common';
 import type { RestManager } from './RestManager';
 
+/**
+ * Data held to represent ratelimit state for a Bucket
+ */
 export interface RatelimitData {
   global: boolean;
   limit: number;
@@ -15,7 +18,8 @@ export interface RatelimitData {
  */
 export class Bucket {
   /**
-   * Creates a simple API route representation (e.g. /users/:id), used as an identifier for each bucket
+   * Creates a simple API route representation (e.g. /users/:id), used as an identifier for each bucket.
+   *
    * Credit to https://github.com/abalabahaha/eris
    */
   public static makeRoute(method: string, url: string) {
@@ -31,7 +35,7 @@ export class Bucket {
   }
 
   /**
-   * @param manager The rest manager instance being used by this bucket
+   * @param manager The rest manager using this bucket instance
    * @param route The identifier of this bucket
    */
   public constructor(
@@ -39,6 +43,9 @@ export class Bucket {
     public readonly route: string
   ) {}
 
+  /**
+   * Shortcut for the manager mutex
+   */
   public get mutex() {
     return this.manager.mutex;
   }
@@ -73,7 +80,7 @@ export class Bucket {
       /* istanbul ignore next */
       const retryAfter = retry ? Number(retry) * 1000 : 0;
 
-      this.manager.emit('ratelimit', this.route, req.path, retryAfter);
+      this.manager.emit('ratelimit', this.route, req.path, false, retryAfter);
 
       await this.mutex.set(this.route, { timeout: retryAfter });
       return this._retry(req);

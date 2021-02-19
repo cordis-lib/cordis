@@ -1,6 +1,10 @@
+<div align = "center">
+
 # @cordis/rest
 
-## About
+</div>
+
+## Description
 Cordis' REST utilities for the Discord API
 
 Note: Props to https://github.com/spec-tacles/spectacles.js for the Mutex logic.
@@ -19,7 +23,7 @@ const main = async () => {
     method: 'get'
   });
 
-  console.log(someUser, someOtherGuy);
+  console.log(someUser, someOtherUser);
 };
 
 main();

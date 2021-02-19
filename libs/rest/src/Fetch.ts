@@ -15,18 +15,17 @@ export interface DiscordFetchOptions<D extends AnyRecord = AnyRecord, Q extends 
   headers: Headers;
   controller: AbortController;
   query?: Q | string;
-  reason?: string;
   files?: { name: string; file: Buffer }[];
   data?: D;
   failures?: number;
 }
 
 /**
- * Makes a request, doing a lot of special things to satisfy Discord's requirements
+ * Makes the actual HTTP request
  * @param options Options for the request
  */
-export const discordFetch = (options: DiscordFetchOptions) => {
-  let { path, method, headers, controller, query, reason, files, data } = options;
+export const discordFetch = <D, Q>(options: DiscordFetchOptions<D, Q>) => {
+  let { path, method, headers, controller, query, files, data } = options;
 
   let queryString: string | null = null;
   if (query) {
@@ -41,8 +40,6 @@ export const discordFetch = (options: DiscordFetchOptions) => {
   }
 
   const url = `${ENDPOINTS.api}/v8/${path}${queryString ? `?${queryString}` : ''}`;
-
-  if (reason) headers.set('X-Audit-Log-Reason', encodeURIComponent(reason));
 
   let body: string | FormData;
   if (files?.length) {
