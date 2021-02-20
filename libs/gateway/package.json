@@ -34,7 +34,7 @@
     "@cordis/bitfield": "workspace:0.1.0",
     "@cordis/common": "workspace:0.1.0",
     "@cordis/error": "workspace:0.1.0",
-    "@cordis/queue": "workspace:^0.1.0",
+    "@cordis/queue": "workspace:0.1.0",
     "@cordis/rest": "workspace:0.1.0",
     "common-tags": "^1.8.0",
     "discord-api-types": "^0.11.2",
