@@ -24,9 +24,9 @@
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
     "@types/node": "^14.14.25",
-    "@types/node-fetch": "^2.5.8",
     "@types/ws": "^7.4.0",
     "erlpack": "github:discordapp/erlpack",
+    "ioredis": "^4.22.0",
     "typescript": "^4.2.0-dev.20210206",
     "zlib-sync": "^0.1.7"
   },
@@ -34,10 +34,10 @@
     "@cordis/bitfield": "workspace:0.1.0",
     "@cordis/common": "workspace:0.1.0",
     "@cordis/error": "workspace:0.1.0",
-    "@cordis/queue": "workspace:0.1.0",
+    "@cordis/queue": "workspace:^0.1.0",
+    "@cordis/rest": "workspace:0.1.0",
     "common-tags": "^1.8.0",
     "discord-api-types": "^0.11.2",
-    "node-fetch": "^2.6.1",
     "tslib": "^2.1.0",
     "ws": "^7.4.3"
   }

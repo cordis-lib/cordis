@@ -12,8 +12,9 @@ import {
   GatewayDispatchPayload,
   GatewayOPCodes,
   GatewayCloseCodes,
-  GatewayDispatchEvents
-} from 'discord-api-types';
+  GatewayDispatchEvents,
+  APIGuild
+} from 'discord-api-types/v8';
 import type * as zlib from 'zlib-sync';
 
 /**
@@ -22,7 +23,7 @@ import type * as zlib from 'zlib-sync';
 export enum WebsocketConnectionStatus {
   /**
    * Not really doing anything
-   * Is IDLE either before .connect is called or after .destroy resolves.
+   * Is IDLE either before {@link WebsocketConnection.connect} is called or after {@link WebsocketConnection.destroy} resolves.
    */
   idle,
   /**
@@ -34,12 +35,11 @@ export enum WebsocketConnectionStatus {
    */
   disconnecting,
   /**
-   * Reconnecting to Discord
+   * The shard is currently reconnecting/resuming
    */
   reconnecting,
   /**
    * The connnection is open, but the shard itself is not ready
-   * (not yet identified, guilds not yet recieved etc)
    */
   open,
   /**
@@ -57,44 +57,44 @@ export interface WebsocketConnectionOptions {
   /**
    * How long to wait for the WebSocket connection to open before giving up
    */
-  openTimeout: number;
+  openTimeout?: number;
   /**
    * How long to wait for Discord's Hello payload before giving up
    */
-  helloTimeout: number;
+  helloTimeout?: number;
   /**
    * How long to wait for Discord's Resume payload before giving up
    */
-  reconnectTimeout: number;
+  reconnectTimeout?: number;
   /**
    * How long to wait for Discord's Ready payload before giving up
    */
-  discordReadyTimeout: number;
+  discordReadyTimeout?: number;
   /**
    * How long to wait between each GUILD_CREATE packet
    * Once the timeout is hit the shard will simply be marked as ready,
    * concluding that the remaining guilds are in an outage
    */
-  guildTimeout: number;
+  guildTimeout?: number;
   /**
    * What encoding to use
    * If you have discordapp/erlpack installed it will default to ETF, otherwise, JSON
    */
-  encoding: Util.Encoding;
+  encoding?: Util.Encoding;
   /**
    * whether or not compression should be used
    * If zlib is not installed but this is set to true a warning will be thrown
    */
-  compress: boolean;
+  compress?: boolean;
   /**
    * Value between 50 and 250, total number of members where the gateway will stop sending offline members in the guild member list
    * (https://discord.com/developers/docs/topics/gateway#identify-identify-structure)
    */
-  largeThreshold: number;
+  largeThreshold?: number;
   /**
    * The intents to use
    */
-  intents: Intents | IntentKeys | IntentKeys[] | bigint;
+  intents?: Intents | IntentKeys | IntentKeys[] | bigint;
 }
 
 export interface WebsocketConnectionDestroyOptions {
@@ -124,17 +124,32 @@ export interface WebsocketConnectionDestroyOptions {
 /**
  * Represents a connection to Discord.
  */
-export class WebsocketConnection implements WebsocketConnectionOptions {
+export class WebsocketConnection {
+  /**
+   * Zlib suffix for decompressing packets
+   */
   public static readonly zlibSuffix = new Uint8Array([0x00, 0x00, 0xff, 0xff]);
 
+  /**
+   * Options for zlib inflate
+   */
   public static readonly infalteOptions = {
     chunkSize: 65535,
     flush: Util.zlib?.Z_SYNC_FLUSH
   };
 
+  /**
+   * Active internal intervals
+   */
   private readonly _intervals: { [key: string]: NodeJS.Timeout | null } = {};
+  /**
+   * Active internal timeouts
+   */
   private readonly _timeouts: { [key: string]: NodeJS.Timeout | null } = {};
 
+  /**
+   * "Command" queue for sequentially sending requests to Discord
+   */
   private readonly _commandQueue = new Queue();
 
   /**
@@ -147,19 +162,47 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
    */
   private _sessionId: string | null = null;
 
+  /**
+   * Guilds this shard is currently waiting for
+   */
   private _pendingGuilds: Set<string> | null = null;
 
+  /**
+   * Wether the last heartbeat was ACKed or not
+   */
   private _ack = true;
+
+  /**
+   * When the last ACK took place
+   */
   private _lastAck = 0;
 
+  /**
+   * When the last heartbeat took place
+   */
   private _lastBeat = 0;
 
+  /**
+   * How many requests have been made since this cycle started
+   */
   private _requests = 0;
+  /**
+   * When the first request was made (during this cycle)
+   */
   private _firstRequest = -1;
 
+  /**
+   * Function that resolves the currrent connect promise
+   */
   private _connectResolve: ((value?: any) => void) | null = null;
+  /**
+   * Function that resolves the currrent reject promise
+   */
   private _connectReject: ((reason: any) => void) | null = null;
 
+  /**
+   * When this shard successfully connected
+   */
   private _connectedAt = -1;
 
   // Options
@@ -174,28 +217,41 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
   public readonly intents: bigint;
 
   // State
+  /**
+   * Guilds this shard is holding
+   */
+  public readonly guilds = new Map<string, APIGuild>();
+
+  /**
+   * Current websocket connection
+   */
   public connection?: WS;
+  /**
+   * Current status of this shard
+   */
   public status = WebsocketConnectionStatus.idle;
 
+  /**
+   * Zlib inflate instance used for decompressing
+   */
   public inflate: zlib.Inflate | null = null;
-  public guilds: Set<string> = new Set();
 
   public constructor(
     public readonly cluster: Cluster,
     public readonly id: number,
     private readonly _url: string,
-    options: Partial<WebsocketConnectionOptions> = {}
+    options: WebsocketConnectionOptions = {}
   ) {
     let {
-      openTimeout = 60000,
-      helloTimeout = 60000,
-      reconnectTimeout = 60000,
-      discordReadyTimeout = 60000,
-      guildTimeout = 10000,
+      openTimeout = 6e4,
+      helloTimeout = 6e4,
+      reconnectTimeout = 6e4,
+      discordReadyTimeout = 6e4,
+      guildTimeout = 1e4,
       encoding = Util.defaultEncoding,
       compress = Util.defaultCompress,
       largeThreshold = 250,
-      intents = INTENTS.all
+      intents = INTENTS.nonPrivileged
     } = options;
 
     this.openTimeout = openTimeout;
@@ -221,7 +277,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
 
     this.encoding = encoding;
     this.compress = compress;
-    if (compress && Util.zlib?.Inflate) this.inflate = new Util.zlib.Inflate(WebsocketConnection.infalteOptions);
+    if (compress) this.inflate = new Util.zlib!.Inflate(WebsocketConnection.infalteOptions);
   }
 
   /**
@@ -232,11 +288,27 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
     return this._lastAck - this._lastBeat;
   }
 
+  private _wrapResolve(resolve: () => void) {
+    if (this._connectResolve) this.debug('UB: set another _connectResolve without calling the previous one.');
+    return () => {
+      this._connectResolve = null;
+      resolve();
+    };
+  }
+
+  private _wrapReject(reject: (reason: any) => void) {
+    if (this._connectResolve) this.debug('UB: set another _connectReject without calling the previous one.');
+    return (reason: any) => {
+      this._connectReject = null;
+      reject(reason);
+    };
+  }
+
   /**
    * Connects to the gateway; resolves when:
    * a) All guilds are recieved from Discord
    * b) The timeout that waits for guilds is hit & the rest of the pending guilds are deemed unavailable.
-   * It should be noted that in either case when this function resolves this shard's status becomes 6 (READY)
+   * It should be noted that in either case when this function resolves this shard's status becomes 6 (ready)
    */
   public connect(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -252,8 +324,8 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
           break;
       }
 
-      this._connectResolve = resolve;
-      this._connectReject = reject;
+      this._connectResolve = this._wrapResolve(resolve);
+      this._connectReject = this._wrapReject(reject);
 
       if (this.status !== WebsocketConnectionStatus.reconnecting) this.status = WebsocketConnectionStatus.connecting;
       this.debug(stripIndent`
@@ -263,6 +335,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
           Encoding   : ${this.encoding}
           Compression: ${this.compress ? 'zlib-stream' : 'none'}
       `);
+
       this._registerTimeout('open', async () => {
         await this.destroy({ reason: 'Gateway did not open in time', fatal: true });
         reject(new CordisGatewayError('timeoutHit', 'open', this.openTimeout));
@@ -306,7 +379,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
       if (requested) reason = 'User requested termination.';
     }
 
-    if (!code) code = Util.normalCloseCode;
+    code ??= reconnect ? Util.restartingCloseCode : Util.normalCloseCode;
 
     for (const timeout of Object.keys(this._timeouts)) this._clearTimeout(timeout);
     for (const interval of Object.keys(this._intervals)) this._clearInterval(interval);
@@ -323,15 +396,26 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
     this._lastAck = 0;
     this._lastBeat = 0;
 
-    if (this.connection && [WS.OPEN, WS.CONNECTING].includes(this.connection.readyState)) this.connection.close(code, reason);
-    await new Promise(res => {
-      this.connection?.on('close', res);
-      setTimeout(res, 15000);
+    if (this.connection && (this.connection.readyState === WS.OPEN || this.connection.readyState === WS.CONNECTING)) {
+      try {
+        this.connection.close(code, reason);
+      } catch {}
+    }
+
+    await new Promise<void>(res => {
+      const cb = () => {
+        this.connection?.off('close', cb);
+        this._clearTimeout('connClose');
+        res();
+      };
+
+      this.connection?.once('close', cb);
+      this._registerTimeout('connClose', cb, 15000);
     });
 
     if (this.compress && Util.zlib?.Inflate) this.inflate = new Util.zlib.Inflate(WebsocketConnection.infalteOptions);
 
-    this.status = reconnect && !fatal ? WebsocketConnectionStatus.reconnecting : WebsocketConnectionStatus.idle;
+    this.status = reconnect ? WebsocketConnectionStatus.reconnecting : WebsocketConnectionStatus.idle;
 
     if (!reconnect) return;
 
@@ -348,7 +432,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
   }
 
   /**
-   * Shortcut for emitting a debug event to the parent manager
+   * Shortcut for emitting a debug event to the parent cluster
    * @param log The debug information
    */
   public debug(log: string) {
@@ -463,7 +547,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
     return Array.isArray(result) ? new Uint8Array(result) : result;
   }
 
-  // Arrow functions are used here to preserve "this" context when passing the function directly
+  // Arrow functions are used here to preserve "this" context when passing the functions directly
 
   private readonly _onOpen = () => {
     this._clearTimeout('open');
@@ -652,15 +736,15 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
         if (payload.d.guilds.length) {
           this.status = WebsocketConnectionStatus.waiting;
           // eslint-disable-next-line no-multi-assign
-          this._pendingGuilds = this.guilds = new Set(payload.d.guilds.map(g => g.id));
+          this._pendingGuilds = new Set(payload.d.guilds.map(g => g.id));
           this._registerTimeout('guilds', () => {
             this.debug(`${this._pendingGuilds!.size} guilds were never recieved.`);
-            this._turnReady();
+            this._checkReady();
             this._pendingGuilds = null;
           }, this.guildTimeout);
         } else {
           this.debug('Shard has no guilds, marking as fully ready.');
-          this._turnReady();
+          this._checkReady();
         }
 
         break;
@@ -673,12 +757,12 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
           if (!this._pendingGuilds!.size) {
             this.debug('Shard recieved all guilds, marking as fully ready.');
             this._clearTimeout('guilds');
-            this._turnReady();
+            this._checkReady();
           }
 
           this._refreshTimeout('guilds');
         } else {
-          this.guilds.add(payload.d.id);
+          this.guilds.set(payload.d.id, payload.d);
         }
 
         break;
@@ -705,10 +789,10 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
   /**
    * Marks the shard as ready, and if applicable the cluster
    */
-  private _turnReady() {
+  private _checkReady() {
     this.status = WebsocketConnectionStatus.ready;
     this._connectResolve?.();
-    if (this.cluster.ready) this.cluster.emit('ready', this.cluster.shardCount, this.cluster.shardsSpawned);
+    if (this.cluster.ready) this.cluster.emit('ready');
   }
 
   private readonly _heartbeat = async (force = false) => {
@@ -741,7 +825,7 @@ export class WebsocketConnection implements WebsocketConnectionOptions {
             $browser: ${Util.CONSTANTS.properties.$browser},
             $device: ${Util.CONSTANTS.properties.$device}
           },
-          shard: [${this.id}, ${this.cluster.shardsSpawned}],
+          shard: [${this.id}, ${this.cluster.totalShardCount}],
           large_threshold: ${this.largeThreshold},
           intents: ${this.intents}
         }

@@ -1,4 +1,3 @@
-import { ENDPOINTS } from '@cordis/common';
 import { TextDecoder } from 'util';
 import type { GatewayReceivePayload } from 'discord-api-types/v8';
 
@@ -9,7 +8,14 @@ const TD = new TextDecoder();
  */
 export type Encoding = 'json' | 'etf';
 
+/**
+ * Code used when gracefully quitting - also makes Discord give up on the session state, preventing resuming
+ */
 export const normalCloseCode = 1000;
+
+/**
+ * Code used when you wish to resume - this is random, it just has to be anything but 1000
+ */
 export const restartingCloseCode = 4900;
 
 /**
@@ -51,9 +57,7 @@ export const defaultCompress = Boolean(zlib);
  * @param encoding Encoding to pack to
  * @param data Data to pack
  */
-export const pack = (encoding: Encoding, data: any) => encoding === 'etf' && erlpack
-  ? erlpack.pack(data)
-  : JSON.stringify(data);
+export const pack = (encoding: Encoding, data: any) => encoding === 'etf' && erlpack ? erlpack.pack(data) : JSON.stringify(data);
 
 /**
  * Unpacks (decompressed) data given from Discord
@@ -71,10 +75,11 @@ export const unpack = (encoding: Encoding, data: any): GatewayReceivePayload => 
 };
 
 export const CONSTANTS = {
-  gateway: `${ENDPOINTS.api}/gateway/bot`,
   properties: {
     $os: process.platform,
     $browser: 'cordis',
     $device: 'cordis'
   }
-};
+} as const;
+
+Object.freeze(CONSTANTS);

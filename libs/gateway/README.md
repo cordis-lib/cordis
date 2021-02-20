@@ -1,6 +1,10 @@
+<div align = "center">
+
 # @cordis/gateway
 
-## About
+</div>
+
+## Description
 The cordis WS client for Discord's API
 ___
 

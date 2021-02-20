@@ -1,5 +1,5 @@
 import { CORDIS_AMQP_SYMBOLS, Patcher } from '@cordis/common';
-import { APIUser } from 'discord-api-types';
+import { APIUser } from 'discord-api-types/v8';
 import { Handler } from '../Handler';
 
 const userUpdate: Handler<APIUser> = (data, service, _, __, user) => {

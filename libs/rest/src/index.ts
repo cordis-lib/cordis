@@ -1,3 +1,4 @@
+export * from './mutex';
 export * from './Bucket';
 export * from './Constants';
 export * from './Error';

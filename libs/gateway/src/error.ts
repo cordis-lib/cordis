@@ -1,7 +1,7 @@
 import makeCordisError from '@cordis/error';
 import { WebsocketConnectionStatus } from './websocket/WebsocketConnection';
 
-/* eslint-disable @typescript-eslint/naming-convention */
+/** @internal */
 export const CordisGatewayError = makeCordisError(
   Error,
   {
@@ -18,6 +18,7 @@ export const CordisGatewayError = makeCordisError(
   }
 );
 
+/** @internal */
 export const CordisGatewayTypeError = makeCordisError(
   TypeError,
   {
@@ -25,4 +26,3 @@ export const CordisGatewayTypeError = makeCordisError(
     invalidCompression: 'Compression was set to true, but zlib is missing'
   }
 );
-/* eslint-enable @typescript-eslint/naming-convention */

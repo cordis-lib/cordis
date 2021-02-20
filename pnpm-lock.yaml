@@ -140,32 +140,32 @@ importers:
       '@cordis/common': link:../common
       '@cordis/error': link:../error
       '@cordis/queue': link:../queue
+      '@cordis/rest': link:../rest
       common-tags: 1.8.0
       discord-api-types: 0.11.2
-      node-fetch: 2.6.1
       tslib: 2.1.0
       ws: 7.4.3
     devDependencies:
       '@types/common-tags': 1.8.0
       '@types/node': 14.14.25
-      '@types/node-fetch': 2.5.8
       '@types/ws': 7.4.0
       erlpack: github.com/discordapp/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d
+      ioredis: 4.22.0
       typescript: 4.2.0-dev.20210206
       zlib-sync: 0.1.7
     specifiers:
       '@cordis/bitfield': workspace:0.1.0
       '@cordis/common': workspace:0.1.0
       '@cordis/error': workspace:0.1.0
-      '@cordis/queue': workspace:0.1.0
+      '@cordis/queue': workspace:^0.1.0
+      '@cordis/rest': workspace:0.1.0
       '@types/common-tags': ^1.8.0
       '@types/node': ^14.14.25
-      '@types/node-fetch': ^2.5.8
       '@types/ws': ^7.4.0
       common-tags: ^1.8.0
       discord-api-types: ^0.11.2
       erlpack: github:discordapp/erlpack
-      node-fetch: ^2.6.1
+      ioredis: ^4.22.0
       tslib: ^2.1.0
       typescript: ^4.2.0-dev.20210206
       ws: ^7.4.3
@@ -208,6 +208,7 @@ importers:
       '@types/node': 14.14.25
       '@types/node-fetch': 2.5.8
       fetch-blob: 2.1.1
+      ioredis: 4.22.0
       typescript: 4.2.0-dev.20210206
     specifiers:
       '@cordis/common': workspace:0.1.0
@@ -217,6 +218,7 @@ importers:
       abort-controller: ^3.0.0
       fetch-blob: ^2.1.1
       form-data: ^3.0.0
+      ioredis: ^4.22.0
       node-fetch: ^2.6.1
       tslib: ^2.1.0
       typescript: ^4.2.0-dev.20210206
@@ -3452,6 +3454,23 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-3haQWw9dpEjcfVcRktXlayVNrrqvvc2io7Q/uiV2UsYw8/HC2YwwJr78Wql7zu5bzwci0x9bZYA69U7KkevAvw==
+  /ioredis/4.22.0:
+    dependencies:
+      cluster-key-slot: 1.1.0
+      debug: 4.3.1
+      denque: 1.5.0
+      lodash.defaults: 4.2.0
+      lodash.flatten: 4.4.0
+      p-map: 2.1.0
+      redis-commands: 1.7.0
+      redis-errors: 1.2.0
+      redis-parser: 3.0.0
+      standard-as-callback: 2.0.1
+    dev: true
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-mtC+jNFMPRxReWx0HodDbcwj34Gj5pK/P4+aE6Nh0pdqgtZKvxUh4z2lVtLjqnRIvMhKaBnIgMYFR8qH/xtttA==
   /ip-regex/2.1.0:
     dev: true
     engines:
@@ -5015,6 +5034,10 @@ packages:
   /redis-commands/1.6.0:
     resolution:
       integrity: sha512-2jnZ0IkjZxvguITjFTrGiLyzQZcTvaw8DAaCXxZq/dsHXz7KfMQ3OUJy7Tz9vnRtZRVz6VRCPDvruvU8Ts44wQ==
+  /redis-commands/1.7.0:
+    dev: true
+    resolution:
+      integrity: sha512-nJWqw3bTFy21hX/CPKHth6sfhZbdiHP6bTawSgQBlKOVRG7EZkfHbbHwQJnrE4vsQf0CMNE+3gJ4Fmm16vdVlQ==
   /redis-errors/1.2.0:
     engines:
       node: '>=4'

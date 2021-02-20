@@ -25,4 +25,6 @@ export const ENDPOINTS = {
   api: 'https://discord.com/api',
   cdn: 'https://cdn.discordapp.com',
   invite: 'https://discord.gg'
-};
+} as const;
+
+Object.freeze(ENDPOINTS);

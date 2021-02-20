@@ -1,117 +1,138 @@
 import { EventEmitter } from 'events';
-import fetch, { Headers } from 'node-fetch';
 import { CordisGatewayError } from '../error';
-import { CONSTANTS } from '../util';
 import {
   WebsocketConnection,
   WebsocketConnectionStatus,
   WebsocketConnectionOptions,
   WebsocketConnectionDestroyOptions
 } from './WebsocketConnection';
-import { CORDIS_META } from '@cordis/common';
 import { stripIndent } from 'common-tags';
-import type {
+import { RestManager, MemoryMutex, RedisMutex } from '@cordis/rest';
+import {
   APIUser,
   GatewayDispatchPayload,
   GatewaySendPayload,
-  RESTGetAPIGatewayBotResult
-} from 'discord-api-types';
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-/**
- * Fired when one of the shards opens
- * @asMemberOf Cluster
- * @event Cluster#open
- */
-declare function open(id: number): any;
+  RESTGetAPIGatewayBotResult,
+  Routes
+} from 'discord-api-types/v8';
+import type { Redis } from 'ioredis';
 
 /**
- * Fired when one of the shards begins reconnecting
- * @asMemberOf Cluster
- * @event Cluster#reconnecting
+ * Options for creating a cluster
  */
-declare function reconnecting(id: number): any;
-
-/**
- * Fired when one of the shards begins disconnecting
- * @asMemberOf Cluster
- * @event Cluster#disconnecting
- */
-declare function disconnecting(id: number): any;
-
-/**
- * Provides information useful for debugging
- * @asMemberOf Cluster
- * @event Cluster#debug
- */
-declare function debug(info: any, id: number): any;
-
-/**
- * Fired when a gateway connection gives an error event or when a payload is not successfully sent
- * @asMemberOf Cluster
- * @event Cluster#error
- */
-declare function error(info: any, id: number): any;
-
-/**
- * Fired when all of the shards under this manager become ready
- * @asMemberOf Cluster
- * @event Cluster#ready
- */
-declare function ready(shardOptions: number | 'auto', shards: number): any;
-
-/**
- * Any gateway event after the Shard has become READY
- * @asMemberOf Cluster
- * @event Cluster#dispatch
- */
-declare function dispatch(data: GatewayDispatchPayload, id: number): any;
-
-/* eslint-enable @typescript-eslint/no-unused-vars */
-
 export interface ClusterOptions extends WebsocketConnectionOptions {
   /**
    * How many shards to spawn for this cluster
    */
-  shardCount: number | 'auto';
+  shardCount?: number | 'auto';
+  /**
+   * In case you have multiple clusters - you'll need to speceify first ID for this cluster's shards
+   */
+  startingShard?: number;
   /**
    * How many shards you intend to spawn across all clusters
    */
-  totalShardCount: number | 'auto';
+  totalShardCount?: number | 'auto';
+  /**
+   * Optional IORedis instance for cross-worker storage
+   */
+  redis?: Redis;
 }
 
+/* eslint-disable @typescript-eslint/unified-signatures */
 export interface Cluster {
-  on(event: 'open' | 'reconecting' | 'disconnecting', listener: typeof open): this;
-  on(event: 'debug' | 'error', listener: typeof debug): this;
-  on(event: 'ready', listener: typeof ready): this;
-  on(event: 'dispatch', listener: typeof dispatch): this;
+  /**
+   * Fired when one of a shard's connection opens
+   * @event
+   */
+  on(event: 'open', listener: (id: string | number) => any): this;
+  /**
+   * Fired when one of the shards begins reconnecting
+   * @event
+   */
+  on(event: 'reconecting', listener: (id: string | number) => any): this;
+  /**
+   * Fired when one of the shards begins disconnecting
+   * @event
+   */
+  on(event: 'disconnecting', listener: (id: string | number) => any): this;
+  /**
+   * Provides information useful for debugging
+   * @event
+   */
+  on(event: 'debug', listener: (info: any, id: string | number) => any): this;
+  /**
+   * Fired when a gateway connection gives an error event or when a payload is not successfully sent
+   * @event
+   */
+  on(event: 'error', listener: (info: any, id: string | number) => any): this;
+  /**
+   * Fired when all of the shards under this cluster become ready
+   * @event
+   */
+  on(event: 'ready', listener: () => any): this;
+  /**
+   * Any gateway event from a Shard that is currently {@link WebsocketConnectionStatus.ready}
+   */
+  on(event: 'dispatch', listener: (data: GatewayDispatchPayload, id: string | number) => any): this;
 
-  once(event: 'open' | 'reconecting' | 'disconnecting', listener: typeof open): this;
-  once(event: 'debug' | 'error', listener: typeof debug): this;
-  once(event: 'ready', listener: typeof ready): this;
-  once(event: 'dispatch', listener: typeof dispatch): this;
+  /** @internal */
+  once(event: 'open' | 'reconecting' | 'disconnecting', listener: (id: string | number) => any): this;
+  /** @internal */
+  once(event: 'debug' | 'error', listener: (info: any, id: string | number) => any): this;
+  /** @internal */
+  once(event: 'ready', listener: () => any): this;
+  /** @internal */
+  once(event: 'dispatch', listener: (data: GatewayDispatchPayload, id: string | number) => any): this;
 
-  emit(event: 'open' | 'ready' | 'reconecting' | 'disconnecting', id: number): boolean;
-  emit(event: 'debug' | 'error', info: any, id: number): boolean;
-  emit(event: 'ready', shardOptions: number | 'auto', shards: number): boolean;
-  emit(event: 'dispatch', data: GatewayDispatchPayload, id: number): this;
+  /** @internal */
+  emit(event: 'open' | 'reconecting' | 'disconnecting', id: string | number): boolean;
+  /** @internal */
+  emit(event: 'debug' | 'error', info: any, id: string | number): boolean;
+  /** @internal */
+  emit(event: 'ready'): boolean;
+  /** @internal */
+  emit(event: 'dispatch', data: GatewayDispatchPayload, id: string | number): boolean;
 }
+/* eslint-enable @typescript-eslint/unified-signatures */
 
 /**
  * The entry point for the cordis gateway
  * @noInheritDoc
  */
 export class Cluster extends EventEmitter {
-  private readonly _shardOptions: Partial<WebsocketConnectionOptions>;
+  /**
+   * Options for constructing each shard
+   */
+  private readonly _shardOptions: WebsocketConnectionOptions;
+  /**
+   * Cache from the last gateway fetch call
+   */
   private _fetchGatewayCache?: RESTGetAPIGatewayBotResult;
 
   /**
-   * An array of all of the WebsocketShards
+   * An array of all of the active shards
    */
   public readonly shards: WebsocketConnection[] = [];
 
+  /**
+   * REST instance
+   */
+  public readonly rest: RestManager;
+
+  /**
+   * First shard ID for this cluster
+   */
+  public readonly startingShard: number;
+
+  /**
+   * Amount of shards under this cluster
+   */
   public shardCount: number | 'auto';
+
+  /**
+   * Amount of shards under all clusters
+   */
   public totalShardCount: number | 'auto';
 
   /**
@@ -149,32 +170,35 @@ export class Cluster extends EventEmitter {
 
   /**
    * @param auth The Discord token for your bot
-   * @param shardCount How many shards to spawn, leave "auto" for Discord recommended count
-   * @param _shardOptions Options to pass into each Websocket Shard
+   * @param options Options for this cluster
    */
   public constructor(
     public readonly auth: string,
-    options: Partial<ClusterOptions> = {}
+    options: ClusterOptions = {}
   ) {
     super();
 
     const {
       shardCount = 'auto',
+      startingShard = 0,
       totalShardCount = shardCount,
+      redis,
       ...shardOptions
     } = options;
 
+    this.rest = new RestManager(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
     this.shardCount = shardCount;
+    this.startingShard = startingShard;
     this.totalShardCount = totalShardCount;
     this._shardOptions = shardOptions;
   }
 
-  private _debug(log: string) {
-    this.emit('debug', log, -1);
+  protected _debug(log: string) {
+    this.emit('debug', log, 'MANAGER');
   }
 
   /**
-   * Gets the the given guild is under
+   * Gets the shard the given guild is under
    * @param guild The guild id associated with the shard you want to obtain
    */
   public getShard(guild: string) {
@@ -188,21 +212,19 @@ export class Cluster extends EventEmitter {
     for (const shard of this.shards) await shard.send(payload, false);
   }
 
+  /**
+   * Fetches the Discord gateway, obtaining recommended sharding data
+   * @param ignoreCache Wether the cache should be simply ignored
+   * @returns Discord gateway information
+   */
   public async fetchGateway(ignoreCache = false) {
     if (this._fetchGatewayCache && !ignoreCache) return this._fetchGatewayCache;
 
-    const headers = new Headers();
-    headers.set('Authorization', `Bot ${this.auth}`);
-    headers.set('User-Agent', `DiscordBot (${CORDIS_META.url}, ${CORDIS_META.version}) Node.js/${process.version}`);
+    const data = await this.rest.get<RESTGetAPIGatewayBotResult>(Routes.gatewayBot()).catch(() => null);
 
-    const res = await fetch(CONSTANTS.gateway, { headers }).catch(() => null);
-
-    if (res?.ok) {
-      const data: RESTGetAPIGatewayBotResult | null = await res.json().catch(() => null);
-      if (data) {
-        this._fetchGatewayCache = data;
-        return data;
-      }
+    if (data) {
+      this._fetchGatewayCache = data;
+      return data;
     }
 
     throw new CordisGatewayError('fetchGatewayFail');
@@ -231,20 +253,20 @@ export class Cluster extends EventEmitter {
       if (this.shardCount === 'auto') this.shardCount = recommendedShards;
       if (this.totalShardCount === 'auto') this.totalShardCount = recommendedShards;
 
-      for (let i = 0; i < this.shardCount; i++) {
+      for (let i = this.startingShard; i < this.startingShard + this.shardCount; i++) {
         this.shards.push(new WebsocketConnection(this, i, url, this._shardOptions));
       }
     }
 
-    for (const shard of this.shards) await shard.connect();
+    return Promise.allSettled(this.shards.map(shard => shard.connect()));
   }
 
   /**
    * Destroys the cluster and all of the shards
    */
   public async destroy(options: WebsocketConnectionDestroyOptions = { fatal: true }) {
-    for (const shard of this.shards) await shard.destroy(options);
-
     this.user = null;
+
+    return Promise.allSettled(this.shards.map(shard => shard.destroy(options)));
   }
 }
