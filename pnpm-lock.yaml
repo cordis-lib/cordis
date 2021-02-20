@@ -96,34 +96,6 @@ importers:
       ioredis: ^4.19.4
       tslib: ^2.1.0
       typescript: ^4.2.0-dev.20210206
-  libs/core:
-    dependencies:
-      '@cordis/brokers': link:../brokers
-      '@cordis/common': link:../common
-      amqplib: 0.6.0
-      discord-api-types: 0.11.2
-      ioredis: 4.19.4
-      tslib: 2.1.0
-      tsyringe: 4.4.0
-    devDependencies:
-      '@cordis/rest': link:../rest
-      '@types/amqplib': 0.5.17
-      '@types/ioredis': 4.19.3
-      '@types/node': 14.14.25
-      typescript: 4.2.0-dev.20210206
-    specifiers:
-      '@cordis/brokers': workspace:0.1.0
-      '@cordis/common': workspace:0.1.0
-      '@cordis/rest': workspace:0.1.0
-      '@types/amqplib': ^0.5.17
-      '@types/ioredis': ^4.19.3
-      '@types/node': ^14.14.25
-      amqplib: ^0.6.0
-      discord-api-types: ^0.11.2
-      ioredis: ^4.19.4
-      tslib: ^2.1.0
-      tsyringe: ^4.4.0
-      typescript: ^4.2.0-dev.20210206
   libs/error:
     dependencies:
       tslib: 2.1.0
@@ -184,16 +156,16 @@ importers:
     dependencies:
       '@cordis/error': link:../error
       '@cordis/store': link:../store
-      ioredis: 4.19.4
       tslib: 2.1.0
     devDependencies:
+      '@types/ioredis': 4.19.4
       '@types/node': 14.14.25
       typescript: 4.2.0-dev.20210206
     specifiers:
       '@cordis/error': workspace:0.1.0
       '@cordis/store': workspace:0.1.0
+      '@types/ioredis': ^4.19.4
       '@types/node': ^14.14.25
-      ioredis: ^4.19.4
       tslib: ^2.1.0
       typescript: ^4.2.0-dev.20210206
   libs/rest:
@@ -1564,12 +1536,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-mWA/4zFQhfvOA8zWkXobwJvBD7vzcxgrOQ0J5CH1votGqdq9m7+FwtGaqyCZqC3NyyBkc9z4m+iry4LlqcMWJg==
-  /@types/ioredis/4.19.3:
+  /@types/ioredis/4.19.4:
     dependencies:
-      '@types/node': 14.14.25
+      '@types/node': 14.14.31
     dev: true
     resolution:
-      integrity: sha512-r9rXLYeZVmvTf0nKDmFYrpBeVzK5B6jgE2ncfkzPOAuRM5RTzKnYdW2wVn+ZONMnFxV6H4R3NrCdRdC3CL4nFA==
+      integrity: sha512-NrXnrymvlUioki2hoFCGakAf/1ej/scdI+ViuTchFmc8KL8DHM2uMcxWx5foKd2C4IkXswX46yoMsexvnr9kPg==
   /@types/istanbul-lib-coverage/2.0.3:
     dev: true
     resolution:
@@ -1608,6 +1580,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-EPpXLOVqDvisVxtlbvzfyqSsFeQxltFbluZNRndIb8tr9KiBnYNLzrc1N3pyKUCww2RNrfHDViqDWWE1LCJQtQ==
+  /@types/node/14.14.31:
+    dev: true
+    resolution:
+      integrity: sha512-vFHy/ezP5qI0rFgJ7aQnjDXwAMrG0KqqIH7tQG5PPv3BWBayOPIQNBjVc/P6hhdZfMx51REc6tfDNXHUio893g==
   /@types/normalize-package-data/2.4.0:
     dev: true
     resolution:

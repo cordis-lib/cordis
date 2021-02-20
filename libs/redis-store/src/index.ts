@@ -1,6 +1,6 @@
-import { Redis } from 'ioredis';
 import { Store, IStore, StoreOptions, StoreSingleEntryCallback, StoreSortCallback, StoreReduceCallback, StoreMapCallback } from '@cordis/store';
 import makeCordisError from '@cordis/error';
+import type { Redis } from 'ioredis';
 
 /**
  * @internal
