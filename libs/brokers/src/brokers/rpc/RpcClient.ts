@@ -110,7 +110,7 @@ export class RpcClient<S, C> extends Broker {
           reject(new CordisBrokerError('noResponseInTime', this.timeout!));
           this.off(`__${correlationId}`, cb);
         },
-        this.timeout!
+        this.timeout
       );
 
       this.once(`__${correlationId}` as const, cb);
