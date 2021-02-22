@@ -12,8 +12,7 @@ import {
   GatewayDispatchPayload,
   GatewayOPCodes,
   GatewayCloseCodes,
-  GatewayDispatchEvents,
-  APIGuild
+  GatewayDispatchEvents
 } from 'discord-api-types/v8';
 import type * as zlib from 'zlib-sync';
 
@@ -218,11 +217,6 @@ export class WebsocketConnection {
 
   // State
   /**
-   * Guilds this shard is holding
-   */
-  public readonly guilds = new Map<string, APIGuild>();
-
-  /**
    * Current websocket connection
    */
   public connection?: WS;
@@ -371,7 +365,7 @@ export class WebsocketConnection {
         code     : ${code}
     `);
 
-    this.cluster.emit(reconnect ? 'reconecting' : 'disconnecting', this.id);
+    this.cluster.emit(reconnect ? 'reconnecting' : 'disconnecting', this.id);
     this.status = WebsocketConnectionStatus.disconnecting;
 
     if (!reason) {
@@ -723,7 +717,7 @@ export class WebsocketConnection {
     }
   };
 
-  private _handleDispatch(payload: GatewayDispatchPayload): void {
+  private async _handleDispatch(payload: GatewayDispatchPayload): Promise<void> {
     if (this._sequence == null || payload.s > this._sequence) this._sequence = payload.s;
 
     switch (payload.t) {
@@ -762,14 +756,14 @@ export class WebsocketConnection {
 
           this._refreshTimeout('guilds');
         } else {
-          this.guilds.set(payload.d.id, payload.d);
+          await this.cluster.guilds.set(payload.d.id, payload.d);
         }
 
         break;
       }
 
       case GatewayDispatchEvents.GuildDelete: {
-        if (!payload.d.unavailable) this.guilds.delete(payload.d.id);
+        if (!payload.d.unavailable) await this.cluster.guilds.delete(payload.d.id);
         break;
       }
 

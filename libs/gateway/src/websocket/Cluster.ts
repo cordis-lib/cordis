@@ -8,7 +8,10 @@ import {
 } from './WebsocketConnection';
 import { stripIndent } from 'common-tags';
 import { RestManager, MemoryMutex, RedisMutex } from '@cordis/rest';
+import { Store, IStore } from '@cordis/store';
+import { RedisStore } from '@cordis/redis-store';
 import {
+  APIGuild,
   APIUser,
   GatewayDispatchPayload,
   GatewaySendPayload,
@@ -50,7 +53,7 @@ export interface Cluster {
    * Fired when one of the shards begins reconnecting
    * @event
    */
-  on(event: 'reconecting', listener: (id: string | number) => any): this;
+  on(event: 'reconnecting', listener: (id: string | number) => any): this;
   /**
    * Fired when one of the shards begins disconnecting
    * @event
@@ -77,7 +80,7 @@ export interface Cluster {
   on(event: 'dispatch', listener: (data: GatewayDispatchPayload, id: string | number) => any): this;
 
   /** @internal */
-  once(event: 'open' | 'reconecting' | 'disconnecting', listener: (id: string | number) => any): this;
+  once(event: 'open' | 'reconnecting' | 'disconnecting', listener: (id: string | number) => any): this;
   /** @internal */
   once(event: 'debug' | 'error', listener: (info: any, id: string | number) => any): this;
   /** @internal */
@@ -86,7 +89,7 @@ export interface Cluster {
   once(event: 'dispatch', listener: (data: GatewayDispatchPayload, id: string | number) => any): this;
 
   /** @internal */
-  emit(event: 'open' | 'reconecting' | 'disconnecting', id: string | number): boolean;
+  emit(event: 'open' | 'reconnecting' | 'disconnecting', id: string | number): boolean;
   /** @internal */
   emit(event: 'debug' | 'error', info: any, id: string | number): boolean;
   /** @internal */
@@ -114,6 +117,11 @@ export class Cluster extends EventEmitter {
    * An array of all of the active shards
    */
   public readonly shards: WebsocketConnection[] = [];
+
+  /**
+   * Guild storage
+   */
+  public readonly guilds: IStore<APIGuild>;
 
   /**
    * REST instance
@@ -186,6 +194,7 @@ export class Cluster extends EventEmitter {
       ...shardOptions
     } = options;
 
+    this.guilds = redis ? new RedisStore({ redis, hash: 'guilds' }) : new Store<APIGuild>();
     this.rest = new RestManager(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
     this.shardCount = shardCount;
     this.startingShard = startingShard;
@@ -195,14 +204,6 @@ export class Cluster extends EventEmitter {
 
   protected _debug(log: string) {
     this.emit('debug', log, 'MANAGER');
-  }
-
-  /**
-   * Gets the shard the given guild is under
-   * @param guild The guild id associated with the shard you want to obtain
-   */
-  public getShard(guild: string) {
-    return this.shards.find(s => s.guilds.has(guild));
   }
 
   /**
