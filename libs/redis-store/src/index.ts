@@ -1,4 +1,12 @@
-import { Store, IStore, StoreOptions, StoreSingleEntryCallback, StoreSortCallback, StoreReduceCallback, StoreMapCallback } from '@cordis/store';
+import {
+  Store,
+  IStore,
+  StoreOptions,
+  StoreSingleEntryCallback,
+  StoreSortCallback,
+  StoreReduceCallback,
+  StoreMapCallback
+} from '@cordis/store';
 import makeCordisError from '@cordis/error';
 import type { Redis } from 'ioredis';
 
@@ -52,10 +60,25 @@ export class RedisStore<T> implements IStore<T> {
    * Async iterator over the redis store
    */
   public async *[Symbol.asyncIterator]() {
-    const raw = await this.redis.hgetall(this.hash);
+    // Redis may or may not duplicate keys
+    const seenKeys = new Set<string>();
 
-    for (const entry of Object.keys(raw)) {
-      yield [entry, this.decode(raw[entry])] as [string, T];
+    for await (const chunk of this.redis.hscanStream(this.hash)) {
+      let isKey = true;
+      let currentKey: string;
+
+      for (const element of chunk) {
+        if (seenKeys.has(element)) continue;
+
+        if (!isKey) {
+          yield [currentKey!, this.decode(element)] as [string, T];
+        } else {
+          seenKeys.add(element);
+          currentKey = element;
+        }
+
+        isKey = !isKey;
+      }
     }
   }
 
