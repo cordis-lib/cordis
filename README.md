@@ -9,19 +9,21 @@ cordis is a fully modular, micro-service based [Node.js](https://nodejs.org/) wr
 
 It is cut up in multiple packages/libraries:
 
+- `@cordis/bitfield`, for working with bitfields using BigInts
 - `@cordis/brokers`, message brokers for routing patterns, pub/sub systems and RPC!
-- `@cordis/core`, a library for interfacing with the Cordis services
-- `@cordis/rest`, containing a REST manager for the Discord API, including a rate limiting system and various utilities
-- `@cordis/gateway`, containing a very flexible way of connecting to Discord's gateway
-- `@cordis/common`, utilities for interacting with Discord or just generally useful functions/structures
+- `@cordis/common`, cordis core utilities
+- `@cordis/gateway`, containing a very flexible way of connecting to Discord's gateway - with clustering support
+- `@cordis/queue`, simple, small sequential queue for async operations
+- `@cordis/redis-store`, Redis implementation of `@cordis/store`
+- `@cordis/rest`, tooling for making HTTP requests to Discord, with rate limiting handling
+- `@cordis/snowflake`, simple snowflake structure for destructuring Discord IDs into relevant information
+- `@cordis/store`, Simple map-like interface for holding key-value pairs - ships with an in-memory implementation
 
 But also services that hook into RabbitMQ using the libraries mentioned above:
 
 - `@cordis/gateway-service`
 
 # Roadmap
-- Finishing `@cordis/core` is the currect absolute priority. No voice support is initially planned; but really high API coverage is.
-- 0.1.0 release
-- Unit tests for the entire toolset.
+- 0.1.0 release - See [the remaining issues](https://github.com/cordisjs/cordis/issues)
 - Front facing website and documentation.
-- [Community](https://discord.gg/37ysd5dPYk)
+- Discord community
