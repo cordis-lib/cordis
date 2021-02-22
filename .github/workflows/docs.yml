@@ -30,13 +30,13 @@ jobs:
         run: rm -rf doc && pnpm run docs
 
       - name: Init the repo
-        run: git clone https://$GITHUB_ACTOR:${{ secrets.API_TOKEN_GITHUB }}@github.com/cordisjs/cordisjs.github.io.git
+        run: git clone https://$GITHUB_ACTOR:${{ secrets.API_TOKEN_GITHUB }}@github.com/cordis-lib/cordis-lib.github.io.git
 
       - name: Add the changes
-        run: rm -rf cordisjs.github.io/docs/"$(basename $GITHUB_REF)" && mv doc cordisjs.github.io/docs/"$(basename $GITHUB_REF)"
+        run: rm -rf cordis-lib.github.io/docs/"$(basename $GITHUB_REF)" && mv doc cordis-lib.github.io/docs/"$(basename $GITHUB_REF)"
 
       - name: Stage & commit the changes
-        run: cd cordisjs.github.io && git add . && git commit -m "Docs build for cordis $(basename $GITHUB_REF) commit on $(date)"
+        run: cd cordis-lib.github.io && git add . && git commit -m "Docs build for cordis $(basename $GITHUB_REF) commit on $(date)"
 
       - name: Push the changes
-        run: cd cordisjs.github.io && git push --force origin main
+        run: cd cordis-lib.github.io && git push --force origin main

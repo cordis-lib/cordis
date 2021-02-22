@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cordisjs/cordis.git"
+    "url": "git+https://github.com/cordis-lib/cordis.git"
   },
   "contributors": [
     "didinele <didinele.dev@gmail.com> (https://github.com/didinele)",
     "Holo-Buckshot (https://github.com/Holo-Buckshot)"
   ],
   "bugs": {
-    "url": "https://github.com/cordisjs/cordis/issues"
+    "url": "https://github.com/cordis-lib/cordis/issues"
   },
-  "homepage": "https://github.com/cordisjs/cordis#readme",
+  "homepage": "https://github.com/cordis-lib/cordis#readme",
   "devDependencies": {
     "@types/node": "^14.14.31",
     "@types/yargs": "^15.0.13",
