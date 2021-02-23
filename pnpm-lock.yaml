@@ -84,14 +84,12 @@ importers:
     devDependencies:
       '@types/amqplib': 0.5.17
       '@types/node': 14.14.31
-      ioredis: 4.22.0
       typescript: 4.2.0-insiders.20210210
     specifiers:
       '@cordis/error': workspace:0.1.0
       '@types/amqplib': ^0.5.17
       '@types/node': ^14.14.31
       discord-api-types: ^0.12.1
-      ioredis: ^4.22.0
       tslib: ^2.1.0
       typescript: ^4.2.0-insiders.20210210
   libs/error:
@@ -194,6 +192,16 @@ importers:
       form-data: ^3.0.1
       ioredis: ^4.22.0
       node-fetch: ^2.6.1
+      tslib: ^2.1.0
+      typescript: ^4.2.0-insiders.20210210
+  libs/routers:
+    dependencies:
+      tslib: 2.1.0
+    devDependencies:
+      '@types/node': 14.14.31
+      typescript: 4.2.0-insiders.20210210
+    specifiers:
+      '@types/node': ^14.14.31
       tslib: ^2.1.0
       typescript: ^4.2.0-insiders.20210210
   libs/snowflake:
