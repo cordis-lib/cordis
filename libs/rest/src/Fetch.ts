@@ -4,18 +4,32 @@ import { URLSearchParams } from 'url';
 import { ENDPOINTS } from '@cordis/common';
 import AbortController from 'abort-controller';
 
-export type AnyRecord = Record<any, any>;
+/**
+ * Represents a file that can be sent to Discord
+ */
+export interface File {
+  /**
+   * Name of the file
+   */
+  name: string;
+  /**
+   * Contents of the file
+   */
+  content: Buffer;
+}
+
+export type StringRecord = Record<string, string>;
 
 /**
  * Presents the base options that may be needed for making a request to Discord
  */
-export interface DiscordFetchOptions<D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord> {
+export interface DiscordFetchOptions<D extends StringRecord = StringRecord, Q extends StringRecord = StringRecord> {
   path: string;
   method: string;
   headers: Headers;
   controller: AbortController;
   query?: Q | string;
-  files?: { name: string; file: Buffer }[];
+  files?: File[];
   data?: D;
   failures?: number;
 }
@@ -24,7 +38,7 @@ export interface DiscordFetchOptions<D extends AnyRecord = AnyRecord, Q extends 
  * Makes the actual HTTP request
  * @param options Options for the request
  */
-export const discordFetch = <D, Q>(options: DiscordFetchOptions<D, Q>) => {
+export const discordFetch = <D extends StringRecord, Q extends StringRecord>(options: DiscordFetchOptions<D, Q>) => {
   let { path, method, headers, controller, query, files, data } = options;
 
   let queryString: string | null = null;
@@ -44,7 +58,7 @@ export const discordFetch = <D, Q>(options: DiscordFetchOptions<D, Q>) => {
   let body: string | FormData;
   if (files?.length) {
     body = new FormData();
-    for (const file of files) body.append(file.name, file.file, file.name);
+    for (const file of files) body.append(file.name, file.content, file.name);
     if (data != null) body.append('payload_json', JSON.stringify(data));
     headers = Object.assign(headers, body.getHeaders());
   } else if (data != null) {
