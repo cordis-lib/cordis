@@ -124,7 +124,7 @@ describe('buckets and rate limiting', () => {
       expect(JSON.parse(final)).toStrictEqual(JSON.parse(value));
       expect(emitter).toBeCalledTimes(4);
       expect(emitter).toHaveBeenNthCalledWith(1, 'request', req);
-      expect(emitter).toHaveBeenNthCalledWith(2, 'ratelimit', 'channels/12345678910111213', 'channels/12345678910111213', 2500);
+      expect(emitter).toHaveBeenNthCalledWith(2, 'ratelimit', 'channels/12345678910111213', 'channels/12345678910111213', false, 2500);
       expect(emitter).toHaveBeenNthCalledWith(3, 'request', req);
       expect(emitter).toHaveBeenNthCalledWith(4, 'response', req, data, { limit: 5, timeout: 2500 });
     });

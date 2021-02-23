@@ -1,4 +1,4 @@
-import { discordFetch, DiscordFetchOptions } from './Fetch';
+import { discordFetch, DiscordFetchOptions, StringRecord } from './Fetch';
 import { CordisRestError, HTTPError } from './Error';
 import { halt } from '@cordis/common';
 import type { RestManager } from './RestManager';
@@ -54,7 +54,7 @@ export class Bucket {
    * Makes a request to Discord
    * @param req Request options
    */
-  public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
+  public async make<T, D extends StringRecord, Q extends StringRecord>(req: DiscordFetchOptions<D, Q>): Promise<T> {
     this.manager.emit('request', req);
 
     const timeout = setTimeout(() => req.controller.abort(), this.manager.abortAfter);

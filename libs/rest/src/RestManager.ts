@@ -4,7 +4,7 @@ import { EventEmitter } from 'events';
 import { Headers } from 'node-fetch';
 import { Mutex, MemoryMutex } from './mutex';
 import AbortController from 'abort-controller';
-import type { DiscordFetchOptions, AnyRecord } from './Fetch';
+import type { DiscordFetchOptions, File, StringRecord } from './Fetch';
 
 /**
  * Options for constructing a rest manager
@@ -66,7 +66,7 @@ export interface RestManager {
 /**
  * Options used for making a request
  */
-export interface RequestOptions<D extends AnyRecord, Q extends AnyRecord> {
+export interface RequestOptions<D extends StringRecord, Q extends StringRecord> {
   /**
    * Path you're requesting
    */
@@ -94,17 +94,12 @@ export interface RequestOptions<D extends AnyRecord, Q extends AnyRecord> {
   /**
    * Files to send, if any
    */
-  files?: { name: string; file: Buffer }[];
+  files?: File[];
   /**
    * Body to send, if any
    */
   data?: D;
 }
-
-/**
- * Options used for making a request using one of the helpers named after a HTTP method, e.g. {@link RestManager.get}
- */
-export type KnownMethodRequestOptions<D extends AnyRecord, Q extends AnyRecord> = Omit<RequestOptions<D, Q>, 'path' | 'method'>;
 
 /**
  * Base REST class used for making requests
@@ -144,7 +139,7 @@ export class RestManager extends EventEmitter {
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public make<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(options: RequestOptions<D, Q>): Promise<T> {
+  public make<T, D extends StringRecord = StringRecord, Q extends StringRecord = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
     const route = Bucket.makeRoute(options.method, options.path);
 
     let bucket = this._buckets.get(route);
@@ -170,15 +165,8 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public get<T, Q extends AnyRecord = AnyRecord>(
-    path: string,
-    options?: KnownMethodRequestOptions<never, Q>
-  ): Promise<T> {
-    return this.make<T, never, Q>({
-      path,
-      method: 'get',
-      ...options
-    });
+  public get<T, Q extends StringRecord = StringRecord>(path: string, options: { query?: Q } = {}): Promise<T> {
+    return this.make<T, never, Q>({ path, method: 'get', ...options });
   }
 
   /**
@@ -187,49 +175,8 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public delete<T, Q extends AnyRecord = AnyRecord>(
-    path: string,
-    options?: KnownMethodRequestOptions<never, Q>
-  ): Promise<T> {
-    return this.make<T, never, Q>({
-      path,
-      method: 'delete',
-      ...options
-    });
-  }
-
-  /**
-   * Makes a PUT request to the given endpoint
-   * @param path The request target
-   * @param options Other options for the request
-   */
-  /* istanbul ignore next */
-  public put<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
-    path: string,
-    options: KnownMethodRequestOptions<D, Q> & { data: D }
-  ): Promise<T> {
-    return this.make<T, D, Q>({
-      path,
-      method: 'put',
-      ...options
-    });
-  }
-
-  /**
-   * Makes a POST request to the given endpoint
-   * @param path The request target
-   * @param options Other options for the request
-   */
-  /* istanbul ignore next */
-  public post<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
-    path: string,
-    options: KnownMethodRequestOptions<D, Q> & { data: D }
-  ): Promise<T> {
-    return this.make<T, D, Q>({
-      path,
-      method: 'post',
-      ...options
-    });
+  public delete<T, D extends StringRecord = StringRecord>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
+    return this.make<T, D, never>({ path, method: 'delete', ...options });
   }
 
   /**
@@ -238,14 +185,27 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public patch<T, D extends AnyRecord = AnyRecord, Q extends AnyRecord = AnyRecord>(
-    path: string,
-    options: KnownMethodRequestOptions<D, Q> & { data: D }
-  ): Promise<T> {
-    return this.make<T, D, Q>({
-      path,
-      method: 'patch',
-      ...options
-    });
+  public patch<T, D extends StringRecord = StringRecord>(path: string, options: { data: D; reason?: string }): Promise<T> {
+    return this.make<T, D, never>({ path, method: 'patch', ...options });
+  }
+
+  /**
+   * Makes a PUT request to the given endpoint
+   * @param path The request target
+   * @param options Other options for the request
+   */
+  /* istanbul ignore next */
+  public put<T, D extends StringRecord = StringRecord>(path: string, options: { data: D; reason?: string }): Promise<T> {
+    return this.make<T, D, never>({ path, method: 'put', ...options });
+  }
+
+  /**
+   * Makes a POST request to the given endpoint
+   * @param path The request target
+   * @param options Other options for the request
+   */
+  /* istanbul ignore next */
+  public post<T, D extends StringRecord = StringRecord>(path: string, options: { data: D; reason?: string; files: File[] }): Promise<T> {
+    return this.make<T, D, never>({ path, method: 'post', ...options });
   }
 }

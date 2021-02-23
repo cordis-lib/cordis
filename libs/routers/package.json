@@ -1,6 +1,6 @@
 {
-  "name": "@cordis/common",
-  "description": "Common things amongst the cordis infrastructure",
+  "name": "@cordis/routers",
+  "description": "Construct API paths using simple JavaScript property accessing and execute requests with method calls",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",
@@ -22,13 +22,11 @@
   },
   "homepage": "https://github.com/cordis-lib/cordis#readme",
   "devDependencies": {
-    "@types/amqplib": "^0.5.17",
     "@types/node": "^14.14.31",
     "typescript": "^4.2.0-insiders.20210210"
   },
   "dependencies": {
-    "@cordis/error": "workspace:0.1.0",
-    "discord-api-types": "^0.12.1",
+    "@cordis/rest": "workspace:^0.1.0",
     "tslib": "^2.1.0"
   }
 }
