@@ -16,6 +16,7 @@ It is cut up in multiple packages/libraries:
 - `@cordis/queue`, simple, small sequential queue for async operations
 - `@cordis/redis-store`, Redis implementation of `@cordis/store`
 - `@cordis/rest`, tooling for making HTTP requests to Discord, with rate limiting handling
+- `@cordis/routers`, make API requests with ease using simple dynamic javascript property accessing
 - `@cordis/snowflake`, simple snowflake structure for destructuring Discord IDs into relevant information
 - `@cordis/store`, Simple map-like interface for holding key-value pairs - ships with an in-memory implementation
 

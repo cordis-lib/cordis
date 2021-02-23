@@ -1,6 +1,21 @@
 import type { RestManager } from '@cordis/rest';
 import type { IRouter } from './IRouter';
 
+/**
+ * Creates a rest router
+ * @example
+ * ```js
+ * const { buildRestRouter } = require('@cordis/router');
+ * const { RestManager } = require('@cordis/rest');
+ *
+ * const manager = new RestManager(yourToken);
+ * const router = buildRestRouter(manager);
+ *
+ * const user = await routers.users[someUserId].get();
+ * console.log(user);
+ * ```
+ * @param manager REST manager
+ */
 export const buildRestRouter = (manager: RestManager) => {
   const method: string[] = [''];
   const handler: ProxyHandler<IRouter> = {
