@@ -1,6 +1,7 @@
 {
   "name": "@cordis/queue",
   "description": "Async queues for sequential operations",
+  "private": false,
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",

@@ -1,6 +1,7 @@
 {
   "name": "@cordis/routers",
   "description": "Construct API paths using simple JavaScript property accessing and execute requests with method calls",
+  "private": false,
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",

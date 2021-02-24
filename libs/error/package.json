@@ -1,6 +1,7 @@
 {
   "name": "@cordis/error",
   "description": "Package for creating error structures",
+  "private": false,
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",
