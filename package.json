@@ -6,7 +6,9 @@
   "scripts": {
     "lint": "pnpm recursive run lint --filter @cordis/*",
     "build": "pnpm recursive run build --filter @cordis/*",
-    "release": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
+    "release:npm": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
+    "build:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile .",
+    "release": "pnpm run release:npm && pnpm run build:docker && docker push cordislib/gateway",
     "docs": "typedoc",
     "test": "jest",
     "test:ci": "jest --ci --no-stack-trace --verbose"

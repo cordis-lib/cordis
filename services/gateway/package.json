@@ -28,13 +28,15 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "@cordis/brokers": "workspace:0.1.0",
-    "@cordis/common": "workspace:0.1.0",
-    "@cordis/gateway": "workspace:0.1.0",
-    "@cordis/redis-store": "workspace:0.1.0",
-    "@cordis/store": "workspace:0.1.0",
+    "@cordis/brokers": "workspace:^0.1.0",
+    "@cordis/common": "workspace:^0.1.0",
+    "@cordis/gateway": "workspace:^0.1.0",
+    "@cordis/redis-store": "workspace:^0.1.0",
+    "@cordis/store": "^0.1.0",
+    "erlpack": "github:discord/erlpack",
     "ioredis": "^4.22.0",
     "tslib": "^2.1.0",
-    "yargs": "^15.4.1"
+    "yargs": "^15.4.1",
+    "zlib-sync": "^0.1.7"
   }
 }

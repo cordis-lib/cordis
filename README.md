@@ -22,7 +22,7 @@ It is cut up in multiple packages/libraries:
 
 But also services that hook into RabbitMQ using the libraries mentioned above:
 
-- `@cordis/gateway-service`
+- `@cordis/gateway-service` - https://hub.docker.com/r/cordislib/gateway
 
 
 # Come talk to me on Discord!
