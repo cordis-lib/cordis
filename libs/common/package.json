@@ -3,7 +3,7 @@
   "description": "Common things amongst the cordis infrastructure",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
@@ -27,7 +27,7 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "@cordis/error": "workspace:^0.1.1",
+    "@cordis/error": "workspace:^0.1.2",
     "discord-api-types": "^0.12.1",
     "tslib": "^2.1.0"
   }
