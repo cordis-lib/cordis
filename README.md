@@ -24,8 +24,6 @@ But also services that hook into RabbitMQ using the libraries mentioned above:
 
 - `@cordis/gateway-service`
 
-# Roadmap
-- 0.1.0 release - See [the remaining issues](https://github.com/cordis-lib/cordis/issues)
 
 # Come talk to me on Discord!
 
