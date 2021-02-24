@@ -1,5 +1,5 @@
 import * as yargs from 'yargs';
-import { createAmqp, RoutingServer, RpcServer } from '@cordis/brokers';
+import { createAmqp, RoutingServer, PubSubClient } from '@cordis/brokers';
 import createRedis, { Redis } from 'ioredis';
 import { Cluster, IntentKeys } from '@cordis/gateway';
 import type { DiscordEvents } from '@cordis/common';
@@ -140,9 +140,10 @@ const main = async () => {
     }
   );
 
-  const gatewayCommandsServer = new RpcServer<void, GatewaySendPayload>(channel);
+  const gatewayCommandsServer = new PubSubClient<GatewaySendPayload>(channel);
   await gatewayCommandsServer.init({
     name: 'gateway_commands',
+    fanout: true,
     cb: req => cluster.broadcast(req)
   });
 
