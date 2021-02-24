@@ -8,13 +8,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install Node v14
+      - name: Install Node v15
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 15
 
       - name: Install pnpm
         run: curl -L https://unpkg.com/@pnpm/self-installer | node
+
+      - name: Use node_modules cache
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install deps
         run: pnpm i
