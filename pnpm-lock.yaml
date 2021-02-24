@@ -246,7 +246,7 @@ importers:
       discord-api-types: 0.12.1
       typescript: 4.2.2
     specifiers:
-      '@cordis/brokers': workspace:^0.1.3
+      '@cordis/brokers': workspace:^0.1.4
       '@cordis/common': workspace:^0.1.2
       '@cordis/gateway': workspace:^0.1.2
       '@cordis/redis-store': workspace:^0.1.2
