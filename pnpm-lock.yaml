@@ -6,8 +6,8 @@ importers:
       '@babel/preset-typescript': 7.12.17_@babel+core@7.12.17
       '@strictsoftware/typedoc-plugin-monorepo': 0.3.1_typedoc@0.19.2
       '@types/jest': 26.0.20
-      '@typescript-eslint/eslint-plugin': 4.15.1_ecb65c0ad14376b31d3f8febd37bc5ad
-      '@typescript-eslint/parser': 4.15.1_4d11b2fd2baec23d65473ae827069d57
+      '@typescript-eslint/eslint-plugin': 4.15.1_7cb14eb4c2a266b20c615c503b6d678b
+      '@typescript-eslint/parser': 4.15.1_eslint@7.20.0+typescript@4.2.2
       babel-jest: 26.6.3_@babel+core@7.12.17
       babel-plugin-const-enum: 1.0.1_@babel+core@7.12.17
       babel-plugin-replace-ts-export-assignment: 0.0.2
@@ -16,12 +16,12 @@ importers:
       husky: 4.3.8
       jest: 26.6.3
       lint-staged: 10.5.4
-      typedoc: 0.19.2_5abf7785e5eb600a31ff8b483936bb6a
+      typedoc: 0.19.2_typescript@4.2.2
       typedoc-plugin-as-member-of: 1.0.2_typedoc@0.19.2
       typedoc-plugin-markdown: 3.5.0_typedoc@0.19.2
       typedoc-plugin-no-inherit: 1.2.0_typedoc@0.19.2
       typedoc-plugin-remove-references: 0.0.5
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@babel/core': ^7.12.17
       '@babel/preset-env': ^7.12.17
@@ -43,19 +43,19 @@ importers:
       typedoc-plugin-markdown: ^3.5.0
       typedoc-plugin-no-inherit: ^1.2.0
       typedoc-plugin-remove-references: ^0.0.5
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/bitfield:
     dependencies:
       '@cordis/error': link:../error
       tslib: 2.1.0
     devDependencies:
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/error': workspace:0.1.0
       '@types/node': ^14.14.31
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/brokers:
     dependencies:
       '@cordis/common': link:../common
@@ -66,7 +66,7 @@ importers:
     devDependencies:
       '@types/amqplib': 0.5.17
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/common': workspace:0.1.0
       '@cordis/error': workspace:0.1.0
@@ -75,7 +75,7 @@ importers:
       '@types/node': ^14.14.31
       amqplib: ^0.6.0
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/common:
     dependencies:
       '@cordis/error': link:../error
@@ -84,24 +84,24 @@ importers:
     devDependencies:
       '@types/amqplib': 0.5.17
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/error': workspace:0.1.0
       '@types/amqplib': ^0.5.17
       '@types/node': ^14.14.31
       discord-api-types: ^0.12.1
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/error:
     dependencies:
       tslib: 2.1.0
     devDependencies:
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@types/node': ^14.14.31
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/gateway:
     dependencies:
       '@cordis/bitfield': link:../bitfield
@@ -121,7 +121,7 @@ importers:
       '@types/node': 14.14.31
       '@types/ws': 7.4.0
       erlpack: github.com/discordapp/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
       zlib-sync: 0.1.7
     specifiers:
       '@cordis/bitfield': workspace:0.1.0
@@ -139,7 +139,7 @@ importers:
       discord-api-types: ^0.12.1
       erlpack: github:discordapp/erlpack
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
       ws: ^7.4.3
       zlib-sync: ^0.1.7
   libs/queue:
@@ -147,11 +147,11 @@ importers:
       tslib: 2.1.0
     devDependencies:
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@types/node': ^14.14.31
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/redis-store:
     dependencies:
       '@cordis/error': link:../error
@@ -160,14 +160,14 @@ importers:
     devDependencies:
       '@types/ioredis': 4.19.4
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/error': workspace:0.1.0
       '@cordis/store': workspace:0.1.0
       '@types/ioredis': ^4.19.4
       '@types/node': ^14.14.31
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/rest:
     dependencies:
       '@cordis/common': link:../common
@@ -181,7 +181,7 @@ importers:
       '@types/node-fetch': 2.5.8
       fetch-blob: 2.1.1
       ioredis: 4.22.0
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/common': workspace:0.1.0
       '@cordis/error': workspace:0.1.0
@@ -193,41 +193,41 @@ importers:
       ioredis: ^4.22.0
       node-fetch: ^2.6.1
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/routers:
     dependencies:
       '@cordis/rest': link:../rest
       tslib: 2.1.0
     devDependencies:
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/rest': workspace:^0.1.0
       '@types/node': ^14.14.31
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/snowflake:
     dependencies:
       tslib: 2.1.0
     devDependencies:
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@types/node': ^14.14.31
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   libs/store:
     dependencies:
       '@cordis/error': link:../error
       tslib: 2.1.0
     devDependencies:
       '@types/node': 14.14.31
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/error': workspace:0.1.0
       '@types/node': ^14.14.31
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
   services/gateway:
     dependencies:
       '@cordis/brokers': link:../../libs/brokers
@@ -242,7 +242,7 @@ importers:
       '@types/node': 14.14.31
       '@types/yargs': 15.0.13
       discord-api-types: 0.12.1
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     specifiers:
       '@cordis/brokers': workspace:0.1.0
       '@cordis/common': workspace:0.1.0
@@ -254,7 +254,7 @@ importers:
       discord-api-types: ^0.12.1
       ioredis: ^4.22.0
       tslib: ^2.1.0
-      typescript: ^4.2.0-insiders.20210210
+      typescript: ^4.2.2
       yargs: ^15.4.1
 lockfileVersion: 5.2
 packages:
@@ -1492,7 +1492,7 @@ packages:
   /@strictsoftware/typedoc-plugin-monorepo/0.3.1_typedoc@0.19.2:
     dependencies:
       highlight.js: 9.18.5
-      typedoc: 0.19.2_5abf7785e5eb600a31ff8b483936bb6a
+      typedoc: 0.19.2_typescript@4.2.2
     dev: true
     peerDependencies:
       typedoc: '>=0.17.3 <1.0'
@@ -1624,10 +1624,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-kQ5JNTrbDv3Rp5X2n/iUu37IJBDU2gsZ5R/g1/KHOOEc5IKfUFjXT6DENPGduh08I/pamwtEq4oul7gUqKTQDQ==
-  /@typescript-eslint/eslint-plugin/4.15.1_ecb65c0ad14376b31d3f8febd37bc5ad:
+  /@typescript-eslint/eslint-plugin/4.15.1_7cb14eb4c2a266b20c615c503b6d678b:
     dependencies:
-      '@typescript-eslint/experimental-utils': 4.15.1_4d11b2fd2baec23d65473ae827069d57
-      '@typescript-eslint/parser': 4.15.1_4d11b2fd2baec23d65473ae827069d57
+      '@typescript-eslint/experimental-utils': 4.15.1_eslint@7.20.0+typescript@4.2.2
+      '@typescript-eslint/parser': 4.15.1_eslint@7.20.0+typescript@4.2.2
       '@typescript-eslint/scope-manager': 4.15.1
       debug: 4.3.1
       eslint: 7.20.0
@@ -1635,8 +1635,8 @@ packages:
       lodash: 4.17.21
       regexpp: 3.1.0
       semver: 7.3.4
-      tsutils: 3.20.0_5abf7785e5eb600a31ff8b483936bb6a
-      typescript: 4.2.0-insiders.20210210
+      tsutils: 3.20.0_typescript@4.2.2
+      typescript: 4.2.2
     dev: true
     engines:
       node: ^10.12.0 || >=12.0.0
@@ -1649,12 +1649,12 @@ packages:
         optional: true
     resolution:
       integrity: sha512-yW2epMYZSpNJXZy22Biu+fLdTG8Mn6b22kR3TqblVk50HGNV8Zya15WAXuQCr8tKw4Qf1BL4QtI6kv6PCkLoJw==
-  /@typescript-eslint/experimental-utils/4.15.1_4d11b2fd2baec23d65473ae827069d57:
+  /@typescript-eslint/experimental-utils/4.15.1_eslint@7.20.0+typescript@4.2.2:
     dependencies:
       '@types/json-schema': 7.0.7
       '@typescript-eslint/scope-manager': 4.15.1
       '@typescript-eslint/types': 4.15.1
-      '@typescript-eslint/typescript-estree': 4.15.1_5abf7785e5eb600a31ff8b483936bb6a
+      '@typescript-eslint/typescript-estree': 4.15.1_typescript@4.2.2
       eslint: 7.20.0
       eslint-scope: 5.1.1
       eslint-utils: 2.1.0
@@ -1666,14 +1666,14 @@ packages:
       typescript: '*'
     resolution:
       integrity: sha512-9LQRmOzBRI1iOdJorr4jEnQhadxK4c9R2aEAsm7WE/7dq8wkKD1suaV0S/JucTL8QlYUPU1y2yjqg+aGC0IQBQ==
-  /@typescript-eslint/parser/4.15.1_4d11b2fd2baec23d65473ae827069d57:
+  /@typescript-eslint/parser/4.15.1_eslint@7.20.0+typescript@4.2.2:
     dependencies:
       '@typescript-eslint/scope-manager': 4.15.1
       '@typescript-eslint/types': 4.15.1
-      '@typescript-eslint/typescript-estree': 4.15.1_5abf7785e5eb600a31ff8b483936bb6a
+      '@typescript-eslint/typescript-estree': 4.15.1_typescript@4.2.2
       debug: 4.3.1
       eslint: 7.20.0
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     dev: true
     engines:
       node: ^10.12.0 || >=12.0.0
@@ -1700,7 +1700,7 @@ packages:
       node: ^8.10.0 || ^10.13.0 || >=11.10.1
     resolution:
       integrity: sha512-iGsaUyWFyLz0mHfXhX4zO6P7O3sExQpBJ2dgXB0G5g/8PRVfBBsmQIc3r83ranEQTALLR3Vko/fnCIVqmH+mPw==
-  /@typescript-eslint/typescript-estree/4.15.1_5abf7785e5eb600a31ff8b483936bb6a:
+  /@typescript-eslint/typescript-estree/4.15.1_typescript@4.2.2:
     dependencies:
       '@typescript-eslint/types': 4.15.1
       '@typescript-eslint/visitor-keys': 4.15.1
@@ -1708,8 +1708,8 @@ packages:
       globby: 11.0.2
       is-glob: 4.0.1
       semver: 7.3.4
-      tsutils: 3.20.0_5abf7785e5eb600a31ff8b483936bb6a
-      typescript: 4.2.0-insiders.20210210
+      tsutils: 3.20.0_typescript@4.2.2
+      typescript: 4.2.2
     dev: true
     engines:
       node: ^10.12.0 || >=12.0.0
@@ -5782,10 +5782,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
-  /tsutils/3.20.0_5abf7785e5eb600a31ff8b483936bb6a:
+  /tsutils/3.20.0_typescript@4.2.2:
     dependencies:
       tslib: 1.14.1
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     dev: true
     engines:
       node: '>= 6'
@@ -5857,7 +5857,7 @@ packages:
       integrity: sha512-Y4Lf+qIb9NTydrexlazAM46SSLrmrQRqWiD52593g53SsmUFioAsMWt8m834J6qsp+7wHRjxCXSZeiiW5cMUdw==
   /typedoc-plugin-as-member-of/1.0.2_typedoc@0.19.2:
     dependencies:
-      typedoc: 0.19.2_5abf7785e5eb600a31ff8b483936bb6a
+      typedoc: 0.19.2_typescript@4.2.2
     dev: true
     peerDependencies:
       typedoc: '>=0.7 <1.11.1'
@@ -5866,7 +5866,7 @@ packages:
   /typedoc-plugin-markdown/3.5.0_typedoc@0.19.2:
     dependencies:
       handlebars: 4.7.7
-      typedoc: 0.19.2_5abf7785e5eb600a31ff8b483936bb6a
+      typedoc: 0.19.2_typescript@4.2.2
     dev: true
     engines:
       node: '>= 10.8.0'
@@ -5876,7 +5876,7 @@ packages:
       integrity: sha512-UzSTK5RpQVbIrcxV1ypHt3Pqr4O3DObYZIhcAXBazitHnpdl500cggXFHmxH7F/j3P3P2IBvPKpfnU6lzRdk8w==
   /typedoc-plugin-no-inherit/1.2.0_typedoc@0.19.2:
     dependencies:
-      typedoc: 0.19.2_5abf7785e5eb600a31ff8b483936bb6a
+      typedoc: 0.19.2_typescript@4.2.2
     dev: true
     peerDependencies:
       typedoc: '>=0.16.0'
@@ -5886,7 +5886,7 @@ packages:
     dev: true
     resolution:
       integrity: sha512-DSZ7kM/Y90CgZUKt8MiDsoi4fvrJyleHydj3ncGyqDqMdhuMes2E/4I6mSmXBrVdTjYhVH6BeoOFSbj2pQ821g==
-  /typedoc/0.19.2_5abf7785e5eb600a31ff8b483936bb6a:
+  /typedoc/0.19.2_typescript@4.2.2:
     dependencies:
       fs-extra: 9.1.0
       handlebars: 4.7.7
@@ -5899,7 +5899,7 @@ packages:
       semver: 7.3.4
       shelljs: 0.8.4
       typedoc-default-themes: 0.11.4
-      typescript: 4.2.0-insiders.20210210
+      typescript: 4.2.2
     dev: true
     engines:
       node: '>= 10.0.0'
@@ -5908,13 +5908,13 @@ packages:
       typescript: 3.9.x || 4.0.x
     resolution:
       integrity: sha512-oDEg1BLEzi1qvgdQXc658EYgJ5qJLVSeZ0hQ57Eq4JXy6Vj2VX4RVo18qYxRWz75ifAaYuYNBUCnbhjd37TfOg==
-  /typescript/4.2.0-insiders.20210210:
+  /typescript/4.2.2:
     dev: true
     engines:
       node: '>=4.2.0'
     hasBin: true
     resolution:
-      integrity: sha512-PBBQ/WNJ/HG+cH2nu+sPFbUPqv8FMraVihOfwlBzoa+0iGHa1I8gueJTUyBIOPU24tClLwKoU8dfscpn0rnuWw==
+      integrity: sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
   /uglify-js/3.12.8:
     dev: true
     engines:
