@@ -11,7 +11,7 @@ import type { IRouter } from './IRouter';
  * const manager = new RestManager(yourToken);
  * const router = buildRestRouter(manager);
  *
- * const user = await routers.users[someUserId].get();
+ * const user = await router.users[someUserId].get();
  * console.log(user);
  * ```
  * @param manager REST manager

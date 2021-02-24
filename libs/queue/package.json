@@ -3,7 +3,7 @@
   "description": "Async queues for sequential operations",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
