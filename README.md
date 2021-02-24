@@ -26,5 +26,7 @@ But also services that hook into RabbitMQ using the libraries mentioned above:
 
 # Roadmap
 - 0.1.0 release - See [the remaining issues](https://github.com/cordis-lib/cordis/issues)
-- Front facing website and documentation.
-- Discord community
+
+# Come talk to me on Discord!
+
+**Permanent invite link**: https://discord.gg/37ysd5dPYk
