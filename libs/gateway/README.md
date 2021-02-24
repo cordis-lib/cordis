@@ -10,10 +10,10 @@ ___
 
 ## Example usage
 ```js
-const { WebsocketManager } = require('@cordis/gateway');
+const { Cluster } = require('@cordis/gateway');
 
 const main = async () => {
-  const manager = new WebsocketManager('token');
+  const manager = new Cluster('token');
 
   manager
     .on('ready', () => console.log('Hello world!'))
