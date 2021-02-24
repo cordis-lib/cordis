@@ -20,3 +20,6 @@ const router = buildRestRouter(manager);
 const user = await router.users[someUserId].get();
 console.log(user);
 ```
+
+## Documentation
+You can find documentation for the whole project over at https://cordis.didinele.me
