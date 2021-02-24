@@ -32,7 +32,7 @@
     "@cordis/common": "workspace:^0.1.1",
     "@cordis/gateway": "workspace:^0.1.1",
     "@cordis/redis-store": "workspace:^0.1.1",
-    "@cordis/store": "^0.1.0",
+    "@cordis/store": "workspace:^0.1.1",
     "erlpack": "github:discord/erlpack",
     "ioredis": "^4.22.0",
     "tslib": "^2.1.0",
