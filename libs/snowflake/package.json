@@ -1,7 +1,6 @@
 {
   "name": "@cordis/snowflake",
   "description": "Utility structure for dealing with Discord snowflakes",
-  "private": false,
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",

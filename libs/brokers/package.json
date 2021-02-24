@@ -1,7 +1,6 @@
 {
   "name": "@cordis/brokers",
   "description": "Message broker library for the cordis micro-services, built for AMQP",
-  "private": false,
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",

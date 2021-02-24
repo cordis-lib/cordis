@@ -2,7 +2,6 @@
   "$schema": "http://json.schemastore.org/package",
   "name": "@cordis/gateway",
   "description": "The cordis gateway to Discord",
-  "private": false,
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",

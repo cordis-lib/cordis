@@ -1,7 +1,6 @@
 {
   "name": "@cordis/redis-store",
   "description": "Redis cache implementing the cordis Store",
-  "private": false,
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "version": "0.1.0",
