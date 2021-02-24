@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "pnpm recursive run lint --filter @cordis/*",
     "build": "pnpm recursive run build --filter @cordis/*",
+    "release": "pnpm recursive publish --filter @cordis/* --filter=!./services",
     "docs": "typedoc",
     "test": "jest",
     "test:ci": "jest --ci --no-stack-trace --verbose"
