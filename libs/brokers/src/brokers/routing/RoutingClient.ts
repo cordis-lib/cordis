@@ -4,7 +4,7 @@ import type * as amqp from 'amqplib';
 /**
  * Options for initializing the routing client
  */
-export interface RoutingClientInitOtions {
+export interface RoutingClientInitOtions<K extends string> {
   /**
    * Name of the exchange to use
    */
@@ -16,7 +16,7 @@ export interface RoutingClientInitOtions {
   /**
    * The routing keys you wish to subscribe to
    */
-  keys: string[];
+  keys: K[];
   /**
    * Queue to bind the packets to
    * @default queue Randomly generated queue by your AMQP server
@@ -59,7 +59,7 @@ export class RoutingClient<K extends string, T extends Record<K, any>> extends B
    * Initializes the client, binding the events you want to the queue
    * @param options Options used for this client
    */
-  public async init(options: RoutingClientInitOtions) {
+  public async init(options: RoutingClientInitOtions<K>) {
     const { name, topicBased = false, keys, queue: rawQueue = '' } = options;
 
     const exchange = await this.channel.assertExchange(name, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
