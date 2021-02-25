@@ -23,7 +23,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install deps
-        run: pnpm i
+        run: pnpm i --r
 
       - name: Build the code
         run: pnpm run build
