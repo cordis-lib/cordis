@@ -2,6 +2,7 @@ importers:
   .:
     devDependencies:
       '@babel/core': 7.12.17
+      '@babel/generator': 7.13.0
       '@babel/preset-env': 7.12.17_@babel+core@7.12.17
       '@babel/preset-typescript': 7.12.17_@babel+core@7.12.17
       '@strictsoftware/typedoc-plugin-monorepo': 0.3.1_typedoc@0.19.2
@@ -24,6 +25,7 @@ importers:
       typescript: 4.2.2
     specifiers:
       '@babel/core': ^7.12.17
+      '@babel/generator': ^7.13.0
       '@babel/preset-env': ^7.12.17
       '@babel/preset-typescript': ^7.12.17
       '@strictsoftware/typedoc-plugin-monorepo': ^0.3.1
@@ -308,6 +310,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-DSA7ruZrY4WI8VxuS1jWSRezFnghEoYEFrZcw9BizQRmOZiUsiHl59+qEARGPqPikwA/GPTyRCi7isuCK/oyqg==
+  /@babel/generator/7.13.0:
+    dependencies:
+      '@babel/types': 7.13.0
+      jsesc: 2.5.2
+      source-map: 0.5.7
+    dev: true
+    resolution:
+      integrity: sha512-zBZfgvBB/ywjx0Rgc2+BwoH/3H+lDtlgD4hBOpEv5LxRnYsm/753iRuLepqnYlynpjC3AdQxtxsoeHJoEEwOAw==
   /@babel/helper-annotate-as-pure/7.12.13:
     dependencies:
       '@babel/types': 7.12.17
@@ -1220,6 +1230,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-tNMDjcv/4DIcHxErTgwB9q2ZcYyN0sUfgGKUK/mm1FJK7Wz+KstoEekxrl/tBiNDgLK1HGi+sppj1An/1DR4fQ==
+  /@babel/types/7.13.0:
+    dependencies:
+      '@babel/helper-validator-identifier': 7.12.11
+      lodash: 4.17.21
+      to-fast-properties: 2.0.0
+    dev: true
+    resolution:
+      integrity: sha512-hE+HE8rnG1Z6Wzo+MhaKE5lM5eMx71T4EHJgku2E3xIfaULhDcxiiRxUYgwX8qwP1BBSlag+TdGOt6JAidIZTA==
   /@bcoe/v8-coverage/0.2.3:
     dev: true
     resolution:
