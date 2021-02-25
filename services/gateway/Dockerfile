@@ -1,6 +1,6 @@
 FROM node:14-alpine
 LABEL name "cordis gateway"
-LABEL version "0.1.0"
+LABEL version "0.1.5"
 
 WORKDIR /usr/gateway
 

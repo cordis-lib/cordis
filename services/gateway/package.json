@@ -4,7 +4,7 @@
   "description": "Cordis' gateway service",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
@@ -28,11 +28,11 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "@cordis/brokers": "workspace:^0.1.4",
-    "@cordis/common": "workspace:^0.1.2",
-    "@cordis/gateway": "workspace:^0.1.2",
-    "@cordis/redis-store": "workspace:^0.1.2",
-    "@cordis/store": "workspace:^0.1.2",
+    "@cordis/brokers": "workspace:^0.1.5",
+    "@cordis/common": "workspace:^0.1.5",
+    "@cordis/gateway": "workspace:^0.1.5",
+    "@cordis/redis-store": "workspace:^0.1.5",
+    "@cordis/store": "workspace:^0.1.5",
     "erlpack": "github:discord/erlpack",
     "ioredis": "^4.22.0",
     "tslib": "^2.1.0",
