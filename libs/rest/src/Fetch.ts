@@ -20,10 +20,14 @@ export interface File {
 
 export type StringRecord = Record<string, string>;
 
+export interface RequestBodyData {
+  [key: string]: string | number | boolean | RequestBodyData;
+}
+
 /**
  * Presents the base options that may be needed for making a request to Discord
  */
-export interface DiscordFetchOptions<D extends StringRecord = StringRecord, Q extends StringRecord = StringRecord> {
+export interface DiscordFetchOptions<D extends RequestBodyData = RequestBodyData, Q extends StringRecord = StringRecord> {
   path: string;
   method: string;
   headers: Headers;
@@ -38,7 +42,7 @@ export interface DiscordFetchOptions<D extends StringRecord = StringRecord, Q ex
  * Makes the actual HTTP request
  * @param options Options for the request
  */
-export const discordFetch = <D extends StringRecord, Q extends StringRecord>(options: DiscordFetchOptions<D, Q>) => {
+export const discordFetch = <D extends RequestBodyData, Q extends StringRecord>(options: DiscordFetchOptions<D, Q>) => {
   let { path, method, headers, controller, query, files, data } = options;
 
   let queryString: string | null = null;

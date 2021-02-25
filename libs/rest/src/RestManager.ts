@@ -4,7 +4,7 @@ import { EventEmitter } from 'events';
 import { Headers } from 'node-fetch';
 import { Mutex, MemoryMutex } from './mutex';
 import AbortController from 'abort-controller';
-import type { DiscordFetchOptions, File, StringRecord } from './Fetch';
+import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from './Fetch';
 
 /**
  * Options for constructing a rest manager
@@ -66,7 +66,7 @@ export interface RestManager {
 /**
  * Options used for making a request
  */
-export interface RequestOptions<D extends StringRecord, Q extends StringRecord> {
+export interface RequestOptions<D extends RequestBodyData, Q extends StringRecord> {
   /**
    * Path you're requesting
    */
@@ -139,7 +139,7 @@ export class RestManager extends EventEmitter {
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public make<T, D extends StringRecord = StringRecord, Q extends StringRecord = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
+  public make<T, D extends RequestBodyData = RequestBodyData, Q extends StringRecord = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
     const route = Bucket.makeRoute(options.method, options.path);
 
     let bucket = this._buckets.get(route);
@@ -175,7 +175,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public delete<T, D extends StringRecord = StringRecord>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
+  public delete<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
     return this.make<T, D, never>({ path, method: 'delete', ...options });
   }
 
@@ -185,7 +185,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public patch<T, D extends StringRecord = StringRecord>(path: string, options: { data: D; reason?: string }): Promise<T> {
+  public patch<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'patch', ...options });
   }
 
@@ -195,7 +195,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public put<T, D extends StringRecord = StringRecord>(path: string, options: { data: D; reason?: string }): Promise<T> {
+  public put<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'put', ...options });
   }
 
@@ -205,7 +205,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public post<T, D extends StringRecord = StringRecord>(path: string, options: { data: D; reason?: string; files: File[] }): Promise<T> {
+  public post<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data: D; reason?: string; files: File[] }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'post', ...options });
   }
 }
