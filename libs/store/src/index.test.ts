@@ -1,117 +1,120 @@
 import { Store, CordisStoreTypeError } from './Store';
 
-describe('constructing a bag', () => {
+describe('constructing a store', () => {
   test('max size', () => {
-    const bag = new Store<number>({ maxSize: 1 });
+    const store = new Store<number>({ maxSize: 1 });
 
-    bag.set('boop', 1);
-    expect(bag.size).toBe(1);
-    expect(bag.has('boop')).toBe(true);
+    store.set('boop', 1);
+    expect(store.size).toBe(1);
+    expect(store.has('boop')).toBe(true);
 
-    bag.set('boop2', 1);
-    expect(bag.size).toBe(1);
-    expect(bag.has('boop')).toBe(false);
-    expect(bag.has('boop2')).toBe(true);
+    store.set('boop2', 1);
+    expect(store.size).toBe(1);
+    expect(store.has('boop')).toBe(false);
+    expect(store.has('boop2')).toBe(true);
   });
 
   describe('auto emptying', () => {
     test('all elements', async () => {
-      const bag = new Store<number>({ emptyEvery: 300 });
-      bag.set('boop', 1);
+      const store = new Store<number>({ emptyEvery: 300 });
+      store.set('boop', 1);
 
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      expect(bag.size).toBe(0);
+      expect(store.size).toBe(0);
+      clearTimeout(store.emptyTimer!);
     });
 
     test('certain elements', async () => {
-      const bag = new Store<number>({ emptyEvery: 300, emptyCb: v => v === 1 });
-      bag.set('boop', 1);
-      bag.set('boop2', 2);
+      const store = new Store<number>({ emptyEvery: 300, emptyCb: v => v === 1 });
+      store.set('boop', 1);
+      store.set('boop2', 2);
 
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      expect(bag.has('boop')).toBe(false);
-      expect(bag.has('boop2')).toBe(true);
+      expect(store.has('boop')).toBe(false);
+      expect(store.has('boop2')).toBe(true);
+
+      clearTimeout(store.emptyTimer!);
     });
   });
 });
 
 test('finding a key/value', () => {
-  const bag = new Store<number>();
-  bag.set('boop', 1);
-  bag.set('boop2', 2);
+  const store = new Store<number>();
+  store.set('boop', 1);
+  store.set('boop2', 2);
 
-  expect(bag.findKey(v => v === 2)).toBe('boop2');
-  expect(bag.find((_, key) => key === 'boop2')).toBe(2);
+  expect(store.findKey(v => v === 2)).toBe('boop2');
+  expect(store.find((_, key) => key === 'boop2')).toBe(2);
 });
 
-test('filtering a bag', () => {
-  const bag = new Store<number>();
-  bag.set('boop', 1);
-  bag.set('boop2', 2);
+test('filtering a store', () => {
+  const store = new Store<number>();
+  store.set('boop', 1);
+  store.set('boop2', 2);
 
-  expect(bag.filter((_, key) => key === 'boop2')).toStrictEqual(new Store<number>({ entries: [['boop2', 2]] }));
+  expect(store.filter((_, key) => key === 'boop2')).toStrictEqual(new Store<number>({ entries: [['boop2', 2]] }));
 });
 
-test('sorting a bag', () => {
-  const bag = new Store<number>();
-  bag.set('boop', 1);
-  bag.set('boop2', 2);
+test('sorting a store', () => {
+  const store = new Store<number>();
+  store.set('boop', 1);
+  store.set('boop2', 2);
 
-  expect(bag.sort((a, b) => a - b)).toStrictEqual(new Store<number>({ entries: [['boop2', 2], ['boop', 1]] }));
+  expect(store.sort((a, b) => a - b)).toStrictEqual(new Store<number>({ entries: [['boop2', 2], ['boop', 1]] }));
 
-  const otherBag = new Store<number>({ entries: [['boop', 1], ['boop2', 2]] });
-  expect(bag).toStrictEqual(otherBag);
-  expect(bag.sort()).toStrictEqual(otherBag);
+  const otherstore = new Store<number>({ entries: [['boop', 1], ['boop2', 2]] });
+  expect(store).toStrictEqual(otherstore);
+  expect(store.sort()).toStrictEqual(otherstore);
 });
 
 test('mutable sort', () => {
-  const bag = new Store<number>();
-  bag.set('boop2', 2);
-  bag.set('boop', 1);
+  const store = new Store<number>();
+  store.set('boop2', 2);
+  store.set('boop', 1);
 
-  const otherBag = new Store<number>({ entries: [['boop', 1], ['boop2', 2]] });
-  expect(bag.mSort()).toStrictEqual(otherBag);
-  expect(bag).toStrictEqual(otherBag);
+  const otherstore = new Store<number>({ entries: [['boop', 1], ['boop2', 2]] });
+  expect(store.mSort()).toStrictEqual(otherstore);
+  expect(store).toStrictEqual(otherstore);
 });
 
-test('mapping a bag', () => {
-  const bag = new Store<number>();
-  bag.set('boop', 1);
-  bag.set('boop2', 2);
+test('mapping a store', () => {
+  const store = new Store<number>();
+  store.set('boop', 1);
+  store.set('boop2', 2);
 
-  expect(bag.map(v => v + 1)).toStrictEqual([2, 3]);
+  expect(store.map(v => v + 1)).toStrictEqual([2, 3]);
 });
 
-test('emptying a bag', () => {
-  const bag = new Store<number>();
-  bag.set('boop', 1);
-  bag.set('boop2', 2);
+test('emptying a store', () => {
+  const store = new Store<number>();
+  store.set('boop', 1);
+  store.set('boop2', 2);
 
-  bag.empty();
+  store.empty();
 
-  expect(bag.size).toBe(0);
+  expect(store.size).toBe(0);
 });
 
-describe('reducing a bag', () => {
+describe('reducing a store', () => {
   test('simple addition reducer', () => {
-    const bag = new Store<number>();
-    bag.set('boop', 1);
-    bag.set('boop2', 2);
+    const store = new Store<number>();
+    store.set('boop', 1);
+    store.set('boop2', 2);
 
-    expect(bag.reduce((acc, v) => acc + v)).toBe(3);
+    expect(store.reduce((acc, v) => acc + v)).toBe(3);
   });
 
   test('simple addition reducer with initial value', () => {
-    const bag = new Store<number>();
-    bag.set('boop', 1);
-    bag.set('boop2', 2);
+    const store = new Store<number>();
+    store.set('boop', 1);
+    store.set('boop2', 2);
 
-    expect(bag.reduce((acc, v) => acc + v, 1)).toBe(4);
+    expect(store.reduce((acc, v) => acc + v, 1)).toBe(4);
   });
 
-  test('reduce empty bag with no initial value', () => {
+  test('reduce empty store with no initial value', () => {
     expect(
       () => new Store<number>().reduce((acc, v) => acc + v)
     ).toThrow(new CordisStoreTypeError('noReduceEmptyStore'));
