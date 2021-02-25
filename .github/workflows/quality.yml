@@ -2,7 +2,7 @@ name: Lint
 on: [push, pull_request]
 jobs:
   lint:
-    name: ESLint
+    name: Quality Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -30,3 +30,7 @@ jobs:
 
       - name: Run ESLint
         run: pnpm run lint
+
+      - name: Run Jest Tests
+        run: pnpm run test
+        
