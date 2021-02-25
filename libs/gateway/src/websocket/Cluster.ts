@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { CordisGatewayError } from '../error';
 import {
   WebsocketConnection,
   WebsocketConnectionStatus,
@@ -221,14 +220,10 @@ export class Cluster extends EventEmitter {
   public async fetchGateway(ignoreCache = false) {
     if (this._fetchGatewayCache && !ignoreCache) return this._fetchGatewayCache;
 
-    const data = await this.rest.get<RESTGetAPIGatewayBotResult>(Routes.gatewayBot()).catch(() => null);
+    const data = await this.rest.get<RESTGetAPIGatewayBotResult>(Routes.gatewayBot());
 
-    if (data) {
-      this._fetchGatewayCache = data;
-      return data;
-    }
-
-    throw new CordisGatewayError('fetchGatewayFail');
+    this._fetchGatewayCache = data;
+    return data;
   }
 
   /**
@@ -259,7 +254,7 @@ export class Cluster extends EventEmitter {
       }
     }
 
-    return Promise.allSettled(this.shards.map(shard => shard.connect()));
+    return Promise.all(this.shards.map(shard => shard.connect()));
   }
 
   /**
@@ -268,6 +263,6 @@ export class Cluster extends EventEmitter {
   public async destroy(options: WebsocketConnectionDestroyOptions = { fatal: true }) {
     this.user = null;
 
-    return Promise.allSettled(this.shards.map(shard => shard.destroy(options)));
+    return Promise.all(this.shards.map(shard => shard.destroy(options)));
   }
 }

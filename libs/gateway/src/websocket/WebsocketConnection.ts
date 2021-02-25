@@ -291,7 +291,7 @@ export class WebsocketConnection {
   }
 
   private _wrapReject(reject: (reason: any) => void) {
-    if (this._connectResolve) this.debug('UB: set another _connectReject without calling the previous one.');
+    if (this._connectReject) this.debug('UB: set another _connectReject without calling the previous one.');
     return (reason: any) => {
       this._connectReject = null;
       reject(reason);
