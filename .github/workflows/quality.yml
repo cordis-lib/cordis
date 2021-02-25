@@ -1,4 +1,4 @@
-name: Lint
+name: Quality Check
 on: [push, pull_request]
 jobs:
   lint:
@@ -33,4 +33,3 @@ jobs:
 
       - name: Run Jest Tests
         run: pnpm run test
-        
