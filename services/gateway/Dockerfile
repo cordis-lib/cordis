@@ -1,8 +1,7 @@
 FROM node:14-alpine
-LABEL name "cordis gateway"
-LABEL version "0.1.5"
+LABEL name "cordis gateway builder"
 
-WORKDIR /usr/gateway
+WORKDIR /opt/build
 
 RUN apk add --update \
 && apk add --no-cache ca-certificates \
@@ -23,7 +22,7 @@ COPY libs/rest/package.json ./libs/rest/
 COPY libs/store/package.json ./libs/store/
 COPY services/gateway/package.json ./services/gateway/package.json
 
-RUN pnpm i --frozen-lockfile
+RUN pnpm i --frozen-lockfile && apk del .build-deps
 
 COPY libs/bitfield ./libs/bitfield
 COPY libs/brokers ./libs/brokers
@@ -36,6 +35,14 @@ COPY libs/rest ./libs/rest
 COPY libs/store ./libs/store
 COPY services/gateway ./services/gateway
 
-RUN pnpm run build && pnpm prune --production && apk del .build-deps
+RUN pnpm run build && pnpm prune --prod
+
+FROM node:14-alpine
+LABEL name "cordis gateway"
+LABEL version "0.1.5"
+
+WORKDIR /usr/gateway
+
+COPY --from=0 /opt/build ./
 
 CMD ["node", "--enable-source-maps", "services/gateway/dist/index.js"]
