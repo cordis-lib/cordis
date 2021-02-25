@@ -23,7 +23,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install deps
-        run: pnpm i --r
+        run: pnpm i
 
       - name: Build the code
         run: pnpm run build
@@ -32,4 +32,4 @@ jobs:
         run: pnpm run lint
 
       - name: Run Jest Tests
-        run: pnpm run test
+        run: pnpm run test:ci
