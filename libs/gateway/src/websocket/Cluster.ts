@@ -254,7 +254,7 @@ export class Cluster extends EventEmitter {
       }
     }
 
-    return Promise.allSettled(this.shards.map(shard => shard.connect()));
+    return Promise.all(this.shards.map(shard => shard.connect()));
   }
 
   /**
@@ -263,6 +263,6 @@ export class Cluster extends EventEmitter {
   public async destroy(options: WebsocketConnectionDestroyOptions = { fatal: true }) {
     this.user = null;
 
-    return Promise.allSettled(this.shards.map(shard => shard.destroy(options)));
+    return Promise.all(this.shards.map(shard => shard.destroy(options)));
   }
 }
