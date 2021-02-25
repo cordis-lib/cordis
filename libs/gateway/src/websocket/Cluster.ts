@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { CordisGatewayError } from '../error';
 import {
   WebsocketConnection,
   WebsocketConnectionStatus,
@@ -221,14 +220,10 @@ export class Cluster extends EventEmitter {
   public async fetchGateway(ignoreCache = false) {
     if (this._fetchGatewayCache && !ignoreCache) return this._fetchGatewayCache;
 
-    const data = await this.rest.get<RESTGetAPIGatewayBotResult>(Routes.gatewayBot()).catch(() => null);
+    const data = await this.rest.get<RESTGetAPIGatewayBotResult>(Routes.gatewayBot());
 
-    if (data) {
-      this._fetchGatewayCache = data;
-      return data;
-    }
-
-    throw new CordisGatewayError('fetchGatewayFail');
+    this._fetchGatewayCache = data;
+    return data;
   }
 
   /**

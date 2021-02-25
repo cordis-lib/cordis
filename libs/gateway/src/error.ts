@@ -5,7 +5,6 @@ import { WebsocketConnectionStatus } from './websocket/WebsocketConnection';
 export const CordisGatewayError = makeCordisError(
   Error,
   {
-    fetchGatewayFail: 'Failed to fetch /gateway/bot',
     tokenInvalid: 'The token you passed is invalid',
     invalidShard: 'An invalid shard was provided to Discord',
     shardingRequired: 'Sharding is required for this bot to connect.',
