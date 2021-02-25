@@ -36,6 +36,6 @@ COPY libs/rest ./libs/rest
 COPY libs/store ./libs/store
 COPY services/gateway ./services/gateway
 
-RUN pnpm run build && pnpm prune --production
+RUN pnpm run build && pnpm prune --production && apk del .build-deps
 
 CMD ["node", "--enable-source-maps", "services/gateway/dist/index.js"]
