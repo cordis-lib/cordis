@@ -65,7 +65,7 @@ export class RoutingClient<K extends string, T extends Record<K, any>> extends B
     const exchange = await this.channel.assertExchange(name, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
     const queue = await this.channel.assertQueue(rawQueue, { durable: true, exclusive: rawQueue === '' }).then(data => data.queue);
 
-    for (const key of keys) await this.channel.bindExchange(queue, exchange, key);
+    for (const key of keys) await this.channel.bindQueue(queue, exchange, key);
 
     await this.util.consumeQueue({
       queue,
