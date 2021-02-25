@@ -1,2 +1,4 @@
 **/*.test.*
 **/src/**
+**/tsconfig.tsbuildinfo
+**/**.map
