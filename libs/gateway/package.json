@@ -13,7 +13,8 @@
     "dist",
     "types",
     "!dist/*.tsbuildinfo",
-    "!**/**.map"
+    "!**/**.map",
+    "!**/*.test.*"
   ],
   "repository": {
     "type": "git",
