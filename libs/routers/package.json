@@ -33,7 +33,7 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "@cordis/rest": "workspace:^0.1.0",
+    "@cordis/rest": "workspace:^0.1.5",
     "tslib": "^2.1.0"
   }
 }
