@@ -1,6 +1,6 @@
 {
   "name": "@cordis/util",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Helper REST functions and other utilities for Cordis",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
@@ -25,7 +25,6 @@
     "Nico (https://github.com/zaida04)"
   ],
   "author": "Zaid \"Nico\"",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/cordis-lib/cordis/issues"
   },
