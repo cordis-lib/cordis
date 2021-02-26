@@ -16,8 +16,8 @@ afterEach(() => {
   mockedMake.mockClear();
 });
 
-test('basic routing', () => {
-  router.users['123'].get();
+test('basic routing', async () => {
+  await router.users['123'].get();
 
   expect(mockedMake).toHaveBeenCalledTimes(1);
   expect(mockedMake).toHaveBeenCalledWith({ method: 'get', path: '/users/123' });
