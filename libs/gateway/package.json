@@ -9,6 +9,12 @@
     "lint": "eslint src --ext .ts",
     "build": "tsc"
   },
+  "files": [
+    "dist",
+    "types",
+    "!dist/*.tsbuildinfo",
+    "!**/**.map"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cordis-lib/cordis.git"
