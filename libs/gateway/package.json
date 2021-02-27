@@ -22,7 +22,8 @@
   },
   "contributors": [
     "didinele <didinele.dev@gmail.com> (https://github.com/didinele)",
-    "Holo-Buckshot (https://github.com/Holo-Buckshot)"
+    "Holo-Buckshot (https://github.com/Holo-Buckshot)",
+    "Nico (https://github.com/zaida04)"
   ],
   "bugs": {
     "url": "https://github.com/cordis-lib/cordis/issues"
@@ -42,9 +43,9 @@
     "@cordis/common": "workspace:^0.1.5",
     "@cordis/error": "workspace:^0.1.5",
     "@cordis/queue": "workspace:^0.1.5",
-    "@cordis/redis-store": "workspace:^0.1.0",
+    "@cordis/redis-store": "workspace:^0.1.5",
     "@cordis/rest": "workspace:^0.1.5",
-    "@cordis/store": "workspace:^0.1.0",
+    "@cordis/store": "workspace:^0.1.5",
     "common-tags": "^1.8.0",
     "discord-api-types": "^0.12.1",
     "tslib": "^2.1.0",
