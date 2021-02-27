@@ -139,7 +139,6 @@ export class RedisStore<T> implements IStore<T> {
     return this.decode(data);
   }
 
-
   public async set(key: string, value: T) {
     const size = await this.redis.hlen(this.hash);
     if (this.maxSize && size >= this.maxSize) await this.empty();
@@ -207,13 +206,10 @@ export class RedisStore<T> implements IStore<T> {
   }
 
   public async map<V = T>(cb: StoreMapCallback<V, T>) {
-    const raw = await this.redis.hgetall(this.hash);
-    return Object
-      .entries(raw)
-      .map(([key, value]) => cb(
-        this.decode(value),
-        key
-      ));
+    const output: V[] = [];
+    for await (const [key, value] of this) output.push(cb(value, key));
+
+    return output;
   }
 
   public async empty(cb?: StoreSingleEntryCallback<T>) {
