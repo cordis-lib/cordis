@@ -139,15 +139,6 @@ export class RedisStore<T> implements IStore<T> {
     return this.decode(data);
   }
 
-  /**
-   * Retrieves multiple keys from Redis using a single hmget call.
-   * @param keys The keys to retrieve
-   * @returns An array of the values
-   */
-  public async getM(...keys: string[]) {
-    const data = await this.redis.hmget(this.hash, ...keys);
-    return data.map(e => e ? this.decode(e) : null);
-  }
 
   public async set(key: string, value: T) {
     const size = await this.redis.hlen(this.hash);
@@ -160,10 +151,6 @@ export class RedisStore<T> implements IStore<T> {
   public async delete(key: string) {
     const count = await this.redis.hdel(this.hash, key);
     return count > 0;
-  }
-
-  public deleteM(...keys: string[]) {
-    return this.redis.hdel(this.hash, ...keys);
   }
 
   public async findKey(cb: StoreSingleEntryCallback<T>) {
