@@ -2,7 +2,7 @@ name: Deploy Docs
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   docs:
     name: Deploy Docs
@@ -45,4 +45,3 @@ jobs:
           destination-repository-name: 'cordis-lib.github.io'
           target-branch: 'main'
           user-email: 41898282+github-actions[bot]@users.noreply.github.com
-
