@@ -3,7 +3,7 @@
   "description": "Utility structure for dealing with Discord snowflakes",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
