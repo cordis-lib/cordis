@@ -35,7 +35,7 @@ jobs:
         run: pnpm run docs
         
       - name: Place CNAME
-        run: touch ./doc/CNAME && echo "cordis.didinele.me\n" >> ./doc/CNAME
+        run: echo "cordis.didinele.me" >| ./doc/CNAME
 
       - name: Commit the Docs
         uses: cpina/github-action-push-to-another-repository@master
