@@ -1,7 +1,7 @@
 {
   "$schema": "http://json.schemastore.org/package",
   "name": "cordis",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A modular, micros-service based Discord API wrapper",
   "scripts": {
     "lint": "pnpm recursive run lint --filter @cordis/*",
