@@ -30,6 +30,9 @@ jobs:
 
       - name: Build the code
         run: pnpm run build
+        
+      - name: Place CNAME
+        run: echo "cordis.didinele.me" > ./doc/CNAME
 
       - name: Build the docs
         run: pnpm run docs
