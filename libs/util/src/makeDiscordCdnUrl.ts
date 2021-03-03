@@ -1,4 +1,4 @@
-import { CordisUtilTypeError, CordisUtilRangeError } from '../error';
+import { CordisUtilTypeError, CordisUtilRangeError } from './error';
 
 /**
  * Valid image formats
