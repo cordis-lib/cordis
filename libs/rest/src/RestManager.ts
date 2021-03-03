@@ -30,14 +30,14 @@ export interface RestManager {
    * Fired when a request is being started (pre-ratelimit checking)
    * @event
    */
-  on(event: 'request', listener: (request: Partial<DiscordFetchOptions>) => any): this;
+  on(event: 'request', listener: (request: Partial<DiscordFetchOptions<any, any>>) => any): this;
   /**
    * Fired when Discord responds to a request
    * @event
    */
   on(
     event: 'response',
-    listener: (request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>) => any
+    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: any, ratelimit: Partial<RatelimitData>) => any
   ): this;
   /**
    * Fired when a rate limit is (about to be) hit.
@@ -46,19 +46,19 @@ export interface RestManager {
   on(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
   /** @internal */
-  once(event: 'request', listener: (request: Partial<DiscordFetchOptions>) => any): this;
+  once(event: 'request', listener: (request: Partial<DiscordFetchOptions<any, any>>) => any): this;
   /** @internal */
   once(
     event: 'response',
-    listener: (request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>) => any
+    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: any, ratelimit: Partial<RatelimitData>) => any
   ): this;
   /** @internal */
   once(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
   /** @internal */
-  emit(event: 'request', request: Partial<DiscordFetchOptions>): boolean;
+  emit(event: 'request', request: Partial<DiscordFetchOptions<any, any>>): boolean;
   /** @internal */
-  emit(event: 'response', request: Partial<DiscordFetchOptions>, response: any, ratelimit: Partial<RatelimitData>): boolean;
+  emit(event: 'response', request: Partial<DiscordFetchOptions<any, any>>, response: any, ratelimit: Partial<RatelimitData>): boolean;
   /** @internal */
   emit(event: 'ratelimit', bucket: string, endpoint: string, prevented: boolean, waitingFor: number): boolean;
 }
@@ -66,7 +66,7 @@ export interface RestManager {
 /**
  * Options used for making a request
  */
-export interface RequestOptions<D extends RequestBodyData, Q extends StringRecord> {
+export interface RequestOptions<D, Q> {
   /**
    * Path you're requesting
    */
@@ -139,7 +139,7 @@ export class RestManager extends EventEmitter {
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public make<T, D extends RequestBodyData = RequestBodyData, Q extends StringRecord = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
+  public make<T, D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
     const route = Bucket.makeRoute(options.method, options.path);
 
     let bucket = this._buckets.get(route);
@@ -165,7 +165,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public get<T, Q extends StringRecord = StringRecord>(path: string, options: { query?: Q } = {}): Promise<T> {
+  public get<T, Q = StringRecord>(path: string, options: { query?: Q } = {}): Promise<T> {
     return this.make<T, never, Q>({ path, method: 'get', ...options });
   }
 
@@ -175,7 +175,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public delete<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
+  public delete<T, D = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
     return this.make<T, D, never>({ path, method: 'delete', ...options });
   }
 
@@ -185,7 +185,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public patch<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
+  public patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'patch', ...options });
   }
 
@@ -195,7 +195,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public put<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
+  public put<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'put', ...options });
   }
 
@@ -205,7 +205,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public post<T, D extends RequestBodyData = RequestBodyData>(path: string, options: { data: D; reason?: string; files: File[] }): Promise<T> {
+  public post<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string; files: File[] }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'post', ...options });
   }
 }
