@@ -1,4 +1,4 @@
-import { discordFetch, DiscordFetchOptions, StringRecord, RequestBodyData } from './Fetch';
+import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { CordisRestError, HTTPError } from './Error';
 import { halt } from '@cordis/common';
 import type { RestManager } from './RestManager';
@@ -54,7 +54,7 @@ export class Bucket {
    * Makes a request to Discord
    * @param req Request options
    */
-  public async make<T, D extends RequestBodyData, Q extends StringRecord>(req: DiscordFetchOptions<D, Q>): Promise<T> {
+  public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
     this.manager.emit('request', req);
 
     const timeout = setTimeout(() => req.controller.abort(), this.manager.abortAfter);
@@ -83,10 +83,10 @@ export class Bucket {
       this.manager.emit('ratelimit', this.route, req.path, false, retryAfter);
 
       await this.mutex.set(this.route, { timeout: retryAfter });
-      return this._retry(req);
+      return this._retry<T, D, Q>(req);
     } else if (res.status >= 500 && res.status < 600) {
       await halt(1000);
-      return this._retry(req);
+      return this._retry<T, D, Q>(req);
     } else if (!res.ok) {
       throw new HTTPError(res.clone(), await res.text());
     }
@@ -105,7 +105,7 @@ export class Bucket {
    * @param req Request options
    * @param res Response given
    */
-  private _retry<T>(req: DiscordFetchOptions): Promise<T> {
+  private _retry<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
     if (req.failures) req.failures++;
     else req.failures = 1;
 
