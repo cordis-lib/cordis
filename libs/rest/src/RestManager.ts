@@ -195,7 +195,7 @@ export class RestManager extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public put<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
+  public put<T, D = RequestBodyData>(path: string, options?: { data?: D; reason?: string }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'put', ...options });
   }
 
