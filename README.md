@@ -9,20 +9,20 @@ cordis is a fully modular, micro-service based [Node.js](https://nodejs.org/) wr
 
 It is cut up in multiple packages/libraries:
 
-- `@cordis/bitfield`, for working with bitfields using BigInts
-- `@cordis/brokers`, message brokers for routing patterns, pub/sub systems and RPC!
-- `@cordis/common`, cordis core utilities
-- `@cordis/gateway`, containing a very flexible way of connecting to Discord's gateway - with clustering support
-- `@cordis/queue`, simple, small sequential queue for async operations
-- `@cordis/redis-store`, Redis implementation of `@cordis/store`
-- `@cordis/rest`, tooling for making HTTP requests to Discord, with rate limiting handling
-- `@cordis/routers`, make API requests with ease using simple dynamic javascript property accessing
-- `@cordis/snowflake`, simple snowflake structure for destructuring Discord IDs into relevant information
-- `@cordis/store`, Simple map-like interface for holding key-value pairs - ships with an in-memory implementation
+- [`@cordis/bitfield`](https://github.com/cordis-lib/cordis/tree/main/libs/bitfield), for working with bitfields using BigInts
+- [`@cordis/brokers`](https://github.com/cordis-lib/cordis/tree/main/libs/brokers), message brokers for routing patterns, pub/sub systems and RPC!
+- [`@cordis/common`](https://github.com/cordis-lib/cordis/tree/main/libs/common), cordis core utilities
+- [`@cordis/gateway`](https://github.com/cordis-lib/cordis/tree/main/libs/gateway), containing a very flexible way of connecting to Discord's gateway - with clustering support
+- [`@cordis/queue`](https://github.com/cordis-lib/cordis/tree/main/libs/queue), simple, small sequential queue for async operations
+- [`@cordis/redis-store`](https://github.com/cordis-lib/cordis/tree/main/libs/redis-store), Redis implementation of `@cordis/store`
+- [`@cordis/rest`](https://github.com/cordis-lib/cordis/tree/main/libs/rest), tooling for making HTTP requests to Discord, with rate limiting handling
+- [`@cordis/routers`](https://github.com/cordis-lib/cordis/tree/main/libs/routers), make API requests with ease using simple dynamic javascript property accessing
+- [`@cordis/snowflake`](https://github.com/cordis-lib/cordis/tree/main/libs/snowflake), simple snowflake structure for destructuring Discord IDs into relevant information
+- [`@cordis/store`](https://github.com/cordis-lib/cordis/tree/main/libs/store), Simple map-like interface for holding key-value pairs - ships with an in-memory implementation
 
 But also services that hook into RabbitMQ using the libraries mentioned above:
 
-- `@cordis/gateway-service` - https://hub.docker.com/r/cordislib/gateway
+- [`@cordis/gateway-service`](https://github.com/cordis-lib/cordis/tree/main/services/gateway) - https://hub.docker.com/r/cordislib/gateway
 
 
 # Come talk to me on Discord!
