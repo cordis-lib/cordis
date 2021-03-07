@@ -4,7 +4,7 @@
   "description": "Cordis' REST utilities for the Discord API",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
@@ -37,8 +37,8 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "@cordis/common": "workspace:^0.1.6",
-    "@cordis/error": "workspace:^0.1.6",
+    "@cordis/common": "workspace:^0.1.7",
+    "@cordis/error": "workspace:^0.1.7",
     "abort-controller": "^3.0.0",
     "form-data": "^3.0.1",
     "node-fetch": "^2.6.1",

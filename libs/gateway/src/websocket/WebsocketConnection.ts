@@ -557,8 +557,6 @@ export class WebsocketConnection {
   };
 
   private readonly _onClose = async ({ code, reason, wasClean }: { code: number; reason: string; wasClean: boolean }) => {
-    const destroy = (options?: WebsocketConnectionDestroyOptions) => this.destroy(options);
-
     this.debug(stripIndent`
       [CLOSE]
         Event Code: ${code}
@@ -571,72 +569,77 @@ export class WebsocketConnection {
 
       case GatewayCloseCodes.UnknownError: {
         this.debug(`An unknown error occured: ${code} ${reason}`);
-        return destroy({ code, reason, reconnect: true });
+        return this.destroy({ code, reason, reconnect: true });
       }
 
       case GatewayCloseCodes.UnknownOpCode: {
         this.debug('An invalid opcode was sent to Discord.');
-        return destroy({ code, reason, reconnect: true });
+        return this.destroy({ code, reason, reconnect: true });
       }
 
       case GatewayCloseCodes.DecodeError: {
         this.debug('An invalid payload was sent to Discord.');
-        return destroy({ code, reason, reconnect: true });
+        return this.destroy({ code, reason, reconnect: true });
       }
 
       case GatewayCloseCodes.NotAuthenticated: {
         this.debug('A request was somehow sent before the identify payload.');
-        return destroy({ code, reason, reconnect: true, fatal: true });
+        return this.destroy({ code, reason, reconnect: true, fatal: true });
       }
 
       case GatewayCloseCodes.AuthenticationFailed: {
-        await destroy({ code, reason, fatal: true });
+        await this.destroy({ code, reason, fatal: true });
         return this._connectReject?.(new CordisGatewayError('tokenInvalid'));
       }
 
       case GatewayCloseCodes.AlreadyAuthenticated: {
         this.debug('More than one auth payload was sent.');
-        return destroy({ code, reason, fatal: true });
+        return this.destroy({ code, reason, fatal: true });
       }
 
       case GatewayCloseCodes.InvalidSeq: {
         this.debug('An invalid sequence was sent.');
-        return destroy({ code, reason, reconnect: true, fatal: true });
+        return this.destroy({ code, reason, reconnect: true, fatal: true });
       }
 
       case GatewayCloseCodes.RateLimited: {
         this.debug('Somehow hit the rate limit, are you messing with any of the internal methods or state?');
-        return destroy({ code, reason, fatal: true });
+        return this.destroy({ code, reason, fatal: true });
       }
 
       case GatewayCloseCodes.SessionTimedOut: {
         this.debug('Session timed out.');
-        return destroy({ code, reason, reconnect: true });
+        return this.destroy({ code, reason, reconnect: true });
       }
 
       case GatewayCloseCodes.InvalidShard: {
-        await destroy({ code, reason, fatal: true });
+        await this.destroy({ code, reason, fatal: true });
         return this._connectReject?.(new CordisGatewayError('invalidShard'));
       }
 
       case GatewayCloseCodes.ShardingRequired: {
-        await destroy({ code, reason, reconnect: true });
+        await this.destroy({ code, reason, reconnect: true });
         return this._connectReject?.(new CordisGatewayError('shardingRequired'));
       }
 
       case GatewayCloseCodes.InvalidAPIVersion: {
-        await destroy({ code, reason, reconnect: false, fatal: true });
+        await this.destroy({ code, reason, reconnect: false, fatal: true });
         return this._connectReject?.(new CordisGatewayError('invalidApiVersion'));
       }
 
       case GatewayCloseCodes.InvalidIntents: {
-        await destroy({ code, reason, reconnect: false, fatal: true });
+        await this.destroy({ code, reason, reconnect: false, fatal: true });
         return this._connectReject?.(new CordisGatewayError('invalidIntents', this.intents));
       }
 
       case GatewayCloseCodes.DisallowedIntents: {
-        await destroy({ code, reason, reconnect: false, fatal: true });
+        await this.destroy({ code, reason, reconnect: false, fatal: true });
         return this._connectReject?.(new CordisGatewayError('disallowedIntents', new Intents(BigInt(this.intents)).toArray()));
+      }
+
+      default: {
+        this.debug(`The gateway closed with an unexpected code ${code}, attempting to resume.`);
+        return this.destroy({ code, reason, reconnect: true });
       }
     }
   };

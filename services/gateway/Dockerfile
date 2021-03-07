@@ -39,7 +39,7 @@ RUN pnpm run build && pnpm prune --prod
 
 FROM node:14-alpine
 LABEL name "cordis gateway"
-LABEL version "0.1.6"
+LABEL version "0.1.7"
 
 WORKDIR /usr/gateway
 

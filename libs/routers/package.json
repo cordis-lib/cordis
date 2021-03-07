@@ -3,7 +3,7 @@
   "description": "Construct API paths using simple JavaScript property accessing and execute requests with method calls",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
@@ -34,7 +34,7 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "@cordis/rest": "workspace:^0.1.6",
+    "@cordis/rest": "workspace:^0.1.7",
     "tslib": "^2.1.0"
   }
 }
