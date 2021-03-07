@@ -7,8 +7,8 @@
     "lint": "pnpm recursive run lint --filter @cordis/*",
     "build": "pnpm recursive run build --filter @cordis/*",
     "release:npm": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
-    "build:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile .",
-    "release": "pnpm run release:npm && pnpm run build:docker && docker push cordislib/gateway",
+    "release:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile .",
+    "release": "rimraf */*/?(dist|types)/** && pnpm run build && pnpm run release:npm && pnpm run release:docker && docker push cordislib/gateway",
     "docs": "typedoc",
     "test": "jest",
     "test:ci": "jest --ci --no-stack-trace --verbose"
@@ -43,6 +43,7 @@
     "husky": "^4.3.8",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
+    "rimraf": "^3.0.2",
     "typedoc": "^0.19.2",
     "typedoc-plugin-as-member-of": "^1.0.2",
     "typedoc-plugin-markdown": "^3.5.0",
