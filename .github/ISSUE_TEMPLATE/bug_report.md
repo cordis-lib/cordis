@@ -20,7 +20,7 @@ assignees: ''
 
 **Further details:**
 
-<!-- Only keep and fill out what's applicable to you -->
+<!-- Only keep and fill out what's applicable to you
 - `@cordis/gateway` version:
 - `@cordis/bitfield` version:
 - `@cordis/brokers` version:
@@ -33,6 +33,8 @@ assignees: ''
 - `@cordis/routers` version:
 - `@cordis/gateway` version:
 - `@cordis/snowflake` version:
+- `@cordis/gateway-service` version:
+-->
 - Node.js version:
 - Operating system:
 - Priority this issue should have – please be realistic and elaborate if possible:
