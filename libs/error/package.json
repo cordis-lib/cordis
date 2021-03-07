@@ -3,7 +3,7 @@
   "description": "Package for creating error structures",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
