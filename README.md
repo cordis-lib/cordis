@@ -41,7 +41,7 @@ Cordis is cut up in the form of multiple packages/libraries:
 # Contributing
 We make use of [`PNPM`](https://pnpm.js.org/) to manage our monorepo setup. It is expected that you have an up-to-date version of it. 
 
-Please ensure you run `pnpm run lint` and `pnpm run build` in the root before pushing your commits.
+Please ensure you run `pnpm run lint`, `pnpm run build`, and `pnpm run test` in the root before pushing your commits.
 
 Please ensure that you follow our [Code Of Conduct](https://github.com/discordjs/discord.js/blob/master/.github/CODE_OF_CONDUCT.md).
 
