@@ -8,7 +8,7 @@ assignees: ''
 ---
 <!-- Thanks to Discord.js for this bug report template -->
 
-**Which cordis library/package are you facing this issue in?:**
+**Which cordis libraries/services are you facing this issue in?:**
 
 **Please describe the problem you are having in as much detail as possible:**
 
