@@ -20,7 +20,19 @@ assignees: ''
 
 **Further details:**
 
-- Cordis Package Version:
+<!-- Only keep and fill out what's applicable to you -->
+- `@cordis/gateway` version:
+- `@cordis/bitfield` version:
+- `@cordis/brokers` version:
+- `@cordis/common` version:
+- `@cordis/error` version:
+- `@cordis/queue` version:
+- `@cordis/redis-store` version:
+- `@cordis/store` version:
+- `@cordis/rest` version:
+- `@cordis/routers` version:
+- `@cordis/gateway` version:
+- `@cordis/snowflake` version:
 - Node.js version:
 - Operating system:
 - Priority this issue should have – please be realistic and elaborate if possible:
