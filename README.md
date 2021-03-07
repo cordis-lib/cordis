@@ -14,8 +14,8 @@
   </p>  
 
   <p>
-      <img src="https://github.com/cordis-lib/cordis/actions/workflows/quality.yml/badge.svg" alt="Linting">
-      <img src="https://github.com/cordis-lib/cordis/actions/workflows/docs.yml/badge.svg" alt="TypeScript"><br>
+      <img src="https://github.com/cordis-lib/cordis/actions/workflows/quality.yml/badge.svg" alt="Quality Check">
+      <img src="https://github.com/cordis-lib/cordis/actions/workflows/docs.yml/badge.svg" alt="Deploy Docs"><br>
       <a href="https://github.com/cordis-lib/cordis/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-yellow.svg" alt="License: APACHE 2.0"></a>
       <a href="https://github.com/cordis-lib/cordis/issues"><img src="https://img.shields.io/github/issues-raw/cordis-lib/cordis.svg?maxAge=25000" alt="Issues"></a>
       <a href="https://github.com/cordis-lib/cordis/pulls"><img src="https://img.shields.io/github/issues-pr/cordis-lib/cordis.svg?style=flat" alt="GitHub pull requests"></a><br>
