@@ -2,6 +2,8 @@ import * as dAPI from 'discord-api-types/v8';
 import { RestManager } from '@cordis/rest';
 
 /*
+TO:DO
+
 Channel
  editChannel - encapsulate permissions
  fetchChannelMessages/fetchChannelMessage
@@ -25,13 +27,6 @@ Channel
  addPinnedChannelMessage
  groupDMAddRecipient
  groupDMRemoveRecipient
-
-Emoji
- fetchGuildEmojis
- fetchGuildEmoji
- createGuildEmoji
- editGuildEmoji
- deleteGuildEmoji
 
 Guild
  createGuild
@@ -70,10 +65,6 @@ Guild
  fetchGuildVanityURL
  fetchGuildWidgetImage
 
-Invite
- fetchInvite
- deleteInvite
-
 Template
  fetchTemplate
  createGuildFromTemplate
@@ -93,9 +84,8 @@ User
  createGroupDM
  getUserConnections
 
-
-    fetchChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.get<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
-    deleteChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.delete<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
+fetchChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.get<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
+deleteChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.delete<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
 */
 
 
@@ -112,6 +102,11 @@ export const makeRestUtils = (rest: RestManager) => (
     editWebhook: ({ webhookID, webhookToken }: webhookIdOrToken, data: dAPI.RESTPatchAPIWebhookJSONBody | dAPI.RESTPatchAPIWebhookWithTokenJSONBody) => rest.patch<dAPI.RESTPatchAPIWebhookResult, dAPI.RESTPatchAPIWebhookJSONBody>(dAPI.Routes.webhook(webhookID, webhookToken), { data }),
     deleteWebhook: ({ webhookID, webhookToken }: webhookIdOrToken) => rest.delete<dAPI.RESTDeleteAPIWebhookResult>(dAPI.Routes.webhook(webhookID, webhookToken)),
     sendWebhookMessage: (webhookID: dAPI.Snowflake, webhookToken: string, data: dAPI.RESTPostAPIWebhookWithTokenJSONBody) => rest.post<dAPI.RESTPostAPIWebhookWithTokenResult, dAPI.RESTPostAPIWebhookWithTokenJSONBody>(dAPI.Routes.webhook(webhookID, webhookToken), { data }),
-    editWebhookMessage: (webhookID: dAPI.Snowflake, webhookToken: string, messageID: dAPI.Snowflake, data: dAPI.RESTPatchAPIWebhookWithTokenMessageJSONBody) => rest.patch<dAPI.APIMessage, dAPI.RESTPatchAPIWebhookWithTokenMessageJSONBody>(dAPI.Routes.webhookMessage(webhookID, webhookToken, messageID), { data })
+    editWebhookMessage: (webhookID: dAPI.Snowflake, webhookToken: string, messageID: dAPI.Snowflake, data: dAPI.RESTPatchAPIWebhookWithTokenMessageJSONBody) => rest.patch<dAPI.APIMessage, dAPI.RESTPatchAPIWebhookWithTokenMessageJSONBody>(dAPI.Routes.webhookMessage(webhookID, webhookToken, messageID), { data }),
+    fetchGuildEmojis: (...args: Parameters<typeof dAPI.Routes.guildEmojis>) => rest.get<dAPI.RESTGetAPIGuildEmojisResult>(dAPI.Routes.guildEmojis(...args)),
+    fetchGuildEmoji: (...args: Parameters<typeof dAPI.Routes.guildEmoji>) => rest.get<dAPI.RESTGetAPIGuildEmojiResult>(dAPI.Routes.guildEmoji(...args)),
+    createGuildEmoji: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPIGuildEmojiJSONBody) => rest.post<dAPI.RESTPostAPIGuildEmojiResult, dAPI.RESTPostAPIGuildEmojiJSONBody>(dAPI.Routes.guildEmojis(guildID), { data }),
+    editGuildEmoji: (guildID: dAPI.Snowflake, emojiID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildEmojiJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildEmojiResult, dAPI.RESTPatchAPIGuildEmojiJSONBody>(dAPI.Routes.guildEmoji(guildID, emojiID), { data }),
+    deleteGuildEmoji: (...args: Parameters<typeof dAPI.Routes.guildEmoji>) => rest.delete<dAPI.RESTDeleteAPIGuildEmojiResult>(dAPI.Routes.guildEmoji(...args))
   }
 );
