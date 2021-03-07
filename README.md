@@ -39,9 +39,13 @@ Cordis is cut up in the form of multiple packages/libraries:
 - [`@cordis/store`](https://github.com/cordis-lib/cordis/tree/main/libs/store) - A simple map-like interface for holding key-value pairs - ships with an in-memory implementation
 
 # Contributing
-We make use of [`PNPM`](https://pnpm.js.org/) to manage our monorepo setup. It is expected that you have an up-to-date version of it.
+We make use of [`PNPM`](https://pnpm.js.org/) to manage our monorepo setup. It is expected that you have an up-to-date version of it. 
+
+Please ensure you run `pnpm run lint` and `pnpm run build` in the root before pushing your commits.
 
 Please ensure that you follow our [Code Of Conduct](https://github.com/discordjs/discord.js/blob/master/.github/CODE_OF_CONDUCT.md).
+
+If all checks out, [Submit a Pull Request](https://github.com/cordis-lib/cordis/compare)
 
 # LICENSING
 
