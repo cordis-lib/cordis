@@ -5,6 +5,7 @@ interface webhookIdOrToken { webhookID: dAPI.Snowflake; webhookToken?: string }
 
 export const makeRestUtils = (rest: RestManager) => (
   {
+    fetchAuditLogs: (guildID: dAPI.Snowflake, options?: dAPI.RESTGetAPIAuditLogQuery) => rest.get<dAPI.APIAuditLog, dAPI.RESTGetAPIAuditLogQuery>(dAPI.Routes.guildAuditLog(guildID), { query: options }),
     createWebhook: (channelID: dAPI.Snowflake, data: dAPI.RESTPostAPIChannelWebhookJSONBody) => rest.post<dAPI.APIWebhook, dAPI.RESTPostAPIChannelWebhookJSONBody>(dAPI.Routes.channelWebhooks(channelID), { data }),
     fetchWebhooks: (...args: Parameters<typeof dAPI.Routes.channelWebhooks>) => rest.get<dAPI.RESTGetAPIChannelWebhooksResult>(dAPI.Routes.channelWebhooks(...args)),
     fetchWebhook: (...args: Parameters<typeof dAPI.Routes.webhook>) => rest.get<dAPI.RESTGetAPIWebhookResult>(dAPI.Routes.webhook(...args)),
