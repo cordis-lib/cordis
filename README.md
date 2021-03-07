@@ -49,6 +49,6 @@ If all checks out, [Submit a Pull Request](https://github.com/cordis-lib/cordis/
 
 # LICENSING
 
-© 2020, [Didinele](https://github.com/didinele). Some rights reserved.
+© 2020, [didinele](https://github.com/didinele). Some rights reserved.
 
 > Cordis is licensed under [Apache 2.0](https://github.com/cordis-lib/cordis/blob/main/LICENSE)
