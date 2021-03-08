@@ -112,9 +112,7 @@ importers:
       '@cordis/common': link:../common
       '@cordis/error': link:../error
       '@cordis/queue': link:../queue
-      '@cordis/redis-store': link:../redis-store
       '@cordis/rest': link:../rest
-      '@cordis/store': link:../store
       common-tags: 1.8.0
       discord-api-types: 0.12.1
       tslib: 2.1.0
@@ -132,9 +130,7 @@ importers:
       '@cordis/common': workspace:^0.1.7
       '@cordis/error': workspace:^0.1.7
       '@cordis/queue': workspace:^0.1.7
-      '@cordis/redis-store': workspace:^0.1.7
       '@cordis/rest': workspace:^0.1.7
-      '@cordis/store': workspace:^0.1.7
       '@types/common-tags': ^1.8.0
       '@types/ioredis': ^4.19.4
       '@types/node': ^14.14.31
@@ -237,10 +233,7 @@ importers:
       '@cordis/brokers': link:../../libs/brokers
       '@cordis/common': link:../../libs/common
       '@cordis/gateway': link:../../libs/gateway
-      '@cordis/redis-store': link:../../libs/redis-store
-      '@cordis/store': link:../../libs/store
       erlpack: github.com/discord/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d
-      ioredis: 4.22.0
       tslib: 2.1.0
       yargs: 15.4.1
       zlib-sync: 0.1.7
@@ -253,13 +246,10 @@ importers:
       '@cordis/brokers': workspace:^0.1.7
       '@cordis/common': workspace:^0.1.7
       '@cordis/gateway': workspace:^0.1.7
-      '@cordis/redis-store': workspace:^0.1.7
-      '@cordis/store': workspace:^0.1.7
       '@types/node': ^14.14.31
       '@types/yargs': ^15.0.13
       discord-api-types: ^0.12.1
       erlpack: github:discord/erlpack
-      ioredis: ^4.22.0
       tslib: ^2.1.0
       typescript: ^4.2.2
       yargs: ^15.4.1
@@ -2297,6 +2287,7 @@ packages:
     resolution:
       integrity: sha512-t6wbgtoCXvAzst7QgXxJYqPt0usEfbgQdftEPbLL/cvv6HPE5VgvqCuAIDR0NgU52ds6rFwqrgakNLrHEjCbrQ==
   /cluster-key-slot/1.1.0:
+    dev: true
     engines:
       node: '>=0.10.0'
     resolution:
@@ -2474,6 +2465,7 @@ packages:
   /debug/4.3.1:
     dependencies:
       ms: 2.1.2
+    dev: true
     engines:
       node: '>=6.0'
     peerDependencies:
@@ -2551,6 +2543,7 @@ packages:
     resolution:
       integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=
   /denque/1.5.0:
+    dev: true
     engines:
       node: '>=0.10'
     resolution:
@@ -3454,6 +3447,7 @@ packages:
       redis-errors: 1.2.0
       redis-parser: 3.0.0
       standard-as-callback: 2.0.1
+    dev: true
     engines:
       node: '>=6'
     resolution:
@@ -4381,9 +4375,11 @@ packages:
     resolution:
       integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==
   /lodash.defaults/4.2.0:
+    dev: true
     resolution:
       integrity: sha1-0JF4cW/+pN3p5ft7N/bwgCJ0WAw=
   /lodash.flatten/4.4.0:
+    dev: true
     resolution:
       integrity: sha1-8xwiIlqWMtK7+OSt2+8kCqdlph8=
   /lodash.sortby/4.7.0:
@@ -4540,6 +4536,7 @@ packages:
     resolution:
       integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
   /ms/2.1.2:
+    dev: true
     resolution:
       integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
   /nan/2.14.2:
@@ -4785,6 +4782,7 @@ packages:
     resolution:
       integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==
   /p-map/2.1.0:
+    dev: true
     engines:
       node: '>=6'
     resolution:
@@ -5022,9 +5020,11 @@ packages:
     resolution:
       integrity: sha1-hSBLVNuoLVdC4oyWdW70OvUOM4Q=
   /redis-commands/1.7.0:
+    dev: true
     resolution:
       integrity: sha512-nJWqw3bTFy21hX/CPKHth6sfhZbdiHP6bTawSgQBlKOVRG7EZkfHbbHwQJnrE4vsQf0CMNE+3gJ4Fmm16vdVlQ==
   /redis-errors/1.2.0:
+    dev: true
     engines:
       node: '>=4'
     resolution:
@@ -5032,6 +5032,7 @@ packages:
   /redis-parser/3.0.0:
     dependencies:
       redis-errors: 1.2.0
+    dev: true
     engines:
       node: '>=4'
     resolution:
@@ -5565,6 +5566,7 @@ packages:
     resolution:
       integrity: sha512-gL//fkxfWUsIlFL2Tl42Cl6+HFALEaB1FU76I/Fy+oZjRreP7OPMXFlGbxM7NQsI0ZpUfw76sHnv0WNYuTb7Iw==
   /standard-as-callback/2.0.1:
+    dev: true
     resolution:
       integrity: sha512-NQOxSeB8gOI5WjSaxjBgog2QFw55FV8TkS6Y07BiB3VJ8xNTvUYm0wl0s8ObgQ5NhdpnNfigMIKjgPESzgr4tg==
   /static-extend/0.1.2:

@@ -17,9 +17,7 @@ COPY libs/common/package.json ./libs/common/
 COPY libs/error/package.json ./libs/error/
 COPY libs/gateway/package.json ./libs/gateway/
 COPY libs/queue/package.json ./libs/queue/
-COPY libs/redis-store/package.json ./libs/redis-store/
 COPY libs/rest/package.json ./libs/rest/
-COPY libs/store/package.json ./libs/store/
 COPY services/gateway/package.json ./services/gateway/package.json
 
 RUN pnpm i --frozen-lockfile && apk del .build-deps
@@ -30,9 +28,7 @@ COPY libs/common ./libs/common
 COPY libs/error ./libs/error
 COPY libs/gateway ./libs/gateway
 COPY libs/queue ./libs/queue
-COPY libs/redis-store ./libs/redis-store
 COPY libs/rest ./libs/rest
-COPY libs/store ./libs/store
 COPY services/gateway ./services/gateway
 
 RUN pnpm run build && pnpm prune --prod
