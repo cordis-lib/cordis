@@ -9,10 +9,18 @@ test('get missing props', () => {
 });
 
 test('halt', async () => {
-  const timeStart = Date.now();
+  jest.useFakeTimers();
 
-  await halt(100);
-  expect(Date.now() - timeStart).toBeGreaterThanOrEqual(100);
+  const cb = jest.fn();
+
+  const promise = halt(100).then(cb);
+  expect(setTimeout).toHaveBeenCalled();
+  expect(cb).not.toHaveBeenCalled();
+
+  jest.runAllTimers();
+
+  await promise;
+  expect(cb).toHaveBeenCalled();
 });
 
 describe('is promise', () => {
