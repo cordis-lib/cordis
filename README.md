@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="400" height="400" src="media/cordis_transparent.png">
+  <img width="400" height="400" style="width: 100%;height: auto;" src="media/cordis_transparent.png">
   <h4>
     A fully modular, micro-service based <a href="https://nodejs.org/">Node.js</a> wrapper around the <a href="https://discordapp.com/developers/docs/intro">Discord API</a>
   </h3>
