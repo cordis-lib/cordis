@@ -4,30 +4,6 @@ import { RestManager } from '@cordis/rest';
 /*
 TO:DO
 
-Channel
- editChannel - encapsulate permissions
- fetchChannelMessages/fetchChannelMessage
- sendMessage
- crosspostMessage
- addMessageReaction
- deleteOwnMessageReaction
- deleteUserReaction
- deleteAllReactions
- deleteReaction
- fetchMessageReactions
- editMessage
- deleteMessage
- bulkDeleteMessages
- fetchChannelInvites
- createChannelInvite
- followNewsChannel
- startTyping
- fetchPinnedChannelMessages
- deletePinnedChannelMessage
- addPinnedChannelMessage
- groupDMAddRecipient
- groupDMRemoveRecipient
-
 Guild
  createGuild
  fetchGuild
@@ -65,15 +41,37 @@ Guild
  fetchGuildVanityURL
  fetchGuildWidgetImage
 
-fetchChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.get<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
-deleteChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.delete<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
-*/
 
+*/
 
 interface webhookIdOrToken { webhookID: dAPI.Snowflake; webhookToken?: string }
 
 export const makeRestUtils = (rest: RestManager) => (
   {
+    fetchChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.get<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
+    editChannel: (channelID: dAPI.Snowflake, data: dAPI.RESTPatchAPIChannelJSONBody) => rest.patch<dAPI.RESTPatchAPIChannelResult, dAPI.RESTPatchAPIChannelJSONBody>(dAPI.Routes.channel(channelID), { data }),
+    deleteChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.delete<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
+    fetchChannelMessages: (...args: Parameters<typeof dAPI.Routes.channelMessages>) => rest.get<dAPI.RESTGetAPIChannelMessagesResult>(dAPI.Routes.channelMessages(...args)),
+    fetchChannelMessage: (...args: Parameters<typeof dAPI.Routes.channelMessage>) => rest.get<dAPI.RESTGetAPIChannelMessageResult>(dAPI.Routes.channelMessage(...args)),
+    sendMessage: (channelID: dAPI.Snowflake, data: dAPI.RESTPostAPIChannelMessageJSONBody) => rest.post<dAPI.RESTPostAPIChannelMessageResult, dAPI.RESTPostAPIChannelMessageJSONBody>(dAPI.Routes.channelMessages(channelID), { data }),
+    crosspostMessage: (channelID: dAPI.Snowflake, messageID: dAPI.Snowflake) => rest.post<dAPI.RESTPostAPIChannelMessageCrosspostResult, null>(dAPI.Routes.channelMessageCrosspost(channelID, messageID), { data: null }),
+    addReaction: (...args: Parameters<typeof dAPI.Routes.channelMessageReaction>) => rest.put<dAPI.RESTPutAPIChannelMessageReactionResult>(dAPI.Routes.channelMessageReaction(...args)),
+    deleteUserReaction: (channelID: dAPI.Snowflake, messageID: dAPI.Snowflake, emoji: dAPI.Snowflake | string, userID?: dAPI.Snowflake) => userID ? rest.delete<dAPI.RESTDeleteAPIChannelMessageUserReactionResult>(dAPI.Routes.channelMessageUserReaction(channelID, messageID, emoji, userID)) : rest.delete<dAPI.RESTDeleteAPIChannelMessageOwnReaction>(dAPI.Routes.channelMessageOwnReaction(channelID, messageID, emoji)),
+    deleteAllMessageReactions: (...args: Parameters<typeof dAPI.Routes.channelMessageAllReactions>) => rest.delete<dAPI.RESTDeleteAPIChannelAllMessageReactionsResult>(dAPI.Routes.channelMessageAllReactions(...args)),
+    deleteAllEmoteReaction: (...args: Parameters<typeof dAPI.Routes.channelMessageReaction>) => rest.delete<dAPI.RESTDeleteAPIChannelMessageReactionResult>(dAPI.Routes.channelMessageReaction(...args)),
+    fetchMessageReactions: (channelID: dAPI.Snowflake, messageID: dAPI.Snowflake, emoji: dAPI.Snowflake | string, options: dAPI.RESTGetAPIChannelMessagesQuery) => rest.get<dAPI.RESTGetAPIChannelMessageResult, dAPI.RESTGetAPIChannelMessagesQuery>(dAPI.Routes.channelMessageReaction(channelID, messageID, emoji), { query: options }),
+    editMessage: (channelID: dAPI.Snowflake, messageID: dAPI.Snowflake, data: dAPI.RESTPatchAPIChannelMessageJSONBody) => rest.patch<dAPI.RESTPatchAPIChannelMessageResult, dAPI.RESTPatchAPIChannelMessageJSONBody>(dAPI.Routes.channelMessage(channelID, messageID), { data }),
+    deleteMessage: (...args: Parameters<typeof dAPI.Routes.channelMessage>) => rest.delete(dAPI.Routes.channelMessage(...args)),
+    bulkDeleteMessages: (channelID: dAPI.Snowflake, data: dAPI.RESTPostAPIChannelMessagesBulkDeleteJSONBody) => rest.post<dAPI.RESTPostAPIChannelMessagesBulkDeleteResult, dAPI.RESTPostAPIChannelMessagesBulkDeleteJSONBody>(dAPI.Routes.channelBulkDelete(channelID), { data }),
+    editChannelPermissions: (channelID: dAPI.Snowflake, owerwriteID: dAPI.Snowflake, data: dAPI.RESTPutAPIChannelPermissionJSONBody) => rest.put<dAPI.RESTPutAPIChannelPermissionResult, dAPI.RESTPutAPIChannelPermissionJSONBody>(dAPI.Routes.channelPermission(channelID, owerwriteID), { data }),
+    deleteChannelPermissions: (...args: Parameters<typeof dAPI.Routes.channelPermission>) => rest.delete<dAPI.RESTDeleteAPIChannelPermissionResult>(dAPI.Routes.channelPermission(...args)),
+    fetchChannelInvites: (...args: Parameters<typeof dAPI.Routes.channelInvites>) => rest.get<dAPI.RESTGetAPIChannelInvitesResult>(dAPI.Routes.channelInvites(...args)),
+    createChannelInvite: (channelID: dAPI.Snowflake, data: dAPI.RESTPostAPIChannelInviteJSONBody) => rest.post<dAPI.RESTPostAPIChannelInviteResult, dAPI.RESTPostAPIChannelInviteJSONBody>(dAPI.Routes.channelInvites(channelID), { data }),
+    followNewsChannel: (channelID: dAPI.Snowflake, data: dAPI.RESTPostAPIChannelFollowersJSONBody) => rest.post<dAPI.RESTPostAPIChannelFollowersResult, dAPI.RESTPostAPIChannelFollowersJSONBody>(dAPI.Routes.channelFollowers(channelID), { data }),
+    startTyping: (...args: Parameters<typeof dAPI.Routes.channelTyping>) => rest.get<dAPI.RESTPostAPIChannelTypingResult>(dAPI.Routes.channelTyping(...args)),
+    fetchPinnedChannelMessages: (...args: Parameters<typeof dAPI.Routes.channelPins>) => rest.get<dAPI.RESTGetAPIChannelPinsResult>(dAPI.Routes.channelPins(...args)),
+    deletePinnedChannelMessage: (...args: Parameters<typeof dAPI.Routes.channelPin>) => rest.delete<dAPI.RESTDeleteAPIChannelPinResult>(dAPI.Routes.channelPin(...args)),
+    addPinnedChannelMessage: (...args: Parameters<typeof dAPI.Routes.channelPin>) => rest.put<dAPI.RESTDeleteAPIChannelPinResult>(dAPI.Routes.channelPin(...args)),
     fetchAuditLogs: (guildID: dAPI.Snowflake, options?: dAPI.RESTGetAPIAuditLogQuery) => rest.get<dAPI.APIAuditLog, dAPI.RESTGetAPIAuditLogQuery>(dAPI.Routes.guildAuditLog(guildID), { query: options }),
     fetchInvite: (...args: Parameters<typeof dAPI.Routes.invite>) => rest.get<dAPI.RESTGetAPIInviteResult>(dAPI.Routes.invite(...args)),
     deleteInvite: (...args: Parameters<typeof dAPI.Routes.invite>) => rest.delete<dAPI.RESTDeleteAPIInviteResult>(dAPI.Routes.invite(...args)),
