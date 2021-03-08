@@ -3,7 +3,7 @@
 name: Feature request
 about: Request a feature for any of the cordis libraries/services
 title: ''
-labels: 'type: enhancement'
+labels: 't: feature'
 assignees: ''
 ---
 
