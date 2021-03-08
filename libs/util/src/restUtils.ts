@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import * as dAPI from 'discord-api-types/v8';
 import { RestManager } from '@cordis/rest';
 
