@@ -65,25 +65,6 @@ Guild
  fetchGuildVanityURL
  fetchGuildWidgetImage
 
-Template
- fetchTemplate
- createGuildFromTemplate
- fetchGuildTemplates
- createGuildTemplate
- syncGuildTemplate
- modifyGuildTemplate
- deleteGuildTemplate
-
-User
- fetchCurrentUser
- fetchUser
- editCurrentUser
- leaveGuild
- fetchDMs
- createDM
- createGroupDM
- getUserConnections
-
 fetchChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.get<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
 deleteChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.delete<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
 */
@@ -107,6 +88,19 @@ export const makeRestUtils = (rest: RestManager) => (
     fetchGuildEmoji: (...args: Parameters<typeof dAPI.Routes.guildEmoji>) => rest.get<dAPI.RESTGetAPIGuildEmojiResult>(dAPI.Routes.guildEmoji(...args)),
     createGuildEmoji: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPIGuildEmojiJSONBody) => rest.post<dAPI.RESTPostAPIGuildEmojiResult, dAPI.RESTPostAPIGuildEmojiJSONBody>(dAPI.Routes.guildEmojis(guildID), { data }),
     editGuildEmoji: (guildID: dAPI.Snowflake, emojiID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildEmojiJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildEmojiResult, dAPI.RESTPatchAPIGuildEmojiJSONBody>(dAPI.Routes.guildEmoji(guildID, emojiID), { data }),
-    deleteGuildEmoji: (...args: Parameters<typeof dAPI.Routes.guildEmoji>) => rest.delete<dAPI.RESTDeleteAPIGuildEmojiResult>(dAPI.Routes.guildEmoji(...args))
+    deleteGuildEmoji: (...args: Parameters<typeof dAPI.Routes.guildEmoji>) => rest.delete<dAPI.RESTDeleteAPIGuildEmojiResult>(dAPI.Routes.guildEmoji(...args)),
+    fetchMe: () => rest.get<dAPI.RESTGetAPICurrentUserResult>(dAPI.Routes.user()),
+    fetchUser: (userID?: dAPI.Snowflake | null) => rest.get<dAPI.RESTGetAPIUserResult>(dAPI.Routes.user(userID ?? undefined)),
+    editMe: (data: dAPI.RESTPatchAPICurrentUserJSONBody) => rest.patch<dAPI.RESTPatchAPICurrentUserResult, dAPI.RESTPatchAPICurrentUserJSONBody>(dAPI.Routes.user(), { data }),
+    leaveGuild: (...args: Parameters<typeof dAPI.Routes.guild>) => rest.delete<dAPI.RESTDeleteAPICurrentUserGuildResult>(dAPI.Routes.guild(...args)),
+    createDM: (data: dAPI.RESTPostAPICurrentUserCreateDMChannelJSONBody) => rest.post<dAPI.RESTPostAPICurrentUserCreateDMChannelResult, dAPI.RESTPostAPICurrentUserCreateDMChannelJSONBody>(dAPI.Routes.userChannels(), { data }),
+    getUserConnections: () => rest.get<dAPI.RESTGetAPICurrentUserConnectionsResult>(dAPI.Routes.userConnections()),
+    fetchTemplate: (...args: Parameters<typeof dAPI.Routes.template>) => rest.get<dAPI.RESTGetAPITemplateResult>(dAPI.Routes.template(...args)),
+    createGuildFromTemplate: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPITemplateCreateGuildJSONBody) => rest.post<dAPI.RESTPostAPITemplateCreateGuildResult, dAPI.RESTPostAPITemplateCreateGuildJSONBody>(dAPI.Routes.template(guildID), { data }),
+    fetchGuildTemplates: (...args: Parameters<typeof dAPI.Routes.guildTemplates>) => rest.get<dAPI.RESTGetAPIGuildTemplatesResult>(dAPI.Routes.guildTemplates(...args)),
+    createGuildTemplate: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPIGuildTemplatesJSONBody) => rest.post<dAPI.RESTPostAPIGuildTemplatesResult, dAPI.RESTPostAPIGuildTemplatesJSONBody>(dAPI.Routes.guildTemplates(guildID), { data }),
+    syncGuildTemplate: (guildID: dAPI.Snowflake, templateCode: string) => rest.put<dAPI.RESTPutAPIGuildTemplateSyncResult>(dAPI.Routes.guildTemplate(guildID, templateCode)),
+    editGuildTemplate: (guildID: dAPI.Snowflake, templateCode: string, data: dAPI.RESTPatchAPIGuildTemplateJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildTemplateResult, dAPI.RESTPatchAPIGuildTemplateJSONBody>(dAPI.Routes.guildTemplate(guildID, templateCode), { data }),
+    deleteGuildTemplate: (...args: Parameters<typeof dAPI.Routes.guildTemplate>) => rest.delete<dAPI.RESTDeleteAPIGuildTemplateResult>(dAPI.Routes.guildTemplate(...args))
   }
 );
