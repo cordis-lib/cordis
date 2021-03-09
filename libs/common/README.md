@@ -12,7 +12,7 @@ A library containing cordis utility functions/types/structures.
 - `yarn add @cordis/common`
 
 ## Documentation
-You can find documentation for the whole project over at https://cordis.didinele.me
+You can find documentation for the whole project over at https://cordis.js.org
 
 ## Contributing
 Please see the main [README.md](https://github.com/cordis-lib/cordis) for info on how to contribute to this package or the other `@cordis` packages.

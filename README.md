@@ -8,7 +8,7 @@
     <br />
     <h3>
       <strong>
-        <a href="https://cordis.didinele.me/">Explore the docs »</a><a href="https://discord.gg/37ysd5dPYk"> Join Our Discord!</a>
+        <a href="https://cordis.js.org/">Explore the docs »</a><a href="https://discord.gg/37ysd5dPYk"> Join Our Discord!</a>
       </strong>
     </h2>
   </p>  
