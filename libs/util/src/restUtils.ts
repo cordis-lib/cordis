@@ -1,9 +1,10 @@
 /* istanbul ignore file */
 
-import { Routes, Snowflake } from 'discord-api-types/v8';
-import { RestManager } from '@cordis/rest';
+import { Routes } from 'discord-api-types/v8';
+import type { RestManager } from '@cordis/rest';
 // eslint-disable-next-line no-duplicate-imports
 import type {
+  Snowflake,
   APIAuditLog,
   APIChannel,
   APIGuildPreview,
