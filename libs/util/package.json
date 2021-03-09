@@ -1,7 +1,7 @@
 {
   "name": "@cordis/util",
   "version": "0.1.5",
-  "description": "Helper REST functions and other utilities for Cordis",
+  "description": "Helper methods and structures for Cordis",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
