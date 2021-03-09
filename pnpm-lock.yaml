@@ -56,7 +56,7 @@ importers:
       '@types/node': 14.14.31
       typescript: 4.2.2
     specifiers:
-      '@cordis/error': workspace:^0.1.6
+      '@cordis/error': workspace:^0.1.7
       '@types/node': ^14.14.31
       tslib: ^2.1.0
       typescript: ^4.2.2
@@ -72,8 +72,8 @@ importers:
       '@types/node': 14.14.31
       typescript: 4.2.2
     specifiers:
-      '@cordis/common': workspace:^0.1.6
-      '@cordis/error': workspace:^0.1.6
+      '@cordis/common': workspace:^0.1.7
+      '@cordis/error': workspace:^0.1.7
       '@msgpack/msgpack': ^2.4.0
       '@types/amqplib': ^0.5.17
       '@types/node': ^14.14.31
@@ -90,7 +90,7 @@ importers:
       '@types/node': 14.14.31
       typescript: 4.2.2
     specifiers:
-      '@cordis/error': workspace:^0.1.6
+      '@cordis/error': workspace:^0.1.7
       '@types/amqplib': ^0.5.17
       '@types/node': ^14.14.31
       discord-api-types: ^0.12.1
@@ -128,13 +128,13 @@ importers:
       typescript: 4.2.2
       zlib-sync: 0.1.7
     specifiers:
-      '@cordis/bitfield': workspace:^0.1.6
-      '@cordis/common': workspace:^0.1.6
-      '@cordis/error': workspace:^0.1.6
-      '@cordis/queue': workspace:^0.1.6
-      '@cordis/redis-store': workspace:^0.1.6
-      '@cordis/rest': workspace:^0.1.6
-      '@cordis/store': workspace:^0.1.6
+      '@cordis/bitfield': workspace:^0.1.7
+      '@cordis/common': workspace:^0.1.7
+      '@cordis/error': workspace:^0.1.7
+      '@cordis/queue': workspace:^0.1.7
+      '@cordis/redis-store': workspace:^0.1.7
+      '@cordis/rest': workspace:^0.1.7
+      '@cordis/store': workspace:^0.1.7
       '@types/common-tags': ^1.8.0
       '@types/ioredis': ^4.19.4
       '@types/node': ^14.14.31
@@ -166,8 +166,8 @@ importers:
       '@types/node': 14.14.31
       typescript: 4.2.2
     specifiers:
-      '@cordis/error': workspace:^0.1.6
-      '@cordis/store': workspace:^0.1.6
+      '@cordis/error': workspace:^0.1.7
+      '@cordis/store': workspace:^0.1.7
       '@types/ioredis': ^4.19.4
       '@types/node': ^14.14.31
       tslib: ^2.1.0
@@ -187,8 +187,8 @@ importers:
       ioredis: 4.22.0
       typescript: 4.2.2
     specifiers:
-      '@cordis/common': workspace:^0.1.6
-      '@cordis/error': workspace:^0.1.6
+      '@cordis/common': workspace:^0.1.7
+      '@cordis/error': workspace:^0.1.7
       '@types/node': ^14.14.31
       '@types/node-fetch': ^2.5.8
       abort-controller: ^3.0.0
@@ -206,7 +206,7 @@ importers:
       '@types/node': 14.14.31
       typescript: 4.2.2
     specifiers:
-      '@cordis/rest': workspace:^0.1.6
+      '@cordis/rest': workspace:^0.1.7
       '@types/node': ^14.14.31
       tslib: ^2.1.0
       typescript: ^4.2.2
@@ -254,11 +254,11 @@ importers:
       discord-api-types: 0.12.1
       typescript: 4.2.2
     specifiers:
-      '@cordis/brokers': workspace:^0.1.6
-      '@cordis/common': workspace:^0.1.6
-      '@cordis/gateway': workspace:^0.1.6
-      '@cordis/redis-store': workspace:^0.1.6
-      '@cordis/store': workspace:^0.1.6
+      '@cordis/brokers': workspace:^0.1.7
+      '@cordis/common': workspace:^0.1.7
+      '@cordis/gateway': workspace:^0.1.7
+      '@cordis/redis-store': workspace:^0.1.7
+      '@cordis/store': workspace:^0.1.7
       '@types/node': ^14.14.31
       '@types/yargs': ^15.0.13
       discord-api-types: ^0.12.1

@@ -4,6 +4,10 @@
   "description": "Helper methods and structures for Cordis",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
+<<<<<<< HEAD:libs/util/package.json
+=======
+  "version": "0.1.7",
+>>>>>>> origin/main:libs/snowflake/package.json
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"

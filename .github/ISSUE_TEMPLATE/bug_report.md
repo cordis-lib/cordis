@@ -1,7 +1,7 @@
 ---
 
 name: Bug report
-about: Report incorrect or unexpected behavior of any cordis libraries/packages
+about: Report incorrect or unexpected behavior of any cordis libraries/services
 title: ''
 labels: 's: unverified, type: bug'
 assignees: ''
