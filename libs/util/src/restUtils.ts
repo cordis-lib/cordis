@@ -3,53 +3,47 @@
 import * as dAPI from 'discord-api-types/v8';
 import { RestManager } from '@cordis/rest';
 
-/*
-TO:DO
-
-Guild
- createGuild
- fetchGuild
- fetchGuildPreview
- editGuild
- deleteGuild
- fetchGuildChannels
- createGuildChannel
- fetchGuildMember
- addGuildMember
- editGuildMember
- setNickname
- addRole
- removeRole
- kickMember
- fetchGuildBans
- fetchGuildBan
- banMember
- unbanMember
- fetchRoles
- createRole
- setRolePosition
- editRole
- deleteRole
- pruneGuild
- getPredictedPruneResult
- fetchGuildVoiceRegions
- fetchGuildInvites
- createGuildIntegration
- editGuildIntegration
- deleteGuildIntegration
- syncGuildIntegration
- fetchGuildWidget
- editGuildWidget (settings too)
- fetchGuildVanityURL
- fetchGuildWidgetImage
-
-
-*/
-
 interface webhookIdOrToken { webhookID: dAPI.Snowflake; webhookToken?: string }
 
 export const makeRestUtils = (rest: RestManager) => (
   {
+    createGuild: (data: dAPI.RESTPostAPIGuildsJSONBody) => rest.post<dAPI.RESTPostAPIGuildsResult, dAPI.RESTPostAPIGuildsJSONBody>(dAPI.Routes.guilds(), { data }),
+    fetchGuild: (...args: Parameters<typeof dAPI.Routes.guild>) => rest.get<dAPI.RESTGetAPIGuildResult>(dAPI.Routes.guild(...args)),
+    fetchGuildPreview: (...args: Parameters<typeof dAPI.Routes.guildPreview>) => rest.get<dAPI.APIGuildPreview>(dAPI.Routes.guildPreview(...args)),
+    editGuild: (guildID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildResult, dAPI.RESTPatchAPIGuildJSONBody>(dAPI.Routes.guild(guildID), { data }),
+    deleteGuild: (...args: Parameters<typeof dAPI.Routes.guild>) => rest.delete<dAPI.RESTDeleteAPIGuildResult>(dAPI.Routes.guild(...args)),
+    fetchGuildChannels: (...args: Parameters<typeof dAPI.Routes.guildChannels>) => rest.get<dAPI.RESTGetAPIGuildChannelsResult>(dAPI.Routes.guildChannels(...args)),
+    createGuildChannel: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPIGuildChannelJSONBody) => rest.post<dAPI.RESTPostAPIGuildChannelResult, dAPI.RESTPostAPIGuildChannelJSONBody>(dAPI.Routes.guildChannels(guildID), { data }),
+    fetchGuildMember: (...args: Parameters<typeof dAPI.Routes.guildMember>) => rest.get<dAPI.RESTGetAPIGuildMemberResult>(dAPI.Routes.guildMember(...args)),
+    addGuildMember: (guildID: dAPI.Snowflake, userID: dAPI.Snowflake, data: dAPI.RESTPutAPIGuildMemberJSONBody) => rest.put<dAPI.RESTPutAPIGuildMemberResult, dAPI.RESTPutAPIGuildMemberJSONBody>(dAPI.Routes.guildMember(guildID, userID), { data }),
+    editGuildMember: (guildID: dAPI.Snowflake, userID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildMemberJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildMemberResult, dAPI.RESTPatchAPIGuildMemberJSONBody>(dAPI.Routes.guildMember(guildID, userID), { data }),
+    setMeNickname: (guildID: dAPI.Snowflake, data: dAPI.RESTPatchAPICurrentGuildMemberNicknameJSONBody) => rest.patch<dAPI.RESTPatchAPICurrentGuildMemberNicknameResult, dAPI.RESTPatchAPICurrentGuildMemberNicknameJSONBody>(dAPI.Routes.guildCurrentMemberNickname(guildID), { data }),
+    addRole: (...args: Parameters<typeof dAPI.Routes.guildMemberRole>) => rest.put<dAPI.RESTPutAPIGuildMemberRoleResult>(dAPI.Routes.guildMemberRole(...args)),
+    removeRole: (...args: Parameters<typeof dAPI.Routes.guildMemberRole>) => rest.delete<dAPI.RESTDeleteAPIGuildMemberRoleResult>(dAPI.Routes.guildMemberRole(...args)),
+    kickMember: (...args: Parameters<typeof dAPI.Routes.guildMember>) => rest.delete<dAPI.RESTDeleteAPIGuildMemberResult>(dAPI.Routes.guildMember(...args)),
+    fetchGuildBans: (...args: Parameters<typeof dAPI.Routes.guildBans>) => rest.get<dAPI.RESTGetAPIGuildBansResult>(dAPI.Routes.guildBans(...args)),
+    fetchGuildBan: (...args: Parameters<typeof dAPI.Routes.guildBan>) => rest.get<dAPI.RESTGetAPIGuildBanResult>(dAPI.Routes.guildBan(...args)),
+    banMember: (guildID: dAPI.Snowflake, userID: dAPI.Snowflake, data: dAPI.RESTPutAPIGuildBanJSONBody) => rest.put<dAPI.RESTPutAPIGuildBanResult, dAPI.RESTPutAPIGuildBanJSONBody>(dAPI.Routes.guildBan(guildID, userID), { data }),
+    unbanMember: (guildID: dAPI.Snowflake, userID: dAPI.Snowflake) => rest.delete<dAPI.RESTDeleteAPIGuildBanResult>(dAPI.Routes.guildBan(guildID, userID)),
+    fetchRoles: (...args: Parameters<typeof dAPI.Routes.guildMemberRole>) => rest.get<dAPI.RESTGetAPIGuildRolesResult>(dAPI.Routes.guildMemberRole(...args)),
+    createRole: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPIGuildRoleJSONBody) => rest.post<dAPI.RESTPostAPIGuildRoleResult, dAPI.RESTPostAPIGuildRoleJSONBody>(dAPI.Routes.guildRoles(guildID), { data }),
+    setRolePosition: (guildID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildRolePositionsJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildRolePositionsResult, dAPI.RESTPatchAPIGuildRolePositionsJSONBody>(dAPI.Routes.guildRoles(guildID), { data }),
+    editRole: (guildID: dAPI.Snowflake, roleID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildRoleJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildRoleResult, dAPI.RESTPatchAPIGuildRoleJSONBody>(dAPI.Routes.guildRole(guildID, roleID), { data }),
+    deleteRole: (...args: Parameters<typeof dAPI.Routes.guildRole>) => rest.delete<dAPI.RESTDeleteAPIGuildRoleResult>(dAPI.Routes.guildRole(...args)),
+    pruneGuild: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPIGuildPruneJSONBody) => rest.post<dAPI.RESTPostAPIGuildPruneResult, dAPI.RESTPostAPIGuildPruneJSONBody>(dAPI.Routes.guildPrune(guildID), { data }),
+    getPredictedPruneResult: (guildID: dAPI.Snowflake, options: dAPI.RESTGetAPIGuildPruneCountQuery) => rest.get<dAPI.RESTGetAPIGuildPruneCountResult, dAPI.RESTGetAPIGuildPruneCountQuery>(dAPI.Routes.guildPrune(guildID), { query: options }),
+    fetchGuildVoiceRegions: (...args: Parameters<typeof dAPI.Routes.guildVoiceRegions>) => rest.get<dAPI.RESTGetAPIGuildVoiceRegionsResult>(dAPI.Routes.guildVoiceRegions(...args)),
+    fetchGuildInvites: (...args: Parameters<typeof dAPI.Routes.guildInvites>) => rest.get<dAPI.RESTGetAPIGuildInvitesResult>(dAPI.Routes.guildInvites(...args)),
+    fetchGuildIntegration: (...args: Parameters<typeof dAPI.Routes.guildIntegrations>) => rest.get<dAPI.RESTGetAPIGuildIntegrationsResult>(dAPI.Routes.guildIntegrations(...args)),
+    createGuildIntegration: (guildID: dAPI.Snowflake, data: dAPI.RESTPostAPIGuildIntegrationJSONBody) => rest.post<dAPI.RESTPostAPIGuildIntegrationResult, dAPI.RESTPostAPIGuildIntegrationJSONBody>(dAPI.Routes.guildIntegrations(guildID), { data }),
+    editGuildIntegration: (guildID: dAPI.Snowflake, integrationID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildIntegrationJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildIntegrationResult, dAPI.RESTPatchAPIGuildIntegrationJSONBody>(dAPI.Routes.guildIntegration(guildID, integrationID), { data }),
+    deleteGuildIntegration: (...args: Parameters<typeof dAPI.Routes.guildIntegration>) => rest.delete<dAPI.RESTDeleteAPIGuildIntegrationResult>(dAPI.Routes.guildIntegration(...args)),
+    syncGuildIntegration: (...args: Parameters<typeof dAPI.Routes.guildIntegrationSync>) => rest.post<dAPI.RESTPostAPIGuildIntegrationSyncResult, null>(dAPI.Routes.guildIntegrationSync(...args), { data: null }),
+    fetchGuildWidgetSettings: (...args: Parameters<typeof dAPI.Routes.guildWidgetSettings>) => rest.get<dAPI.RESTGetAPIGuildWidgetJSONResult>(dAPI.Routes.guildWidgetSettings(...args)),
+    fetchGuildWidget: (...args: Parameters<typeof dAPI.Routes.guildWidgetImage>) => rest.get<dAPI.RESTGetAPIGuildWidgetJSONResult>(dAPI.Routes.guildWidgetImage(...args)),
+    editGuildWidget: (guildID: dAPI.Snowflake, data: dAPI.RESTPatchAPIGuildWidgetSettingsJSONBody) => rest.patch<dAPI.RESTPatchAPIGuildWidgetSettingsResult, dAPI.RESTPatchAPIGuildWidgetSettingsJSONBody>(dAPI.Routes.guildWidgetSettings(guildID), { data }),
+    fetchGuildVanityURL: (...args: Parameters<typeof dAPI.Routes.guildVanityUrl>) => rest.get<dAPI.RESTGetAPIGuildVanityUrlResult>(dAPI.Routes.guildVanityUrl(...args)),
+    fetchGuildWidgetImage: (guildID: dAPI.Snowflake, options: dAPI.RESTGetAPIGuildWidgetImageQuery) => rest.get<dAPI.RESTGetAPIGuildWidgetImageResult, dAPI.RESTGetAPIGuildWidgetImageQuery>(dAPI.Routes.guildWidgetImage(guildID), { query: options }),
     fetchChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.get<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
     editChannel: (channelID: dAPI.Snowflake, data: dAPI.RESTPatchAPIChannelJSONBody) => rest.patch<dAPI.RESTPatchAPIChannelResult, dAPI.RESTPatchAPIChannelJSONBody>(dAPI.Routes.channel(channelID), { data }),
     deleteChannel: (...args: Parameters<typeof dAPI.Routes.channel>) => rest.delete<dAPI.APIChannel>(dAPI.Routes.channel(...args)),
