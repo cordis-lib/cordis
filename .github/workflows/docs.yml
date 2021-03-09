@@ -35,7 +35,7 @@ jobs:
         run: pnpm run docs
         
       - name: Place CNAME
-        run: echo "cordis.didinele.me" >| ./doc/CNAME
+        run: echo "cordis.js.org" >| ./doc/CNAME
 
       - name: Commit the Docs
         uses: cpina/github-action-push-to-another-repository@master
