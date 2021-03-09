@@ -1,4 +1,4 @@
-import type { RestManager } from '@cordis/rest';
+import type { Rest } from './Rest';
 import type { IRouter } from './IRouter';
 
 /**
@@ -16,7 +16,7 @@ import type { IRouter } from './IRouter';
  * ```
  * @param manager REST manager
  */
-export const buildRestRouter = (manager: RestManager) => {
+export const buildRestRouter = (manager: Rest) => {
   const method: string[] = [''];
   const handler: ProxyHandler<IRouter> = {
     get(_, property) {

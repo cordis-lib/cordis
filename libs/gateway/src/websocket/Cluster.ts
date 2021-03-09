@@ -6,7 +6,7 @@ import {
   WebsocketConnectionDestroyOptions
 } from './WebsocketConnection';
 import { stripIndent } from 'common-tags';
-import { RestManager, MemoryMutex, RedisMutex } from '@cordis/rest';
+import { Rest, MemoryMutex, RedisMutex } from '@cordis/rest';
 import { Store, IStore } from '@cordis/store';
 import { RedisStore } from '@cordis/redis-store';
 import {
@@ -125,7 +125,7 @@ export class Cluster extends EventEmitter {
   /**
    * REST instance
    */
-  public readonly rest: RestManager;
+  public readonly rest: Rest;
 
   /**
    * First shard ID for this cluster
@@ -194,7 +194,7 @@ export class Cluster extends EventEmitter {
     } = options;
 
     this.guilds = redis ? new RedisStore({ redis, hash: 'guilds', encode: JSON.stringify, decode: JSON.parse }) : new Store<APIGuild>();
-    this.rest = new RestManager(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
+    this.rest = new Rest(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
     this.shardCount = shardCount;
     this.startingShard = startingShard;
     this.totalShardCount = totalShardCount;

@@ -1,7 +1,7 @@
 import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { CordisRestError, HTTPError } from './Error';
 import { halt } from '@cordis/common';
-import type { RestManager } from './RestManager';
+import type { Rest } from './Rest';
 
 /**
  * Data held to represent ratelimit state for a Bucket
@@ -39,7 +39,7 @@ export class Bucket {
    * @param route The identifier of this bucket
    */
   public constructor(
-    public readonly manager: RestManager,
+    public readonly manager: Rest,
     public readonly route: string
   ) {}
 

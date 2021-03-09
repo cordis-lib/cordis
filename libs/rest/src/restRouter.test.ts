@@ -1,7 +1,7 @@
 import { buildRestRouter } from './restRouter';
-import { RestManager } from '@cordis/rest';
+import { Rest } from './Rest';
 
-const manager = RestManager as any as RestManager;
+const manager = Rest as any as Rest;
 const mockedMake = manager.make as any as jest.Mock;
 
 jest.mock('@cordis/rest', () => ({
