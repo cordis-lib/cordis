@@ -1,31 +1,30 @@
-import Embed from './Embed';
+import { embed } from './Embed';
 
 test('Dataless value checks', () => {
-  const embed = new Embed({});
-  expect(embed.author).toBe(null);
-  expect(embed.color).toBe(null);
-  expect(embed.description).toBe(null);
-  expect(embed.footer).toBe(null);
-  expect(embed.fields).toStrictEqual([]);
-  expect(embed.image).toBe(null);
-  expect(embed.provider).toBe(null);
-  expect(embed.thumbnail).toBe(null);
-  expect(embed.timestamp).toBe(null);
-  expect(embed.title).toBe(null);
-  expect(embed.author).toBe(null);
-  expect(embed.url).toBe(null);
-  expect(embed.video).toBe(null);
+  const embed1 = embed({});
+  expect(embed1.author).toBe(undefined);
+  expect(embed1.color).toBe(undefined);
+  expect(embed1.description).toBe(undefined);
+  expect(embed1.footer).toBe(undefined);
+  expect(embed1.fields).toStrictEqual([]);
+  expect(embed1.image).toBe(undefined);
+  expect(embed1.provider).toBe(undefined);
+  expect(embed1.thumbnail).toBe(undefined);
+  expect(embed1.timestamp).toBe(undefined);
+  expect(embed1.title).toBe(undefined);
+  expect(embed1.author).toBe(undefined);
+  expect(embed1.url).toBe(undefined);
+  expect(embed1.video).toBe(undefined);
 });
 
 test('Data value checks', () => {
-  const timestamp = '2021-03-08T14:40:27.875Z';
+  const date = new Date('2021-03-08T14:40:27.875Z').getTime();
   const color = 16753920;
 
-  const embed = new Embed({
+  const embed2 = embed({
     title: 'testing title!',
     description: 'testing description',
     url: 'https://google.com',
-    timestamp,
     color,
     fields: [],
     thumbnail: {
@@ -40,9 +39,9 @@ test('Data value checks', () => {
     footer: {
       text: 'Test Footer'
     }
-  });
+  }).setTimestamp(date);
 
-  expect(embed.timestamp).toBe(new Date(timestamp).getTime());
-  expect(embed.color).toBe(color);
-  expect(embed.fields).toStrictEqual([]);
+  expect(embed2.timestamp).toBe(date.toString());
+  expect(embed2.color).toBe(color);
+  expect(embed2.fields).toStrictEqual([]);
 });
