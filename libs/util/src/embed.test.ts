@@ -18,7 +18,7 @@ test('Dataless value checks', () => {
 });
 
 test('Data value checks', () => {
-  const date = new Date('2021-03-08T14:40:27.875Z').getTime();
+  const date = new Date('2021-03-08T14:40:27.875Z');
   const color = 16753920;
 
   const embed2 = buildEmbed({
@@ -39,7 +39,7 @@ test('Data value checks', () => {
     footer: {
       text: 'Test Footer'
     }
-  }).setTimestamp(date);
+  }).setTimestamp(date.getTime());
 
   expect(embed2.timestamp).toBe(date.toString());
   expect(embed2.color).toBe(color);
