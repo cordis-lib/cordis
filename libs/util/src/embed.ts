@@ -37,7 +37,7 @@ export const buildEmbed = (embedData: Partial<APIEmbed> = {}) => {
       return buildEmbed({ ...this, timestamp: timestamp.toString() });
     },
     addFields(...data: APIEmbedField[]) {
-      return buildEmbed({ ...this, fields: embedData.fields?.concat(data) ?? [] });
+      return buildEmbed({ ...this, fields: embedData.fields?.concat(data) ?? data });
     }
   };
 };
