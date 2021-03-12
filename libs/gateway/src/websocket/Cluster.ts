@@ -3,7 +3,8 @@ import {
   WebsocketConnection,
   WebsocketConnectionStatus,
   WebsocketConnectionOptions,
-  WebsocketConnectionDestroyOptions
+  WebsocketConnectionDestroyOptions,
+  WebsocketConnectionConnectOptions
 } from './WebsocketConnection';
 import { stripIndent } from 'common-tags';
 import { RestManager, MemoryMutex, RedisMutex } from '@cordis/rest';
@@ -228,8 +229,9 @@ export class Cluster extends EventEmitter {
 
   /**
    * Spawns all of the shards (if not yet spawned) and connects each one to the gateway
+   * @param options Array of connection options for each shard
    */
-  public async connect() {
+  public async connect(options?: (WebsocketConnectionConnectOptions | undefined)[]) {
     if (!this.shards.length) {
       const {
         url,
@@ -254,7 +256,7 @@ export class Cluster extends EventEmitter {
       }
     }
 
-    return Promise.all(this.shards.map(shard => shard.connect()));
+    return Promise.all(this.shards.map((shard, i) => shard.connect(options?.[i])));
   }
 
   /**
