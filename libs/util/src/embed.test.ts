@@ -1,7 +1,7 @@
-import { embed } from './Embed';
+import { buildEmbed } from './embed';
 
 test('Dataless value checks', () => {
-  const embed1 = embed({});
+  const embed1 = buildEmbed({});
   expect(embed1.author).toBe(undefined);
   expect(embed1.color).toBe(undefined);
   expect(embed1.description).toBe(undefined);
@@ -21,7 +21,7 @@ test('Data value checks', () => {
   const date = new Date('2021-03-08T14:40:27.875Z').getTime();
   const color = 16753920;
 
-  const embed2 = embed({
+  const embed2 = buildEmbed({
     title: 'testing title!',
     description: 'testing description',
     url: 'https://google.com',
