@@ -35,7 +35,6 @@ Cordis is cut up in the form of multiple packages/libraries:
 - [`@cordis/redis-store`](https://github.com/cordis-lib/cordis/tree/main/libs/redis-store) - A Redis implementation of `@cordis/store`
 - [`@cordis/rest`](https://github.com/cordis-lib/cordis/tree/main/libs/rest) - Tooling for making HTTP requests to Discord, with rate limiting handling
 - [`@cordis/routers`](https://github.com/cordis-lib/cordis/tree/main/libs/routers) - Make API requests with ease using simple dynamic JavaScript property accessing
-- [`@cordis/snowflake`](https://github.com/cordis-lib/cordis/tree/main/libs/snowflake) - A simple snowflake structure for destructuring Discord IDs into relevant information
 - [`@cordis/store`](https://github.com/cordis-lib/cordis/tree/main/libs/store) - A simple map-like interface for holding key-value pairs - ships with an in-memory implementation
 
 # Contributing

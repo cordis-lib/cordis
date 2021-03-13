@@ -1,4 +1,4 @@
-import { Snowflake, getCreationData } from './';
+import { Snowflake, getCreationData } from './Snowflake';
 
 const ID = '223703707118731264';
 const CREATED_AT = 1473405519991;
