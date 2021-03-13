@@ -3,14 +3,12 @@ import {
   WebsocketConnection,
   WebsocketConnectionStatus,
   WebsocketConnectionOptions,
-  WebsocketConnectionDestroyOptions
+  WebsocketConnectionDestroyOptions,
+  WebsocketConnectionConnectOptions
 } from './WebsocketConnection';
 import { stripIndent } from 'common-tags';
-import { RestManager, MemoryMutex, RedisMutex } from '@cordis/rest';
-import { Store, IStore } from '@cordis/store';
-import { RedisStore } from '@cordis/redis-store';
+import { Rest, MemoryMutex, RedisMutex } from '@cordis/rest';
 import {
-  APIGuild,
   APIUser,
   GatewayDispatchPayload,
   GatewaySendPayload,
@@ -118,14 +116,9 @@ export class Cluster extends EventEmitter {
   public readonly shards: WebsocketConnection[] = [];
 
   /**
-   * Guild storage
-   */
-  public readonly guilds: IStore<APIGuild>;
-
-  /**
    * REST instance
    */
-  public readonly rest: RestManager;
+  public readonly rest: Rest;
 
   /**
    * First shard ID for this cluster
@@ -193,8 +186,7 @@ export class Cluster extends EventEmitter {
       ...shardOptions
     } = options;
 
-    this.guilds = redis ? new RedisStore({ redis, hash: 'guilds', encode: JSON.stringify, decode: JSON.parse }) : new Store<APIGuild>();
-    this.rest = new RestManager(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
+    this.rest = new Rest(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
     this.shardCount = shardCount;
     this.startingShard = startingShard;
     this.totalShardCount = totalShardCount;
@@ -228,8 +220,9 @@ export class Cluster extends EventEmitter {
 
   /**
    * Spawns all of the shards (if not yet spawned) and connects each one to the gateway
+   * @param options Array of connection options for each shard
    */
-  public async connect() {
+  public async connect(options?: (WebsocketConnectionConnectOptions | undefined)[]) {
     if (!this.shards.length) {
       const {
         url,
@@ -254,7 +247,7 @@ export class Cluster extends EventEmitter {
       }
     }
 
-    return Promise.all(this.shards.map(shard => shard.connect()));
+    return Promise.all(this.shards.map((shard, i) => shard.connect(options?.[i])));
   }
 
   /**

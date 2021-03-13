@@ -96,6 +96,11 @@ export interface WebsocketConnectionOptions {
   intents?: Intents | IntentKeys | IntentKeys[] | bigint;
 }
 
+export interface WebsocketConnectionConnectOptions {
+  sessionId?: string;
+  sequence?: number;
+}
+
 export interface WebsocketConnectionDestroyOptions {
   /**
    * whether the shard should try to reconnect or not
@@ -304,8 +309,8 @@ export class WebsocketConnection {
    * b) The timeout that waits for guilds is hit & the rest of the pending guilds are deemed unavailable.
    * It should be noted that in either case when this function resolves this shard's status becomes 6 (ready)
    */
-  public connect(): Promise<void> {
-    return new Promise((resolve, reject) => {
+  public connect(options?: WebsocketConnectionConnectOptions) {
+    return new Promise<void>((resolve, reject) => {
       switch (this.status) {
         case WebsocketConnectionStatus.connecting:
         case WebsocketConnectionStatus.disconnecting:
@@ -321,7 +326,14 @@ export class WebsocketConnection {
       this._connectResolve = this._wrapResolve(resolve);
       this._connectReject = this._wrapReject(reject);
 
-      if (this.status !== WebsocketConnectionStatus.reconnecting) this.status = WebsocketConnectionStatus.connecting;
+      if (options?.sequence && options.sessionId) {
+        this.status = WebsocketConnectionStatus.reconnecting;
+        this._sequence = options.sequence;
+        this._sessionId = options.sessionId;
+      } else if (this.status !== WebsocketConnectionStatus.reconnecting) {
+        this.status = WebsocketConnectionStatus.connecting;
+      }
+
       this.debug(stripIndent`
         [CONNECT]
           Gateway    : ${this._url}
@@ -659,41 +671,33 @@ export class WebsocketConnection {
         this._clearTimeout('hello');
         this.debug('Clearing HELLO timeout');
 
-        let reconnecting = this.status === WebsocketConnectionStatus.reconnecting;
+        const reconnecting = this.status === WebsocketConnectionStatus.reconnecting;
         this.debug(`Setting heartbeat interval of ${packet.d.heartbeat_interval}ms`);
 
         this._registerInterval('heartbeat', () => this._heartbeat(false), packet.d.heartbeat_interval);
 
-        const necessary = this._sequence != null && this._sessionId != null;
-
         if (reconnecting) {
+          const necessary = this._sequence != null && this._sessionId != null;
+
           this.debug(stripIndent`
-            Trying to resume with
+            Trying to resume
               data is present: ${necessary}
               session        : ${this._sessionId}
               sequence       : ${this._sequence}
           `);
-        }
 
-        if (reconnecting && necessary) {
-          await this.send({
-            op: GatewayOPCodes.Resume,
-            d: {
-              token: this.cluster.auth,
-              // eslint-disable-next-line @typescript-eslint/naming-convention
-              session_id: this._sessionId!,
-              seq: this._sequence!
-            }
-          });
-        } else {
-          // In case the necessary state wasn't present for reconnecting make sure to properly clean up
-          if (reconnecting && !necessary) {
-            await this.destroy({ reason: 'Tried to resume but was missing essential state', reconnect: true, fatal: true });
+          if (necessary) {
+            await this.send({
+              op: GatewayOPCodes.Resume,
+              d: {
+                token: this.cluster.auth,
+                session_id: this._sessionId!,
+                seq: this._sequence!
+              }
+            });
+          } else {
+            return this.destroy({ reason: 'Tried to resume but was missing essential state', reconnect: true, fatal: true });
           }
-
-          this.status = WebsocketConnectionStatus.open;
-          reconnecting = false;
-          await this._identify();
         }
 
         if (!reconnecting) {
@@ -720,9 +724,7 @@ export class WebsocketConnection {
     }
   };
 
-  private async _handleDispatch(payload: GatewayDispatchPayload): Promise<void> {
-    if (this._sequence == null || payload.s > this._sequence) this._sequence = payload.s;
-
+  private _handleDispatch(payload: GatewayDispatchPayload) {
     switch (payload.t) {
       case GatewayDispatchEvents.Ready: {
         this._clearTimeout('discordReady');
@@ -758,21 +760,15 @@ export class WebsocketConnection {
           }
 
           this._refreshTimeout('guilds');
-        } else {
-          await this.cluster.guilds.set(payload.d.id, payload.d);
         }
 
         break;
       }
 
-      case GatewayDispatchEvents.GuildDelete: {
-        if (!payload.d.unavailable) await this.cluster.guilds.delete(payload.d.id);
-        break;
-      }
-
       case GatewayDispatchEvents.Resumed: {
         this._clearTimeout('reconnecting');
-        this.debug(`Resumed Session ${this._sessionId}; Replayed ${payload.s - this._sequence} events`);
+        const replayed = this._sequence ? payload.s - this._sequence : 'an unknown amount of';
+        this.debug(`Resumed Session ${this._sessionId}; Replaying ${replayed} events`);
         this.status = WebsocketConnectionStatus.ready;
         break;
       }
@@ -780,6 +776,7 @@ export class WebsocketConnection {
       default: break;
     }
 
+    if (this._sequence == null || payload.s > this._sequence) this._sequence = payload.s;
     this.cluster.emit('dispatch', payload, this.id);
   }
 

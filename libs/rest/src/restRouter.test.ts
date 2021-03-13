@@ -1,16 +1,9 @@
 import { buildRestRouter } from './restRouter';
-import { RestManager } from '@cordis/rest';
+import type { Rest } from './Rest';
 
-const manager = RestManager as any as RestManager;
-const mockedMake = manager.make as any as jest.Mock;
-
-jest.mock('@cordis/rest', () => ({
-  RestManager: {
-    make: jest.fn()
-  }
-}));
-
-const router = buildRestRouter(manager);
+const mockedMake = jest.fn();
+const rest = { make: mockedMake } as any as Rest;
+const router = buildRestRouter(rest);
 
 afterEach(() => {
   mockedMake.mockClear();
