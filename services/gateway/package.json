@@ -31,10 +31,7 @@
     "@cordis/brokers": "workspace:^0.1.7",
     "@cordis/common": "workspace:^0.1.7",
     "@cordis/gateway": "workspace:^0.1.7",
-    "@cordis/redis-store": "workspace:^0.1.7",
-    "@cordis/store": "workspace:^0.1.7",
     "erlpack": "github:discord/erlpack",
-    "ioredis": "^4.22.0",
     "tslib": "^2.1.0",
     "yargs": "^15.4.1",
     "zlib-sync": "^0.1.7"

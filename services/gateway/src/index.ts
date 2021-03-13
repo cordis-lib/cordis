@@ -1,6 +1,5 @@
 import * as yargs from 'yargs';
 import { createAmqp, RoutingServer, PubSubClient } from '@cordis/brokers';
-import createRedis, { Redis } from 'ioredis';
 import { Cluster, IntentKeys } from '@cordis/gateway';
 import type { DiscordEvents } from '@cordis/common';
 import type { GatewaySendPayload } from 'discord-api-types/v8';
@@ -124,11 +123,6 @@ const main = async () => {
       process.exit(1);
     });
 
-  let redis: Redis | null = null;
-  if (argv['redis-url']) {
-    redis = new createRedis(argv['redis-url']);
-  }
-
   const service = new RoutingServer<keyof DiscordEvents, DiscordEvents>(channel);
   const cluster = new Cluster(
     argv.auth,
@@ -142,7 +136,6 @@ const main = async () => {
       reconnectTimeout: argv['ws-reconnect-timeout'],
       largeThreshold: argv['ws-large-threshold'],
       intents: argv['ws-intents'] as IntentKeys[],
-      redis: redis ?? undefined,
       shardCount: argv['shard-count'],
       startingShard: argv['starting-shard'],
       totalShardCount: argv['total-shard-count']

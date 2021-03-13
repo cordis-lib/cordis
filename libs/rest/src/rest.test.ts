@@ -2,7 +2,7 @@ import fetch, { Response, Headers } from 'node-fetch';
 import Blob from 'fetch-blob';
 import { Bucket } from './Bucket';
 import { CordisRestError, HTTPError } from './Error';
-import { RequestOptions, RestManager } from './RestManager';
+import { RequestOptions, Rest } from './Rest';
 
 jest.mock('node-fetch', () => {
   const fetch: typeof import('node-fetch') = jest.requireActual('node-fetch');
@@ -32,10 +32,10 @@ jest.mock('@cordis/common', () => {
 
 const mockedFetch = fetch as any as jest.Mock<Promise<Response>>;
 
-let rest: RestManager;
+let rest: Rest;
 
 beforeEach(() => {
-  rest = new RestManager('token');
+  rest = new Rest('token');
 });
 
 describe('buckets and rate limiting', () => {

@@ -724,7 +724,7 @@ export class WebsocketConnection {
     }
   };
 
-  private async _handleDispatch(payload: GatewayDispatchPayload): Promise<void> {
+  private _handleDispatch(payload: GatewayDispatchPayload) {
     switch (payload.t) {
       case GatewayDispatchEvents.Ready: {
         this._clearTimeout('discordReady');
@@ -760,15 +760,8 @@ export class WebsocketConnection {
           }
 
           this._refreshTimeout('guilds');
-        } else {
-          await this.cluster.guilds.set(payload.d.id, payload.d);
         }
 
-        break;
-      }
-
-      case GatewayDispatchEvents.GuildDelete: {
-        if (!payload.d.unavailable) await this.cluster.guilds.delete(payload.d.id);
         break;
       }
 
