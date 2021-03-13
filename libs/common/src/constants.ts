@@ -56,6 +56,9 @@ export interface GatewayServiceConfig {
   };
 }
 
+/**
+ * Injection tokens used by the gateway service
+ */
 export const GATEWAY_INJECTION_TOKENS = {
   kConfig: Symbol('parsed configuration options'),
   amqp: {

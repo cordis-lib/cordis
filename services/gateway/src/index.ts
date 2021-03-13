@@ -185,8 +185,6 @@ const main = async () => {
   container.register(GATEWAY_INJECTION_TOKENS.amqp.kCommandsServer, { useValue: gatewayCommandsServer });
   container.register(GATEWAY_INJECTION_TOKENS.kCluster, { useValue: cluster });
 
-  await loadExtension('pre-init');
-
   cluster
     .on('disconnecting', id => console.log(`[DISCONNECTING]: Shard id ${id}`))
     .on('reconnecting', id => console.log(`[RECONNECTING]: Shard id ${id}`))
@@ -194,6 +192,8 @@ const main = async () => {
     .on('error', (err, id) => console.error(`[SHARD ERROR]: Shard id ${id}`, err))
     .on('ready', () => console.log('[READY]: All shards have fully connected'))
     .on('dispatch', data => service.publish(data.t, data.d));
+
+  await loadExtension('pre-init');
 
   if (argv.debug) cluster.on('debug', (info, id) => console.log(`[DEBUG]: Shard id ${id}`, info));
 
