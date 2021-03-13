@@ -5,5 +5,5 @@ export type IRouter = {
   delete<T, D = RequestBodyData>(options?: { data?: D; reason?: string }): Promise<T>;
   patch<T, D = RequestBodyData>(options: { data: D; reason?: string }): Promise<T>;
   put<T, D = RequestBodyData>(options?: { data?: D; reason?: string }): Promise<T>;
-  post<T, D = RequestBodyData>(options: { data: D; reason?: string; files?: File[] }): Promise<T>;
+  post<T, D = RequestBodyData, Q = StringRecord>(options: { data: D; reason?: string; files?: File[]; query?: Q }): Promise<T>;
 } & { [key: string]: IRouter };
