@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
 import { Routes } from 'discord-api-types/v8';
-import type { RestManager } from '@cordis/rest';
+import type { Rest } from '@cordis/rest';
 // eslint-disable-next-line no-duplicate-imports
 import type {
   Snowflake,
@@ -137,7 +137,7 @@ import type {
 
 interface webhookIdOrToken { webhookID: Snowflake; webhookToken?: string }
 
-export const makeRestUtils = (rest: RestManager) => ({
+export const makeRestUtils = (rest: Rest) => ({
   createGuild: (data: RESTPostAPIGuildsJSONBody) => rest.post<RESTPostAPIGuildsResult, RESTPostAPIGuildsJSONBody>(Routes.guilds(), { data }),
   fetchGuild: (...args: Parameters<typeof Routes.guild>) => rest.get<RESTGetAPIGuildResult>(Routes.guild(...args)),
   fetchGuildPreview: (...args: Parameters<typeof Routes.guildPreview>) => rest.get<APIGuildPreview>(Routes.guildPreview(...args)),

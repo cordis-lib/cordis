@@ -9,7 +9,7 @@ import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from '.
 /**
  * Options for constructing a rest manager
  */
-export interface RestManagerOptions {
+export interface RestOptions {
   /**
    * How many times to retry making a request before giving up
    */
@@ -25,7 +25,7 @@ export interface RestManagerOptions {
   mutex?: Mutex;
 }
 
-export interface RestManager {
+export interface Rest {
   /**
    * Fired when a request is being started (pre-ratelimit checking)
    * @event
@@ -105,7 +105,7 @@ export interface RequestOptions<D, Q> {
  * Base REST class used for making requests
  * @noInheritDoc
  */
-export class RestManager extends EventEmitter {
+export class Rest extends EventEmitter {
   /**
    * Current active rate limiting Buckets
    */
@@ -121,7 +121,7 @@ export class RestManager extends EventEmitter {
    */
   public constructor(
     public readonly auth: string,
-    options: RestManagerOptions = {}
+    options: RestOptions = {}
   ) {
     super();
     const {

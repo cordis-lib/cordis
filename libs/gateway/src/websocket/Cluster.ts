@@ -6,7 +6,7 @@ import {
   WebsocketConnectionDestroyOptions
 } from './WebsocketConnection';
 import { stripIndent } from 'common-tags';
-import { RestManager, MemoryMutex, RedisMutex } from '@cordis/rest';
+import { Rest, MemoryMutex, RedisMutex } from '@cordis/rest';
 import {
   APIUser,
   GatewayDispatchPayload,
@@ -117,7 +117,7 @@ export class Cluster extends EventEmitter {
   /**
    * REST instance
    */
-  public readonly rest: RestManager;
+  public readonly rest: Rest;
 
   /**
    * First shard ID for this cluster
@@ -185,7 +185,7 @@ export class Cluster extends EventEmitter {
       ...shardOptions
     } = options;
 
-    this.rest = new RestManager(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
+    this.rest = new Rest(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
     this.shardCount = shardCount;
     this.startingShard = startingShard;
     this.totalShardCount = totalShardCount;

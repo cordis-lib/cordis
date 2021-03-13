@@ -1,4 +1,4 @@
-import type { File, StringRecord, RequestBodyData } from '@cordis/rest';
+import type { File, StringRecord, RequestBodyData } from './';
 
 export type IRouter = {
   get<T, Q = StringRecord>(options?: { query?: Q }): Promise<T>;
