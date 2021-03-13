@@ -1,8 +1,18 @@
+import 'reflect-metadata';
+import { container } from 'tsyringe';
 import * as yargs from 'yargs';
 import { createAmqp, RoutingServer, PubSubClient } from '@cordis/brokers';
 import { Cluster, IntentKeys } from '@cordis/gateway';
-import type { DiscordEvents } from '@cordis/common';
+import { DiscordEvents, GatewayServiceConfig, GATEWAY_INJECTION_TOKENS } from '@cordis/common';
 import type { GatewaySendPayload } from 'discord-api-types/v8';
+
+const loadExtension = async (name: string) => {
+  try {
+    await require(`../extensions/${name}`);
+  } catch (e) {
+    if (e.code !== 'MODULE_NOT_FOUND') console.error(`[${name.toUpperCase()} EXTENSION ERROR]`, e);
+  }
+};
 
 const main = async () => {
   const { argv } = yargs
@@ -45,12 +55,6 @@ const main = async () => {
       'demandOption': false,
       'default': 'auto' as const
     })
-    .option('redis-url', {
-      global: true,
-      description: 'URL for connecting to your redis instance',
-      type: 'string',
-      demandOption: false
-    })
     .option('ws-compress', {
       'global': true,
       'description': 'Whether or not to use compression',
@@ -61,7 +65,7 @@ const main = async () => {
       'global': true,
       'description': 'What websocket encoding to use, JSON or ETF',
       'type': 'string',
-      'default': 'etf'
+      'default': 'etf' as const
     })
     .option('ws-open-timeout', {
       'global': true,
@@ -115,6 +119,32 @@ const main = async () => {
     })
     .help();
 
+  const config: GatewayServiceConfig = {
+    auth: argv.auth,
+    amqpHost: argv['amqp-host'],
+    debug: argv.debug,
+    shardCount: argv['shard-count'],
+    startingShard: argv['starting-shard'],
+    totalShardCount: argv['total-shard-count'],
+    ws: {
+      compress: argv['ws-compress'],
+      encoding: argv['ws-encoding'],
+      timeouts: {
+        open: argv['ws-open-timeout'],
+        hello: argv['ws-hello-timeout'],
+        ready: argv['ws-ready-timeout'],
+        guild: argv['ws-guild-timeout'],
+        reconnect: argv['ws-reconnect-timeout']
+      },
+      largeThreshold: argv['ws-large-threshold'],
+      intents: argv['ws-intents']
+    }
+  };
+
+  container.register(GATEWAY_INJECTION_TOKENS.kConfig, { useValue: config });
+
+  await loadExtension('pre-setup');
+
   const { channel, connection } = await createAmqp(argv['amqp-host']);
   connection
     .on('error', e => console.error(`[AMQP ERROR]: ${e}`))
@@ -149,6 +179,12 @@ const main = async () => {
     cb: req => cluster.broadcast(req)
   });
 
+  container.register(GATEWAY_INJECTION_TOKENS.amqp.kChannel, { useValue: channel });
+  container.register(GATEWAY_INJECTION_TOKENS.amqp.kConnection, { useValue: connection });
+  container.register(GATEWAY_INJECTION_TOKENS.amqp.kService, { useValue: service });
+  container.register(GATEWAY_INJECTION_TOKENS.amqp.kCommandsServer, { useValue: gatewayCommandsServer });
+  container.register(GATEWAY_INJECTION_TOKENS.kCluster, { useValue: cluster });
+
   cluster
     .on('disconnecting', id => console.log(`[DISCONNECTING]: Shard id ${id}`))
     .on('reconnecting', id => console.log(`[RECONNECTING]: Shard id ${id}`))
@@ -157,11 +193,15 @@ const main = async () => {
     .on('ready', () => console.log('[READY]: All shards have fully connected'))
     .on('dispatch', data => service.publish(data.t, data.d));
 
+  await loadExtension('pre-init');
+
   if (argv.debug) cluster.on('debug', (info, id) => console.log(`[DEBUG]: Shard id ${id}`, info));
 
   try {
     await service.init({ name: 'gateway', topicBased: false });
     await cluster.connect();
+
+    await loadExtension('post-init');
   } catch (e) {
     console.error('Failed to initialize the service or the cluster', e);
     process.exit(1);

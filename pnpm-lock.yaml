@@ -194,18 +194,6 @@ importers:
       node-fetch: ^2.6.1
       tslib: ^2.1.0
       typescript: ^4.2.2
-  libs/routers:
-    dependencies:
-      '@cordis/rest': link:../rest
-      tslib: 2.1.0
-    devDependencies:
-      '@types/node': 14.14.31
-      typescript: 4.2.2
-    specifiers:
-      '@cordis/rest': workspace:^0.1.7
-      '@types/node': ^14.14.31
-      tslib: ^2.1.0
-      typescript: ^4.2.2
   libs/store:
     dependencies:
       '@cordis/error': link:../error
@@ -238,7 +226,9 @@ importers:
       '@cordis/common': link:../../libs/common
       '@cordis/gateway': link:../../libs/gateway
       erlpack: github.com/discord/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d
+      reflect-metadata: 0.1.13
       tslib: 2.1.0
+      tsyringe: 4.4.0
       yargs: 15.4.1
       zlib-sync: 0.1.7
     devDependencies:
@@ -254,7 +244,9 @@ importers:
       '@types/yargs': ^15.0.13
       discord-api-types: ^0.12.1
       erlpack: github:discord/erlpack
+      reflect-metadata: ^0.1.13
       tslib: ^2.1.0
+      tsyringe: ^4.4.0
       typescript: ^4.2.2
       yargs: ^15.4.1
       zlib-sync: ^0.1.7
@@ -5041,6 +5033,10 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-tm2CjNyv5rS4pCin3vTGvKwxyLQ=
+  /reflect-metadata/0.1.13:
+    dev: false
+    resolution:
+      integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
   /regenerate-unicode-properties/8.2.0:
     dependencies:
       regenerate: 1.4.2
@@ -5802,7 +5798,6 @@ packages:
     resolution:
       integrity: sha512-3n1qG+/5kg+jrbTzwAykB5yRYtQCTqOGKq5U5PE3b0a1/mzo6snDhjGS0zJVJunO0NrT3Dg1MLy5TjWP/UJppg==
   /tslib/1.14.1:
-    dev: true
     resolution:
       integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
   /tslib/2.1.0:
@@ -5820,6 +5815,14 @@ packages:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
     resolution:
       integrity: sha512-RYbuQuvkhuqVeXweWT3tJLKOEJ/UUw9GjNEZGWdrLLlM+611o1gwLHBpxoFJKKl25fLprp2eVthtKs5JOrNeXg==
+  /tsyringe/4.4.0:
+    dependencies:
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>= 6.0.0'
+    resolution:
+      integrity: sha512-SlMApe1lhIq546CDp7bF+IdF4RB6d+9C5T7B0AS0P/Bm+Qpizj/gEmZzvw9J/KlXPEt4qHTbi1TRvX3rCPSdTg==
   /tunnel-agent/0.6.0:
     dependencies:
       safe-buffer: 5.2.1
