@@ -4,14 +4,15 @@
   "version": "0.1.7",
   "description": "A modular, micros-service based Discord API wrapper",
   "scripts": {
-    "lint": "pnpm recursive run lint --filter @cordis/*",
     "build": "pnpm recursive run build --filter @cordis/*",
-    "release:npm": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
-    "release:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile .",
-    "release": "rimraf */*/?(dist|types)/** && pnpm run build && pnpm run release:npm && pnpm run release:docker && docker push cordislib/gateway",
     "docs": "typedoc",
+    "lint": "pnpm recursive run lint --filter @cordis/*",
+    "lint:ci": "pnpm lint --parallel --filter @cordis/*",
     "test": "jest",
-    "test:ci": "jest --ci --no-stack-trace --verbose"
+    "test:ci": "jest --ci --no-stack-trace --verbose",
+    "release:npm": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
+    "release:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile . && docker push cordislib/gateway",
+    "release": "pnpm run lint && pnpm run test:ci && rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run release:npm && pnpm run release:docker"
   },
   "repository": {
     "type": "git",
