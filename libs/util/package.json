@@ -1,6 +1,6 @@
 {
   "name": "@cordis/util",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "Helper methods and structures for Cordis",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
