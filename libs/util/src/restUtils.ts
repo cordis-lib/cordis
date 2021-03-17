@@ -135,7 +135,10 @@ import type {
   RESTPutAPIGuildTemplateSyncResult
 } from 'discord-api-types/v8';
 
-interface webhookIdOrToken { webhookID: Snowflake; webhookToken?: string }
+export interface WebhookData {
+  webhookId: Snowflake;
+  webhookToken?: string;
+}
 
 export const makeRestUtils = (rest: Rest) => ({
   createGuild: (data: RESTPostAPIGuildsJSONBody) => rest.post<RESTPostAPIGuildsResult, RESTPostAPIGuildsJSONBody>(Routes.guilds(), { data }),
@@ -205,8 +208,8 @@ export const makeRestUtils = (rest: Rest) => ({
   createWebhook: (channelID: Snowflake, data: RESTPostAPIChannelWebhookJSONBody) => rest.post<APIWebhook, RESTPostAPIChannelWebhookJSONBody>(Routes.channelWebhooks(channelID), { data }),
   fetchWebhooks: (...args: Parameters<typeof Routes.channelWebhooks>) => rest.get<RESTGetAPIChannelWebhooksResult>(Routes.channelWebhooks(...args)),
   fetchWebhook: (...args: Parameters<typeof Routes.webhook>) => rest.get<RESTGetAPIWebhookResult>(Routes.webhook(...args)),
-  editWebhook: ({ webhookID, webhookToken }: webhookIdOrToken, data: RESTPatchAPIWebhookJSONBody | RESTPatchAPIWebhookWithTokenJSONBody) => rest.patch<RESTPatchAPIWebhookResult, RESTPatchAPIWebhookJSONBody>(Routes.webhook(webhookID, webhookToken), { data }),
-  deleteWebhook: ({ webhookID, webhookToken }: webhookIdOrToken) => rest.delete<RESTDeleteAPIWebhookResult>(Routes.webhook(webhookID, webhookToken)),
+  editWebhook: ({ webhookId: webhookID, webhookToken }: WebhookData, data: RESTPatchAPIWebhookJSONBody | RESTPatchAPIWebhookWithTokenJSONBody) => rest.patch<RESTPatchAPIWebhookResult, RESTPatchAPIWebhookJSONBody>(Routes.webhook(webhookID, webhookToken), { data }),
+  deleteWebhook: ({ webhookId: webhookID, webhookToken }: WebhookData) => rest.delete<RESTDeleteAPIWebhookResult>(Routes.webhook(webhookID, webhookToken)),
   sendWebhookMessage: (webhookID: Snowflake, webhookToken: string, data: RESTPostAPIWebhookWithTokenJSONBody) => rest.post<RESTPostAPIWebhookWithTokenResult, RESTPostAPIWebhookWithTokenJSONBody>(Routes.webhook(webhookID, webhookToken), { data }),
   editWebhookMessage: (webhookID: Snowflake, webhookToken: string, messageID: Snowflake, data: RESTPatchAPIWebhookWithTokenMessageJSONBody) => rest.patch<APIMessage, RESTPatchAPIWebhookWithTokenMessageJSONBody>(Routes.webhookMessage(webhookID, webhookToken, messageID), { data }),
   fetchGuildEmojis: (...args: Parameters<typeof Routes.guildEmojis>) => rest.get<RESTGetAPIGuildEmojisResult>(Routes.guildEmojis(...args)),
