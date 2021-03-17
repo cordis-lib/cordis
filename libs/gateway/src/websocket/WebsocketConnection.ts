@@ -695,22 +695,22 @@ export class WebsocketConnection {
                 seq: this._sequence!
               }
             });
-          } else {
-            return this.destroy({ reason: 'Tried to resume but was missing essential state', reconnect: true, fatal: true });
+
+            return this._registerTimeout('reconnecting', async () => {
+              await this.destroy({ reason: 'Did not recieve the resume payload in time', fatal: true });
+              this._connectReject?.(new CordisGatewayError('timeoutHit', 'reconnecting', this.reconnectTimeout));
+            }, this.reconnectTimeout);
           }
+
+          return this.destroy({ reason: 'Tried to resume but was missing essential state', reconnect: true, fatal: true });
         }
 
-        if (!reconnecting) {
-          this._registerTimeout('discordReady', async () => {
-            await this.destroy({ reason: 'Did not recieve the Discord ready payload in time', fatal: true });
-            this._connectReject?.(new CordisGatewayError('timeoutHit', 'discordReady', this.discordReadyTimeout));
-          }, this.discordReadyTimeout);
-        } else {
-          this._registerTimeout('reconnecting', async () => {
-            await this.destroy({ reason: 'Did not recieve the resume payload in time', fatal: true });
-            this._connectReject?.(new CordisGatewayError('timeoutHit', 'reconnecting', this.reconnectTimeout));
-          }, this.reconnectTimeout);
-        }
+        await this._identify();
+
+        this._registerTimeout('discordReady', async () => {
+          await this.destroy({ reason: 'Did not recieve the Discord ready payload in time', fatal: true });
+          this._connectReject?.(new CordisGatewayError('timeoutHit', 'discordReady', this.discordReadyTimeout));
+        }, this.discordReadyTimeout);
 
         break;
       }
