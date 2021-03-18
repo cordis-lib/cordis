@@ -43,7 +43,7 @@ We make use of [`PNPM`](https://pnpm.js.org/) to manage our monorepo setup. It i
 
 Please ensure you run `pnpm run lint`, `pnpm run build`, and `pnpm run test` in the root before pushing your commits.
 
-Please ensure that you follow our [Code Of Conduct](https://github.com/discordjs/discord.js/blob/master/.github/CODE_OF_CONDUCT.md).
+Please ensure that you follow our [Code Of Conduct](https://github.com/cordis-lib/cordis/blob/main/.github/CODE_OF_CONDUCT.md)).
 
 If all checks out, [Submit a Pull Request](https://github.com/cordis-lib/cordis/compare)
 
