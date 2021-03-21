@@ -16,7 +16,7 @@ export abstract class Mutex {
   public claim(route: string, signal?: AbortSignal | null) {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return new Promise<void>(async (resolve, reject) => {
-      const listener = () => reject(new CordisRestError('requestTimeout'));
+      const listener = () => reject(new CordisRestError('requestTimeout', route));
       if (signal) signal.addEventListener('abort', listener, { once: true });
 
       try {
