@@ -19,4 +19,6 @@ A clear and concise description of any alternative solutions or features you've 
 **Additional context**
 Add any other context or screenshots about the feature request here.
 
+<!-- 
 Adapted from the [Discord.js Feature Request Template](https://github.com/discordjs/discord.js/blob/master/.github/ISSUE_TEMPLATE/feature_request.md)
+-->

@@ -3,6 +3,7 @@ import Blob from 'fetch-blob';
 import { Bucket } from './Bucket';
 import { CordisRestError, HTTPError } from './Error';
 import { RequestOptions, Rest } from './Rest';
+import AbortController from 'abort-controller';
 
 jest.mock('node-fetch', () => {
   const fetch: typeof import('node-fetch') = jest.requireActual('node-fetch');
@@ -255,9 +256,6 @@ describe('non 429 error recovery', () => {
   });
 
   test('timeout', async () => {
-    // Makes setTimeout etc mock functions
-    jest.useFakeTimers();
-
     const value = '{"foo":"bar"}';
     const response = new Response(value, {
       headers: {
@@ -275,12 +273,13 @@ describe('non 429 error recovery', () => {
     const req: RequestOptions<{ test: string }, never> = {
       path: 'channels/12345678910111213',
       method: 'get',
-      data: { test: '' }
+      data: { test: '' },
+      controller: new AbortController()
     };
 
     await expect(() => {
       const promise = rest.make(req);
-      jest.runAllTimers();
+      req.controller!.abort();
       return promise;
     })
       .rejects
