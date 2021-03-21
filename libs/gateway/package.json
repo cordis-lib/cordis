@@ -4,7 +4,7 @@
   "description": "The cordis gateway to Discord",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
@@ -39,11 +39,11 @@
     "zlib-sync": "^0.1.7"
   },
   "dependencies": {
-    "@cordis/bitfield": "workspace:^0.2.0",
-    "@cordis/common": "workspace:^0.2.0",
-    "@cordis/error": "workspace:^0.2.0",
-    "@cordis/queue": "workspace:^0.2.0",
-    "@cordis/rest": "workspace:^0.2.0",
+    "@cordis/bitfield": "workspace:^0.2.3",
+    "@cordis/common": "workspace:^0.2.3",
+    "@cordis/error": "workspace:^0.2.3",
+    "@cordis/queue": "workspace:^0.2.3",
+    "@cordis/rest": "workspace:^0.2.3",
     "common-tags": "^1.8.0",
     "discord-api-types": "^0.12.1",
     "tslib": "^2.1.0",
