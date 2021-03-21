@@ -58,9 +58,14 @@ export class Bucket {
     this.manager.emit('request', req);
 
     await this.mutex.claim(this.route, req.controller.signal);
+
+    const listener = () => void Promise.reject(new CordisRestError('requestTimeout', req.path));
+    req.controller.signal.addEventListener('abort', listener, { once: true });
+
     const timeout = setTimeout(() => req.controller.abort(), this.manager.abortAfter);
 
     const res = await discordFetch(req).finally(() => clearTimeout(timeout));
+    req.controller.signal.removeEventListener('abort', listener);
 
     const global = res.headers.get('x-ratelimit-global');
     const limit = res.headers.get('x-ratelimit-limit');

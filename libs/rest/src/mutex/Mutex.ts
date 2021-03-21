@@ -13,6 +13,7 @@ export abstract class Mutex {
    * @param signal Abort signal
    * @returns A promise that resolves once it is safe to go through with the request
    */
+  // TODO(didinele): With the next major release, remove functionality for aborting things here
   public claim(route: string, signal?: AbortSignal | null) {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return new Promise<void>(async (resolve, reject) => {
