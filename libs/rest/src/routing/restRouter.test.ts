@@ -1,5 +1,5 @@
 import { buildRestRouter } from './restRouter';
-import type { Rest } from './Rest';
+import type { Rest } from '../struct';
 
 const mockedMake = jest.fn();
 const rest = { make: mockedMake } as any as Rest;

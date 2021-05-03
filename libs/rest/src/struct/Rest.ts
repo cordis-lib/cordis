@@ -1,10 +1,12 @@
 import { Bucket, RatelimitData } from './Bucket';
-import { USER_AGENT } from './Constants';
+import { USER_AGENT } from '../Constants';
 import { EventEmitter } from 'events';
-import { Headers } from 'node-fetch';
-import { Mutex, MemoryMutex } from './mutex';
+import { Headers, Response } from 'node-fetch';
+import { Mutex, MemoryMutex } from '../mutex';
 import AbortController from 'abort-controller';
-import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from './Fetch';
+import { CordisRestError, HTTPError } from '../Error';
+import { halt } from '@cordis/common';
+import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from '../Fetch';
 
 /**
  * Options for constructing a rest manager
@@ -23,6 +25,11 @@ export interface RestOptions {
    * @default MemoryMutex
    */
   mutex?: Mutex;
+  /**
+   * Wether or not requests, by default, should be re-attempted after a ratelimit is waited out
+   * @default true
+   */
+  retryAfterRatelimit?: boolean;
 }
 
 export interface Rest {
@@ -37,7 +44,7 @@ export interface Rest {
    */
   on(
     event: 'response',
-    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: any, ratelimit: Partial<RatelimitData>) => any
+    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: Response, ratelimit: Partial<RatelimitData>) => any
   ): this;
   /**
    * Fired when a rate limit is (about to be) hit.
@@ -50,7 +57,7 @@ export interface Rest {
   /** @internal */
   once(
     event: 'response',
-    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: any, ratelimit: Partial<RatelimitData>) => any
+    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: Response, ratelimit: Partial<RatelimitData>) => any
   ): this;
   /** @internal */
   once(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
@@ -58,7 +65,7 @@ export interface Rest {
   /** @internal */
   emit(event: 'request', request: Partial<DiscordFetchOptions<any, any>>): boolean;
   /** @internal */
-  emit(event: 'response', request: Partial<DiscordFetchOptions<any, any>>, response: any, ratelimit: Partial<RatelimitData>): boolean;
+  emit(event: 'response', request: Partial<DiscordFetchOptions<any, any>>, response: Response, ratelimit: Partial<RatelimitData>): boolean;
   /** @internal */
   emit(event: 'ratelimit', bucket: string, endpoint: string, prevented: boolean, waitingFor: number): boolean;
 }
@@ -99,6 +106,10 @@ export interface RequestOptions<D, Q> {
    * Body to send, if any
    */
   data?: D;
+  /**
+   * Wether or not this request should be re-attempted after a ratelimit is waited out
+   */
+  retryAfterRatelimit?: boolean;
 }
 
 /**
@@ -114,6 +125,7 @@ export class Rest extends EventEmitter {
   public readonly retries: number;
   public readonly abortAfter: number;
   public readonly mutex: Mutex;
+  public readonly retryAfterRatelimit: boolean;
 
   /**
    * @param auth Your bot's Discord token
@@ -127,19 +139,21 @@ export class Rest extends EventEmitter {
     const {
       retries = 3,
       abortAfter = 15e3,
-      mutex = new MemoryMutex()
+      mutex = new MemoryMutex(),
+      retryAfterRatelimit = true
     } = options;
 
     this.retries = retries;
     this.abortAfter = abortAfter;
     this.mutex = mutex;
+    this.retryAfterRatelimit = retryAfterRatelimit;
   }
 
   /**
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public make<T, D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
+  public async make<T, D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
     const route = Bucket.makeRoute(options.method, options.path);
 
     let bucket = this._buckets.get(route);
@@ -149,14 +163,44 @@ export class Rest extends EventEmitter {
       this._buckets.set(route, bucket);
     }
 
+    const implicitAbortBehavior = !Boolean(options.controller);
     options.controller ??= new AbortController();
+    options.retryAfterRatelimit ??= this.retryAfterRatelimit;
 
     options.headers ??= new Headers();
     options.headers.set('Authorization', `Bot ${this.auth}`);
     options.headers.set('User-Agent', USER_AGENT);
     if (options.reason) options.headers.set('X-Audit-Log-Reason', encodeURIComponent(options.reason));
 
-    return bucket.make<T, D, Q>(options as DiscordFetchOptions<D, Q>);
+    let retries = 0;
+    let res: T | null = null;
+
+    while (!res) {
+      try {
+        res = await bucket.make<T, D, Q>({ implicitAbortBehavior, ...options } as DiscordFetchOptions<D, Q>);
+      } catch (e) {
+        if (
+          e instanceof HTTPError ||
+          (e instanceof CordisRestError && e.code === 'rateLimited' && !options.retryAfterRatelimit)
+        ) {
+          return Promise.reject(e);
+        }
+
+        if (e instanceof CordisRestError && e.code === 'internal') {
+          await halt(1000);
+        }
+
+        if (e.name === 'AbortError') {
+          return Promise.reject(e);
+        }
+
+        if (retries++ >= this.retries) {
+          return Promise.reject(new CordisRestError('retryLimitExceeded', `${options.method.toUpperCase()} ${options.path}`, this.retries));
+        }
+      }
+    }
+
+    return res;
   }
 
   /**

@@ -1,4 +1,4 @@
-import type { File, StringRecord, RequestBodyData } from './';
+import type { File, StringRecord, RequestBodyData } from '../Fetch';
 
 export type IRouter = {
   get<T, Q = StringRecord>(options?: { query?: Q }): Promise<T>;

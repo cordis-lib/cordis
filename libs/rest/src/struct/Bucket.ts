@@ -1,6 +1,5 @@
-import { discordFetch, DiscordFetchOptions } from './Fetch';
-import { CordisRestError, HTTPError } from './Error';
-import { halt } from '@cordis/common';
+import { discordFetch, DiscordFetchOptions } from '../Fetch';
+import { CordisRestError, HTTPError } from '../Error';
 import type { Rest } from './Rest';
 
 /**
@@ -35,11 +34,11 @@ export class Bucket {
   }
 
   /**
-   * @param manager The rest manager using this bucket instance
+   * @param rest The rest manager using this bucket instance
    * @param route The identifier of this bucket
    */
   public constructor(
-    public readonly manager: Rest,
+    public readonly rest: Rest,
     public readonly route: string
   ) {}
 
@@ -47,7 +46,7 @@ export class Bucket {
    * Shortcut for the manager mutex
    */
   public get mutex() {
-    return this.manager.mutex;
+    return this.rest.mutex;
   }
 
   /**
@@ -55,17 +54,16 @@ export class Bucket {
    * @param req Request options
    */
   public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
-    this.manager.emit('request', req);
+    this.rest.emit('request', req);
 
-    await this.mutex.claim(this.route, req.controller.signal);
+    await this.mutex.claim(this.route);
 
-    const listener = () => void Promise.reject(new CordisRestError('requestTimeout', req.path));
-    req.controller.signal.addEventListener('abort', listener, { once: true });
-
-    const timeout = setTimeout(() => req.controller.abort(), this.manager.abortAfter);
+    let timeout: NodeJS.Timeout;
+    if (req.implicitAbortBehavior) {
+      timeout = setTimeout(() => req.controller.abort(), this.rest.abortAfter);
+    }
 
     const res = await discordFetch(req).finally(() => clearTimeout(timeout));
-    req.controller.signal.removeEventListener('abort', listener);
 
     const global = res.headers.get('x-ratelimit-global');
     const limit = res.headers.get('x-ratelimit-limit');
@@ -77,47 +75,29 @@ export class Bucket {
     if (limit) state.limit = Number(limit);
     if (remaining) state.remaining = Number(remaining);
     if (resetAfter) state.timeout = Number(resetAfter) * 1000;
+    this.rest.emit('response', req, res.clone(), state);
 
     await this.mutex.set(this.route, state);
 
     if (res.status === 429) {
-      const retry = res.headers.get('Retry-After');
+      const retry = res.headers.get('retry-after');
       /* istanbul ignore next */
-      const retryAfter = retry ? Number(retry) * 1000 : 0;
+      const retryAfter = Number(retry ?? 1) * 1000;
 
-      this.manager.emit('ratelimit', this.route, req.path, false, retryAfter);
+      this.rest.emit('ratelimit', this.route, req.path, false, retryAfter);
 
       await this.mutex.set(this.route, { timeout: retryAfter });
-      return this._retry<T, D, Q>(req);
+      return Promise.reject(new CordisRestError('rateLimited'));
     } else if (res.status >= 500 && res.status < 600) {
-      await halt(1000);
-      return this._retry<T, D, Q>(req);
+      return Promise.reject(new CordisRestError('internal'));
     } else if (!res.ok) {
-      throw new HTTPError(res.clone(), await res.text());
+      return Promise.reject(new HTTPError(res.clone(), await res.text()));
     }
 
-    let final: any;
-
-    if (res.headers.get('content-type') === 'application/json') final = await res.json();
-    else final = await res.blob();
-
-    this.manager.emit('response', req, final, state);
-    return final;
-  }
-
-  /**
-   * Retries to make a request after failure
-   * @param req Request options
-   * @param res Response given
-   */
-  private _retry<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
-    if (req.failures) req.failures++;
-    else req.failures = 1;
-
-    if (req.failures > this.manager.retries) {
-      throw new CordisRestError('retryLimitExceeded', `${req.method.toUpperCase()} ${req.path}`, this.manager.retries);
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json();
     }
 
-    return this.make(req);
+    return res.blob() as any;
   }
 }

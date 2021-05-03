@@ -2,7 +2,7 @@
 
 import { Mutex } from './Mutex';
 import type { Redis } from 'ioredis';
-import type { RatelimitData } from '../Bucket';
+import type { RatelimitData } from '../struct';
 
 /**
  * Redis implementation of the Mutex for keeping the rate limit state cross-worker

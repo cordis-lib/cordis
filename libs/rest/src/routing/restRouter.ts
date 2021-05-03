@@ -1,4 +1,4 @@
-import type { Rest } from './Rest';
+import type { Rest } from '../struct';
 import type { IRouter } from './IRouter';
 
 /**
