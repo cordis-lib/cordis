@@ -98,6 +98,6 @@ export class Bucket {
       return res.json();
     }
 
-    return res.blob() as any;
+    return res.blob() as unknown as T;
   }
 }
