@@ -5,9 +5,9 @@ import type { Response } from 'node-fetch';
 export const CordisRestError = makeCordisError(
   Error,
   {
-    retryLimitExceeded: (attempts: number) => `Tried to make request ${attempts} times but all of them failed`,
-    rateLimited: 'A ratelimit was hit',
-    internal: 'Discord raised an internal error'
+    retryLimitExceeded: (request: string, attempts: number) => `Tried to "${request}" for ${attempts} times but all of them failed`,
+    rateLimited: (request: string) => `A ratelimit was hit while "${request}"`,
+    internal: (request: string) => `Discord raised an internal error on "${request}"`
   }
 );
 
