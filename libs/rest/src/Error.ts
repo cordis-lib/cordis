@@ -5,8 +5,9 @@ import type { Response } from 'node-fetch';
 export const CordisRestError = makeCordisError(
   Error,
   {
-    retryLimitExceeded: (request: string, attempts: number) => `Tried to "${request}" for ${attempts} times but all of them failed.`,
-    requestTimeout: (request: string) => `Request "${request}" timed out.`
+    retryLimitExceeded: (request: string, attempts: number) => `Tried to "${request}" for ${attempts} times but all of them failed`,
+    rateLimited: (request: string) => `A ratelimit was hit while "${request}"`,
+    internal: (request: string) => `Discord raised an internal error on "${request}"`
   }
 );
 
@@ -16,7 +17,5 @@ export const CordisRestError = makeCordisError(
 export class HTTPError extends Error {
   public constructor(public readonly response: Response, body: string) {
     super(`${response.statusText}: ${body}`);
-
-    Error.captureStackTrace(this);
   }
 }

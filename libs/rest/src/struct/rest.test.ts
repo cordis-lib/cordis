@@ -1,9 +1,9 @@
 import fetch, { Response, Headers } from 'node-fetch';
 import Blob from 'fetch-blob';
 import { Bucket } from './Bucket';
-import { CordisRestError, HTTPError } from './Error';
+import { CordisRestError, HTTPError } from '../Error';
 import { RequestOptions, Rest } from './Rest';
-import AbortController from 'abort-controller';
+import AbortController, { AbortSignal } from 'abort-controller';
 
 jest.mock('node-fetch', () => {
   const fetch: typeof import('node-fetch') = jest.requireActual('node-fetch');
@@ -77,8 +77,8 @@ describe('buckets and rate limiting', () => {
       expect(req.headers).toBeInstanceOf(Headers);
       expect(data).toStrictEqual(JSON.parse(value));
       expect(emitter).toBeCalledTimes(2);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', req);
-      expect(emitter).toHaveBeenLastCalledWith('response', req, JSON.parse(value), { limit: 5, timeout: 2500 });
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenLastCalledWith('response', req, res, { limit: 5, timeout: 2500 });
     });
 
     test('429 response', async () => {
@@ -109,7 +109,7 @@ describe('buckets and rate limiting', () => {
       ];
 
       let calls = 0;
-      mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++]));
+      mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++].clone()));
 
       const emitter = jest.spyOn(rest, 'emit');
       const req: RequestOptions<{ test: string }, never> = {
@@ -122,12 +122,14 @@ describe('buckets and rate limiting', () => {
       let final = '';
       for await (const piece of data.stream()) final += piece;
 
+      expect(emitter).toBeCalledTimes(5);
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], { global: false, limit: 5, remaining: 0, timeout: 2500 });
+      expect(emitter).toHaveBeenNthCalledWith(3, 'ratelimit', 'channels/12345678910111213', 'channels/12345678910111213', false, 2500);
+      expect(emitter).toHaveBeenNthCalledWith(4, 'request', req);
+      expect(emitter).toHaveBeenNthCalledWith(5, 'response', req, responses[1], { limit: 5, timeout: 2500 });
+
       expect(JSON.parse(final)).toStrictEqual(JSON.parse(value));
-      expect(emitter).toBeCalledTimes(4);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', req);
-      expect(emitter).toHaveBeenNthCalledWith(2, 'ratelimit', 'channels/12345678910111213', 'channels/12345678910111213', false, 2500);
-      expect(emitter).toHaveBeenNthCalledWith(3, 'request', req);
-      expect(emitter).toHaveBeenNthCalledWith(4, 'response', req, data, { limit: 5, timeout: 2500 });
     });
   });
 });
@@ -157,7 +159,7 @@ describe('non 429 error recovery', () => {
       ];
 
       let calls = 0;
-      mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++]));
+      mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++].clone()));
 
       const emitter = jest.spyOn(rest, 'emit');
       const req: RequestOptions<{ test: string }, never> = {
@@ -169,10 +171,11 @@ describe('non 429 error recovery', () => {
       const data = await rest.make(req);
 
       expect(data).toStrictEqual(JSON.parse(value));
-      expect(emitter).toBeCalledTimes(3);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', req);
-      expect(emitter).toHaveBeenNthCalledWith(2, 'request', req);
-      expect(emitter).toHaveBeenNthCalledWith(3, 'response', req, JSON.parse(value), { limit: 5, timeout: 2500 });
+      expect(emitter).toBeCalledTimes(4);
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], {});
+      expect(emitter).toHaveBeenNthCalledWith(3, 'request', req);
+      expect(emitter).toHaveBeenNthCalledWith(4, 'response', req, responses[1], { limit: 5, timeout: 2500 });
     });
 
     test('exceeding the retry limit', async () => {
@@ -202,7 +205,7 @@ describe('non 429 error recovery', () => {
       ];
 
       let calls = 0;
-      mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++]));
+      mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++].clone()));
 
       const emitter = jest.spyOn(rest, 'emit');
       const req: RequestOptions<{ test: string }, never> = {
@@ -215,11 +218,15 @@ describe('non 429 error recovery', () => {
         .rejects
         .toThrow(CordisRestError);
 
-      expect(emitter).toBeCalledTimes(4);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', req);
-      expect(emitter).toHaveBeenNthCalledWith(2, 'request', req);
+      expect(emitter).toBeCalledTimes(8);
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], {});
       expect(emitter).toHaveBeenNthCalledWith(3, 'request', req);
-      expect(emitter).toHaveBeenNthCalledWith(4, 'request', req);
+      expect(emitter).toHaveBeenNthCalledWith(4, 'response', req, responses[1], {});
+      expect(emitter).toHaveBeenNthCalledWith(5, 'request', req);
+      expect(emitter).toHaveBeenNthCalledWith(6, 'response', req, responses[2], {});
+      expect(emitter).toHaveBeenNthCalledWith(7, 'request', req);
+      expect(emitter).toHaveBeenNthCalledWith(8, 'response', req, responses[3], {});
     });
   });
 
@@ -238,7 +245,7 @@ describe('non 429 error recovery', () => {
     ];
 
     let calls = 0;
-    mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++]));
+    mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++].clone()));
 
     const emitter = jest.spyOn(rest, 'emit');
     const req: RequestOptions<{ test: string }, never> = {
@@ -251,24 +258,12 @@ describe('non 429 error recovery', () => {
       .rejects
       .toThrow(HTTPError);
 
-    expect(emitter).toBeCalledTimes(1);
-    expect(emitter).toHaveBeenNthCalledWith(1, 'request', req);
+    expect(emitter).toBeCalledTimes(2);
+    expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+    expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], { limit: 5, timeout: 2500 });
   });
 
   test('timeout', async () => {
-    const value = '{"foo":"bar"}';
-    const response = new Response(value, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Ratelimit-Limit': '5',
-        'X-Ratelimit-Reset-After': '2.5'
-      },
-      status: 200,
-      url: ''
-    });
-
-    mockedFetch.mockImplementation(() => Promise.resolve(response));
-
     const emitter = jest.spyOn(rest, 'emit');
     const req: RequestOptions<{ test: string }, never> = {
       path: 'channels/12345678910111213',
@@ -277,15 +272,23 @@ describe('non 429 error recovery', () => {
       controller: new AbortController()
     };
 
+    const err = { name: 'AbortError', message: 'User aborted a request' };
+
+    mockedFetch.mockImplementation(
+      (_: string, { signal }: { signal: AbortSignal }) => new Promise(
+        (_, reject) => signal.addEventListener('abort', () => reject(err), { once: true })
+      )
+    );
+
     await expect(() => {
       const promise = rest.make(req);
-      req.controller!.abort();
+      setImmediate(() => req.controller!.abort());
       return promise;
     })
       .rejects
-      .toThrow(CordisRestError);
+      .toStrictEqual(err);
 
     expect(emitter).toBeCalledTimes(1);
-    expect(emitter).toHaveBeenNthCalledWith(1, 'request', req);
+    expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: false }));
   });
 });

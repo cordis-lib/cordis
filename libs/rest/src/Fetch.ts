@@ -32,10 +32,10 @@ export interface DiscordFetchOptions<D = RequestBodyData, Q = StringRecord> {
   method: string;
   headers: Headers;
   controller: AbortController;
+  implicitAbortBehavior: boolean;
   query?: Q | string;
   files?: File[];
   data?: D;
-  failures?: number;
 }
 
 /**
