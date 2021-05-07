@@ -77,7 +77,10 @@ describe('buckets and rate limiting', () => {
       expect(req.headers).toBeInstanceOf(Headers);
       expect(data).toStrictEqual(JSON.parse(value));
       expect(emitter).toBeCalledTimes(2);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
+        implicitAbortBehavior: true,
+        isRetryAfterRatelimit: false
+      }));
       expect(emitter).toHaveBeenLastCalledWith('response', req, res, { limit: 5, timeout: 2500 });
     });
 
@@ -123,10 +126,13 @@ describe('buckets and rate limiting', () => {
       for await (const piece of data.stream()) final += piece;
 
       expect(emitter).toBeCalledTimes(5);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
+        implicitAbortBehavior: true,
+        isRetryAfterRatelimit: false
+      }));
       expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], { global: false, limit: 5, remaining: 0, timeout: 2500 });
       expect(emitter).toHaveBeenNthCalledWith(3, 'ratelimit', 'channels/12345678910111213', 'channels/12345678910111213', false, 2500);
-      expect(emitter).toHaveBeenNthCalledWith(4, 'request', req);
+      expect(emitter).toHaveBeenNthCalledWith(4, 'request', Object.assign(req, { isRetryAfterRatelimit: true }));
       expect(emitter).toHaveBeenNthCalledWith(5, 'response', req, responses[1], { limit: 5, timeout: 2500 });
 
       expect(JSON.parse(final)).toStrictEqual(JSON.parse(value));
@@ -172,7 +178,10 @@ describe('non 429 error recovery', () => {
 
       expect(data).toStrictEqual(JSON.parse(value));
       expect(emitter).toBeCalledTimes(4);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
+        implicitAbortBehavior: true,
+        isRetryAfterRatelimit: false
+      }));
       expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], {});
       expect(emitter).toHaveBeenNthCalledWith(3, 'request', req);
       expect(emitter).toHaveBeenNthCalledWith(4, 'response', req, responses[1], { limit: 5, timeout: 2500 });
@@ -219,7 +228,10 @@ describe('non 429 error recovery', () => {
         .toThrow(CordisRestError);
 
       expect(emitter).toBeCalledTimes(8);
-      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+      expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
+        implicitAbortBehavior: true,
+        isRetryAfterRatelimit: false
+      }));
       expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], {});
       expect(emitter).toHaveBeenNthCalledWith(3, 'request', req);
       expect(emitter).toHaveBeenNthCalledWith(4, 'response', req, responses[1], {});
@@ -259,7 +271,10 @@ describe('non 429 error recovery', () => {
       .toThrow(HTTPError);
 
     expect(emitter).toBeCalledTimes(2);
-    expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: true }));
+    expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
+      implicitAbortBehavior: true,
+      isRetryAfterRatelimit: false
+    }));
     expect(emitter).toHaveBeenNthCalledWith(2, 'response', req, responses[0], { limit: 5, timeout: 2500 });
   });
 
@@ -289,6 +304,9 @@ describe('non 429 error recovery', () => {
       .toStrictEqual(err);
 
     expect(emitter).toBeCalledTimes(1);
-    expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, { implicitAbortBehavior: false }));
+    expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
+      implicitAbortBehavior: false,
+      isRetryAfterRatelimit: false
+    }));
   });
 });

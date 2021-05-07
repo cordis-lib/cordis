@@ -1,4 +1,5 @@
 import { halt } from '@cordis/common';
+import { CordisRestError } from '../Error';
 import type { RatelimitData } from '../struct';
 
 /**
@@ -8,14 +9,24 @@ export abstract class Mutex {
   /**
    * "Claims" a route
    * @param route Route to claim
-   * @returns A promise that resolves once it is safe to go through with the request
+   * @param wait Wether or not the function should wait for the limit or if it should simply throw
+   * @returns A promise that resolves once it is safe to go through with the request - its value being the timeout
    */
-  public async claim(route: string) {
+  public async claim(route: string, wait = true) {
     let timeout = await this._getTimeout(route);
-    while (timeout > 0) {
-      await halt(timeout);
-      timeout = await this._getTimeout(route);
+    let output = timeout;
+
+    if (timeout > 0) {
+      if (!wait) return Promise.reject(new CordisRestError('mutexLock', route));
+
+      while (timeout > 0) {
+        await halt(timeout);
+        timeout = await this._getTimeout(route);
+        output += timeout;
+      }
     }
+
+    return output;
   }
 
   /**

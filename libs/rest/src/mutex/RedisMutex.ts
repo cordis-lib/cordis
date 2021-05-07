@@ -43,8 +43,7 @@ export class RedisMutex extends Mutex {
     const remaining = parseInt(rawRemaining);
 
     const ttl = await this.redis.pttl(this._keys.remaining(route));
-    if (remaining <= 0) {
-      if (ttl <= 0) return 1e2;
+    if (remaining <= 0 && ttl > 0) {
       return ttl;
     }
 
