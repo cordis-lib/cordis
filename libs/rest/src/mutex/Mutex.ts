@@ -8,14 +8,19 @@ export abstract class Mutex {
   /**
    * "Claims" a route
    * @param route Route to claim
-   * @returns A promise that resolves once it is safe to go through with the request
+   * @returns A promise that resolves once it is safe to go through with the request - its value being the timeout
    */
   public async claim(route: string) {
     let timeout = await this._getTimeout(route);
+    let output = timeout;
+
     while (timeout > 0) {
       await halt(timeout);
       timeout = await this._getTimeout(route);
+      output += timeout;
     }
+
+    return output;
   }
 
   /**
