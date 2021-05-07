@@ -43,11 +43,11 @@ export class RedisMutex extends Mutex {
     const remaining = parseInt(rawRemaining);
 
     const ttl = await this.redis.pttl(this._keys.remaining(route));
-    if (remaining <= 0 && ttl >= 0) {
+    if (remaining <= 0 && ttl > 0) {
       return ttl;
     }
 
-    await this.redis.set(this._keys.remaining(route), Math.max(remaining - 1, limit - 1));
+    await this.redis.set(this._keys.remaining(route), remaining - 1);
     if (ttl > 0) await this.redis.pexpire(this._keys.remaining(route), ttl);
 
     return 0;
