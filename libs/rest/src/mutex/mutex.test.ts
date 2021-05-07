@@ -32,7 +32,7 @@ test('setting nothing changes nothing', async () => {
 
   expect(mutex.set('foo', {})).toBeUndefined();
   expect(mutex.global).toBeNull();
-  expect(await mutex.claim('foo')).toBeUndefined();
+  expect(await mutex.claim('foo')).toBe(0);
 });
 
 test('setting only the timeout does not cause delay', async () => {

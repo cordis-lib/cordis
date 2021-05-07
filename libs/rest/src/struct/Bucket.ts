@@ -56,10 +56,13 @@ export class Bucket {
   public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
     this.rest.emit('request', req);
 
-    const mutexTimeout = await this.mutex.claim(this.route);
-    if (mutexTimeout > 0) {
+    const mutexTimeout = await this.mutex
+      .claim(this.route, req.retryAfterRatelimit)
+      // Would rather throw a ratelimit error
+      .catch(() => Promise.reject(new CordisRestError('rateLimited', `${req.method.toUpperCase()} ${req.path}`)));
+
+    if (mutexTimeout > 0 && !req.isRetryAfterRatelimit) {
       this.rest.emit('ratelimit', this.route, req.path, true, mutexTimeout);
-      if (!req.retryAfterRatelimit) return Promise.reject(new CordisRestError('rateLimited', `${req.method.toUpperCase()} ${req.path}`));
     }
 
     let timeout: NodeJS.Timeout;
