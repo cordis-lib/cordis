@@ -17,6 +17,7 @@ jest.mock('amqplib', () => {
           .mockImplementation(() => ({ on }));
 
         let callback: (msg: amqp.ConsumeMessage | null) => void;
+        const props = { properties: { timestamp: Date.now() } } as any;
 
         return Promise.resolve({
           on,
@@ -33,13 +34,13 @@ jest.mock('amqplib', () => {
               bindExchange: jest.fn(),
               sendToQueue: jest
                 .fn<any, [string, any]>()
-                .mockImplementation((_, data) => callback({ content: data } as any)),
+                .mockImplementation((_, data) => callback({ content: data, ...props })),
               sendToExchange: jest
                 .fn<any, [string, any]>()
-                .mockImplementation((_, data) => callback({ content: data } as any)),
+                .mockImplementation((_, data) => callback({ content: data, ...props })),
               publish: jest
                 .fn<any, [string, string, any]>()
-                .mockImplementation((_, __, data) => callback({ content: data } as any)),
+                .mockImplementation((_, __, data) => callback({ content: data, ...props })),
               assertQueue: jest
                 .fn<Promise<{ queue: string }>, [string]>()
                 .mockImplementation(queue => Promise.resolve({ queue })),

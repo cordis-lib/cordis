@@ -45,8 +45,10 @@ export class RoutingServer<K extends string, T extends Record<K, any>> extends B
    * @param content Data to publish
    * @param options Message-specific options
    */
-  public publish<LK extends K>(key: LK, content: T[LK], options?: amqp.Options.Publish) {
+  public publish<LK extends K>(key: LK, content: T[LK], options: amqp.Options.Publish = {}) {
     if (!this.exchange) throw new CordisBrokerError('brokerNotInit');
+
+    options.timestamp ??= Date.now();
 
     return this.util.sendToExchange({
       to: this.exchange,
