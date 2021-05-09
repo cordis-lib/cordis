@@ -69,6 +69,7 @@ importers:
     specifiers:
       '@cordis/common': workspace:^0.3.0
       '@cordis/error': workspace:^0.3.0
+      '@cordis/store': workspace:^0.3.0
       '@msgpack/msgpack': ^2.4.0
       '@types/amqplib': ^0.5.17
       '@types/node': ^14.14.31
@@ -78,6 +79,7 @@ importers:
     dependencies:
       '@cordis/common': link:../common
       '@cordis/error': link:../error
+      '@cordis/store': link:../store
       '@msgpack/msgpack': 2.4.0
       amqplib: 0.6.0
       tslib: 2.1.0

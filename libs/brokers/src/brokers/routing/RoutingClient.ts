@@ -1,4 +1,5 @@
 import { Broker } from '../Broker';
+import { IStore, Store } from '@cordis/store';
 import type * as amqp from 'amqplib';
 
 /**
@@ -22,6 +23,15 @@ export interface RoutingClientInitOtions<K extends string> {
    * @default queue Randomly generated queue by your AMQP server
    */
   queue?: string;
+  /**
+   * Storage for seen nonces
+   */
+  nonceStore?: IStore<number>;
+  /**
+   * How old a message can be without being discarded
+   * Use this so your workers don't play crazy catch-up with long-time downtime when they don't need to
+   */
+  maxMessageAge?: number;
 }
 
 export interface RoutingClient<K extends string, T extends Record<K, any>> extends Broker {
@@ -60,16 +70,29 @@ export class RoutingClient<K extends string, T extends Record<K, any>> extends B
    * @param options Options used for this client
    */
   public async init(options: RoutingClientInitOtions<K>) {
-    const { name, topicBased = false, keys, queue: rawQueue = '' } = options;
+    const { name, topicBased = false, keys, queue: rawQueue = '', nonceStore = new Store(), maxMessageAge = Infinity } = options;
 
     const exchange = await this.channel.assertExchange(name, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
     const queue = await this.channel.assertQueue(rawQueue, { durable: true, exclusive: rawQueue === '' }).then(data => data.queue);
 
-    for (const key of keys) await this.channel.bindQueue(queue, exchange, key);
+    for (const key of keys) {
+      await this.channel.bindQueue(queue, exchange, key);
+    }
 
     await this.util.consumeQueue({
       queue,
-      cb: (content: { type: K; data: T[K] }) => this.emit(content.type, content.data),
+      cb: async (content: { type: K; data: T[K] }, { properties: { correlationId, timestamp } }) => {
+        console.log(correlationId, timestamp);
+        if ((timestamp as number) + maxMessageAge < Date.now()) return;
+
+        const nonce = await nonceStore.get(correlationId);
+        if (nonce) {
+          if (nonce > Date.now()) return;
+          await nonceStore.delete(correlationId);
+        }
+
+        this.emit(content.type, content.data);
+      },
       autoAck: true
     });
   }

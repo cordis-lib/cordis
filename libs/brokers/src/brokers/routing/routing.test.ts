@@ -6,6 +6,7 @@ import type * as amqp from 'amqplib';
 
 jest.mock('amqplib', () => {
   const actual: typeof import('amqplib') = jest.requireActual('amqplib');
+  const crypto: typeof import('crypto') = jest.requireActual('crypto');
 
   return {
     ...actual,
@@ -17,6 +18,7 @@ jest.mock('amqplib', () => {
           .mockImplementation(() => ({ on }));
 
         let callback: (msg: amqp.ConsumeMessage | null) => void;
+        const props = { properties: { correlationId: crypto.randomBytes(16).toString('base64'), timestamp: Date.now() } } as any;
 
         return Promise.resolve({
           on,
@@ -33,13 +35,13 @@ jest.mock('amqplib', () => {
               bindExchange: jest.fn(),
               sendToQueue: jest
                 .fn<any, [string, any]>()
-                .mockImplementation((_, data) => callback({ content: data } as any)),
+                .mockImplementation((_, data) => callback({ content: data, ...props })),
               sendToExchange: jest
                 .fn<any, [string, any]>()
-                .mockImplementation((_, data) => callback({ content: data } as any)),
+                .mockImplementation((_, data) => callback({ content: data, ...props })),
               publish: jest
                 .fn<any, [string, string, any]>()
-                .mockImplementation((_, __, data) => callback({ content: data } as any)),
+                .mockImplementation((_, __, data) => callback({ content: data, ...props })),
               assertQueue: jest
                 .fn<Promise<{ queue: string }>, [string]>()
                 .mockImplementation(queue => Promise.resolve({ queue })),
@@ -86,6 +88,8 @@ describe('publishing', () => {
 
     server.publish('test', 'test');
 
+    await new Promise(res => setImmediate(res));
+
     expect(eventCb).toHaveBeenCalled();
   });
 
@@ -102,6 +106,8 @@ describe('publishing', () => {
     client.on('test', eventCb);
 
     server.publish('test', 'test');
+
+    await new Promise(res => setImmediate(res));
 
     expect(eventCb).toHaveBeenCalled();
   });
