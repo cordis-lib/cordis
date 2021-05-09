@@ -6,7 +6,6 @@ import type * as amqp from 'amqplib';
 
 jest.mock('amqplib', () => {
   const actual: typeof import('amqplib') = jest.requireActual('amqplib');
-  const crypto: typeof import('crypto') = jest.requireActual('crypto');
 
   return {
     ...actual,
@@ -18,7 +17,7 @@ jest.mock('amqplib', () => {
           .mockImplementation(() => ({ on }));
 
         let callback: (msg: amqp.ConsumeMessage | null) => void;
-        const props = { properties: { correlationId: crypto.randomBytes(16).toString('base64'), timestamp: Date.now() } } as any;
+        const props = { properties: { timestamp: Date.now() } } as any;
 
         return Promise.resolve({
           on,
@@ -88,8 +87,6 @@ describe('publishing', () => {
 
     server.publish('test', 'test');
 
-    await new Promise(res => setImmediate(res));
-
     expect(eventCb).toHaveBeenCalled();
   });
 
@@ -106,8 +103,6 @@ describe('publishing', () => {
     client.on('test', eventCb);
 
     server.publish('test', 'test');
-
-    await new Promise(res => setImmediate(res));
 
     expect(eventCb).toHaveBeenCalled();
   });

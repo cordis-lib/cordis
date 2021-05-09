@@ -1,5 +1,4 @@
 import { Broker } from '../Broker';
-import { IStore, Store } from '@cordis/store';
 import type * as amqp from 'amqplib';
 
 /**
@@ -23,10 +22,6 @@ export interface RoutingClientInitOptions<K extends string> {
    * @default queue Randomly generated queue by your AMQP server
    */
   queue?: string;
-  /**
-   * Storage for seen nonces
-   */
-  nonceStore?: IStore<number>;
   /**
    * How old a message can be without being discarded
    * Use this so your workers don't play crazy catch-up with long-time downtime when they don't need to
@@ -70,7 +65,7 @@ export class RoutingClient<K extends string, T extends Record<K, any>> extends B
    * @param options Options used for this client
    */
   public async init(options: RoutingClientInitOptions<K>) {
-    const { name, topicBased = false, keys, queue: rawQueue = '', nonceStore = new Store(), maxMessageAge = Infinity } = options;
+    const { name, topicBased = false, keys, queue: rawQueue = '', maxMessageAge = Infinity } = options;
 
     const exchange = await this.channel.assertExchange(name, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);
     const queue = await this.channel.assertQueue(rawQueue, { durable: true, exclusive: rawQueue === '' }).then(data => data.queue);
@@ -81,15 +76,8 @@ export class RoutingClient<K extends string, T extends Record<K, any>> extends B
 
     await this.util.consumeQueue({
       queue,
-      cb: async (content: { type: K; data: T[K] }, { properties: { correlationId, timestamp } }) => {
-        console.log(correlationId, timestamp);
+      cb: (content: { type: K; data: T[K] }, { properties: { timestamp } }) => {
         if ((timestamp as number) + maxMessageAge < Date.now()) return;
-
-        const nonce = await nonceStore.get(correlationId);
-        if (nonce) {
-          if (nonce > Date.now()) return;
-          await nonceStore.delete(correlationId);
-        }
 
         this.emit(content.type, content.data);
       },
