@@ -152,7 +152,7 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
     let first = true;
     for (const [key, value] of this) {
       if (first) {
-        accum = value as any;
+        accum = value as unknown as V;
         first = false;
         continue;
       }

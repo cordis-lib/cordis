@@ -1,7 +1,7 @@
 import { MemoryMutex } from './MemoryMutex';
 import { halt } from '@cordis/common';
 
-const mockedHalt = halt as any as jest.Mock<typeof halt>;
+const mockedHalt = halt as unknown as jest.Mock<typeof halt>;
 
 jest.mock('@cordis/common', () => {
   const start = Date.now();

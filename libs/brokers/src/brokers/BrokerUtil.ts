@@ -8,12 +8,12 @@ import type { Broker } from './Broker';
 /**
  * Callback used for consuming a queue
  */
-export type ConsumeQueueCallback<T = any> = (content: T, original: amqp.Message) => any;
+export type ConsumeQueueCallback<T = unknown> = (content: T, original: amqp.Message) => unknown;
 
 /**
  * Options for consuming a queue
  */
-export interface ConsumeQueueOptions<T = any> {
+export interface ConsumeQueueOptions<T = unknown> {
   /**
    * Queue to consume
    */
@@ -35,7 +35,7 @@ export interface ConsumeQueueOptions<T = any> {
 /**
  * Options used to send a message to a queue
  */
-export interface SendOptions<T = any> {
+export interface SendOptions<T = unknown> {
   /**
    * The queue you're sending to
    */
@@ -49,7 +49,7 @@ export interface SendOptions<T = any> {
 /**
  * Options used to send a message to a queue
  */
-export interface SendToQueueOptions<T = any> extends SendOptions<T> {
+export interface SendToQueueOptions<T = unknown> extends SendOptions<T> {
   /**
    * Queue-specific AMQP options
    */
@@ -59,7 +59,7 @@ export interface SendToQueueOptions<T = any> extends SendOptions<T> {
 /**
  * Options used to send a message to an exchange
  */
-export interface SendToExchangeOptions<T = any> extends SendOptions<T> {
+export interface SendToExchangeOptions<T = unknown> extends SendOptions<T> {
   /**
    * Targetted routing key
    */
@@ -73,7 +73,7 @@ export interface SendToExchangeOptions<T = any> extends SendOptions<T> {
 /**
  * Data used to reply to a message
  */
-export interface ReplyData<T = any> {
+export interface ReplyData<T = unknown> {
   msg: amqp.Message;
   content: T | null;
   error: boolean;

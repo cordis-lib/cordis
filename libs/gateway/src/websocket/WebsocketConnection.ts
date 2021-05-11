@@ -353,7 +353,10 @@ export class WebsocketConnection {
       this.connection.onopen = this._onOpen;
       this.connection.onclose = this._onClose;
       this.connection.onerror = ({ error }) => this.cluster.emit('error', error, this.id);
-      this.connection.onmessage = ({ data }) => this._onMessage(Util.unpack(this.encoding, this._decompress(data)));
+      this.connection.onmessage = ({ data }) => {
+        const decompressed = this._decompress(data);
+        if (decompressed) return this._onMessage(Util.unpack(this.encoding, decompressed));
+      };
     });
   }
 
@@ -526,8 +529,9 @@ export class WebsocketConnection {
    * Errors are sent to {@link WebsocketManager.error}
    * @param data Raw data recieved
    */
-  private _decompress(data: any) {
-    if (!this.inflate) return data;
+  private _decompress(data: WS.Data): string | Buffer | Uint8Array | void {
+    // Cast safety: if this.inflate is missing that means compression is disabled - this will just be plain text JSON
+    if (!this.inflate) return data as string;
 
     let decompressable: Uint8Array | string;
     if (Array.isArray(data)) decompressable = new Uint8Array(Buffer.concat(data));
@@ -550,7 +554,7 @@ export class WebsocketConnection {
     if (!flush) return;
 
     const { result } = this.inflate;
-    return Array.isArray(result) ? new Uint8Array(result) : result;
+    return Array.isArray(result) ? new Uint8Array(result) : result!;
   }
 
   // Arrow functions are used here to preserve "this" context when passing the functions directly

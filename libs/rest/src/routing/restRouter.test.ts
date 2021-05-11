@@ -2,7 +2,7 @@ import { buildRestRouter } from './restRouter';
 import type { Rest } from '../struct';
 
 const mockedMake = jest.fn();
-const rest = { make: mockedMake } as any as Rest;
+const rest = { make: mockedMake } as unknown as Rest;
 const router = buildRestRouter(rest);
 
 afterEach(() => {

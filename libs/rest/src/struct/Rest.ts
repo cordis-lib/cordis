@@ -37,14 +37,14 @@ export interface Rest {
    * Fired when a request is being started (pre-ratelimit checking)
    * @event
    */
-  on(event: 'request', listener: (request: Partial<DiscordFetchOptions<any, any>>) => any): this;
+  on(event: 'request', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
   /**
    * Fired when Discord responds to a request
    * @event
    */
   on(
     event: 'response',
-    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: Response, ratelimit: Partial<RatelimitData>) => any
+    listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>, response: Response, ratelimit: Partial<RatelimitData>) => any
   ): this;
   /**
    * Fired when a rate limit is (about to be) hit.
@@ -53,19 +53,24 @@ export interface Rest {
   on(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
   /** @internal */
-  once(event: 'request', listener: (request: Partial<DiscordFetchOptions<any, any>>) => any): this;
+  once(event: 'request', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
   /** @internal */
   once(
     event: 'response',
-    listener: (request: Partial<DiscordFetchOptions<any, any>>, response: Response, ratelimit: Partial<RatelimitData>) => any
+    listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>, response: Response, ratelimit: Partial<RatelimitData>) => any
   ): this;
   /** @internal */
   once(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
   /** @internal */
-  emit(event: 'request', request: Partial<DiscordFetchOptions<any, any>>): boolean;
+  emit(event: 'request', request: Partial<DiscordFetchOptions<unknown, unknown>>): boolean;
   /** @internal */
-  emit(event: 'response', request: Partial<DiscordFetchOptions<any, any>>, response: Response, ratelimit: Partial<RatelimitData>): boolean;
+  emit(
+    event: 'response',
+    request: Partial<DiscordFetchOptions<unknown, unknown>>,
+    response: Response,
+    ratelimit: Partial<RatelimitData>
+  ): boolean;
   /** @internal */
   emit(event: 'ratelimit', bucket: string, endpoint: string, prevented: boolean, waitingFor: number): boolean;
 }
