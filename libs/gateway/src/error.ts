@@ -7,7 +7,7 @@ export const CordisGatewayError = makeCordisError(
   {
     tokenInvalid: 'The token you passed is invalid',
     invalidShard: 'An invalid shard was provided to Discord',
-    shardingRequired: 'Sharding is required for this bot to connect.',
+    shardingRequired: 'Sharding is required for this bot to connect',
     notConnectable: (id: number, status: WebsocketConnectionStatus) =>
       `Shard<${id}>#connect was called, but the shard's current status is: ${WebsocketConnectionStatus[status]}`,
     timeoutHit: (name: string, waitedFor: number) => `The timeout with the name of "${name}" was hit, waited for ${waitedFor}`,

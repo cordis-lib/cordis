@@ -2,7 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "declarationDir": "./types"
+    "declarationDir": "./types",
+    // Due to the nature of the IRouter - this is a reasonable thing to do
+    "noUncheckedIndexedAccess": false
   },
   "include": ["./src/**/*.ts"]
 }

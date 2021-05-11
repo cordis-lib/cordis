@@ -15,6 +15,7 @@
     "noEmitHelpers": true,
     "importHelpers": true,
     "declaration": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true
   }
 }

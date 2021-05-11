@@ -57,21 +57,21 @@ export const defaultCompress = Boolean(zlib);
  * @param encoding Encoding to pack to
  * @param data Data to pack
  */
-export const pack = (encoding: Encoding, data: any) => encoding === 'etf' && erlpack ? erlpack.pack(data) : JSON.stringify(data);
+export const pack = (encoding: Encoding, data: unknown) => encoding === 'etf' && erlpack ? erlpack.pack(data) : JSON.stringify(data);
 
 /**
  * Unpacks (decompressed) data given from Discord
  * @param encoding The encoding to unpack from
  * @param data Data to unpack
  */
-export const unpack = (encoding: Encoding, data: any): GatewayReceivePayload => {
+export const unpack = (encoding: Encoding, data: string | Buffer | Uint8Array): GatewayReceivePayload => {
   if (encoding === 'json' || !erlpack) {
     if (typeof data !== 'string') data = TD.decode(data);
     return JSON.parse(data);
   }
 
-  if (!Buffer.isBuffer(data)) data = Buffer.from(new Uint8Array(data));
-  return data.length ? erlpack.unpack(data) : {};
+  if (!Buffer.isBuffer(data)) data = Buffer.from(new Uint8Array(data as Buffer | Uint8Array));
+  return data.length ? erlpack.unpack(data as Buffer) : {};
 };
 
 export const CONSTANTS = {
