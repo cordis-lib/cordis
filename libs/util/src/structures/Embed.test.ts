@@ -1,4 +1,4 @@
-import { buildEmbed } from './embed';
+import { buildEmbed } from './Embed';
 
 test('Dataless value checks', () => {
   const embed1 = buildEmbed({});

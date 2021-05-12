@@ -1,1 +1,2 @@
-export * from './embed';
+export * from './Embed';
+export * from './Snowflake';
