@@ -1,4 +1,3 @@
-export * from './embed';
+export * from './structures';
 export * from './makeDiscordCdnUrl';
 export * from './restUtils';
-export * from './Snowflake';
