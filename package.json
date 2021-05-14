@@ -12,7 +12,8 @@
     "test:ci": "jest --ci --no-stack-trace --verbose",
     "release:npm": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
     "release:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile . && docker push cordislib/gateway",
-    "release": "pnpm run lint && pnpm run test:ci && rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run release:npm && pnpm run release:docker"
+    "release": "pnpm run lint && pnpm run test:ci && rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run release:npm && pnpm run release:docker",
+    "changelog": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,8 @@
     "@babel/generator": "^7.14.1",
     "@babel/preset-env": "^7.14.1",
     "@babel/preset-typescript": "^7.13.0",
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
     "@strictsoftware/typedoc-plugin-monorepo": "^0.3.1",
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.23.0",
@@ -45,6 +48,7 @@
     "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
     "rimraf": "^3.0.2",
+    "standard-version": "^9.3.0",
     "typedoc": "^0.19.2",
     "typedoc-plugin-as-member-of": "^1.0.2",
     "typedoc-plugin-markdown": "^3.8.0",
@@ -54,12 +58,25 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "lint-staged": {
     "*.ts": [
       "eslint --fix"
     ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "scope-case": [
+        2,
+        "always",
+        "pascal-case"
+      ]
+    }
   }
 }
