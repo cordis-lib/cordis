@@ -7,7 +7,7 @@ import {
   WebsocketConnectionConnectOptions
 } from './WebsocketConnection';
 import { stripIndent } from 'common-tags';
-import { Rest, MemoryMutex, RedisMutex } from '@cordis/rest';
+import { Rest, MemoryMutex, Mutex } from '@cordis/rest';
 import {
   APIUser,
   GatewayDispatchPayload,
@@ -15,7 +15,6 @@ import {
   RESTGetAPIGatewayBotResult,
   Routes
 } from 'discord-api-types/v8';
-import type { Redis } from 'ioredis';
 
 /**
  * Options for creating a cluster
@@ -34,9 +33,9 @@ export interface ClusterOptions extends WebsocketConnectionOptions {
    */
   totalShardCount?: number | 'auto';
   /**
-   * Optional IORedis instance for cross-worker storage
+   * Optional Mutex implementation to use for REST
    */
-  redis?: Redis;
+  mutex?: Mutex;
 }
 
 /* eslint-disable @typescript-eslint/unified-signatures */
@@ -182,11 +181,11 @@ export class Cluster extends EventEmitter {
       shardCount = 'auto',
       startingShard = 0,
       totalShardCount = shardCount,
-      redis,
+      mutex,
       ...shardOptions
     } = options;
 
-    this.rest = new Rest(auth, { mutex: redis ? new RedisMutex(redis) : new MemoryMutex() });
+    this.rest = new Rest(auth, { mutex: mutex ?? new MemoryMutex() });
     this.shardCount = shardCount;
     this.startingShard = startingShard;
     this.totalShardCount = totalShardCount;
