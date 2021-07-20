@@ -11,12 +11,15 @@ export type MessageCallback = (...args: any[]) => string;
  */
 export const makeCordisError = <K extends string>(base: ErrorConstructor, messages: Record<K, string | MessageCallback>) =>
   class Error extends base {
+    public override stack!: string;
     public code: K;
-    public stack!: string;
 
     public constructor(key: K, ...args: any[]) {
-      const message = messages[key] as string | MessageCallback;
-      if (!message) throw new TypeError('Bad error key given');
+      const message = messages[key];
+      if (!message) {
+        throw new TypeError('Bad error key given');
+      }
+
       super(
         typeof message === 'string'
           ? message
@@ -27,7 +30,7 @@ export const makeCordisError = <K extends string>(base: ErrorConstructor, messag
       this.code = key;
     }
 
-    public get name() {
+    public override get name() {
       return `${super.name} [${this.code}]`;
     }
   };

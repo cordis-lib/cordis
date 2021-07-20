@@ -28,7 +28,9 @@ export class Bucket {
       .replace(/^\/webhooks\/(\d+)\/[A-Za-z0-9-_]{64,}/, '/webhooks/$1/:token')
       .replace(/\?.*$/, '');
 
-    if (method === 'delete' && route.endsWith('/messages/:id')) route = method + route;
+    if (method === 'delete' && route.endsWith('/messages/:id')) {
+      route = method + route;
+    }
 
     return route;
   }
@@ -78,10 +80,23 @@ export class Bucket {
     const resetAfter = res.headers.get('x-ratelimit-reset-after');
 
     const state: Partial<RatelimitData> = {};
-    if (global) state.global = global === 'true';
-    if (limit) state.limit = Number(limit);
-    if (remaining) state.remaining = Number(remaining);
-    if (resetAfter) state.timeout = Number(resetAfter) * 1000;
+
+    if (global) {
+      state.global = global === 'true';
+    }
+
+    if (limit) {
+      state.limit = Number(limit);
+    }
+
+    if (remaining) {
+      state.remaining = Number(remaining);
+    }
+
+    if (resetAfter) {
+      state.timeout = Number(resetAfter) * 1000;
+    }
+
     this.rest.emit('response', req, res.clone(), state);
 
     await this.mutex.set(this.route, state);

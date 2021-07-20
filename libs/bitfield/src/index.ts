@@ -60,16 +60,25 @@ export class BitField<T extends string> {
    * @param flags The flags to look for
    */
   public static resolve<T extends string>(bit: BitFieldResolvable<T>, flags: Record<T, bigint>): bigint {
-    if (typeof bit === 'bigint' && bit >= 0n) return bit;
-    if (bit instanceof BitField) return bit.bits;
+    if (typeof bit === 'bigint' && bit >= 0n) {
+      return bit;
+    }
+
+    if (bit instanceof BitField) {
+      return bit.bits;
+    }
 
     if (typeof bit === 'string') {
       const num = flags[bit];
       /* istanbul ignore else */
-      if (num) return num;
+      if (num) {
+        return num;
+      }
     }
 
-    if (Array.isArray(bit)) return bit.map(p => this.resolve(p, flags)).reduce((prev, p) => prev | p, 0n);
+    if (Array.isArray(bit)) {
+      return bit.map(p => this.resolve(p, flags)).reduce((prev, p) => prev | p, 0n);
+    }
 
     throw new BitfieldRangeError('bitfieldInvalid');
   }
@@ -150,7 +159,10 @@ export class BitField<T extends string> {
    * @param bit Bits to check for
    */
   public has(bit: BitFieldResolvable<T>): boolean {
-    if (Array.isArray(bit)) return bit.every(b => this.has(b));
+    if (Array.isArray(bit)) {
+      return bit.every(b => this.has(b));
+    }
+
     return (this.bits & this.resolve(bit)) !== 0n;
   }
 
@@ -160,7 +172,10 @@ export class BitField<T extends string> {
    * @returns An array of the missing bits
    */
   public missing(bit: BitFieldResolvable<T>) {
-    if (!Array.isArray(bit)) bit = new this.constructor(this.flags, bit).toArray();
+    if (!Array.isArray(bit)) {
+      bit = new this.constructor(this.flags, bit).toArray();
+    }
+
     return bit.filter(p => !this.has(p));
   }
 
@@ -170,10 +185,15 @@ export class BitField<T extends string> {
    */
   public add(...bits: BitFieldResolvable<T>[]) {
     let total = 0n;
-    for (const bit of bits) total |= this.resolve(bit);
+    for (const bit of bits) {
+      total |= this.resolve(bit);
+    }
 
     /* istanbul ignore if */
-    if (Object.isFrozen(this)) return new this.constructor(this.flags, this.bits | total);
+    if (Object.isFrozen(this)) {
+      return new this.constructor(this.flags, this.bits | total);
+    }
+
     this.bits |= total;
     return this;
   }
@@ -184,10 +204,15 @@ export class BitField<T extends string> {
    */
   public remove(...bits: BitFieldResolvable<T>[]) {
     let total = 0n;
-    for (const bit of bits) total |= this.resolve(bit);
+    for (const bit of bits) {
+      total |= this.resolve(bit);
+    }
 
     /* istanbul ignore if */
-    if (Object.isFrozen(this)) return new this.constructor(this.flags, this.bits & ~total);
+    if (Object.isFrozen(this)) {
+      return new this.constructor(this.flags, this.bits & ~total);
+    }
+
     this.bits &= ~total;
     return this;
   }
@@ -211,7 +236,10 @@ export class BitField<T extends string> {
    */
   public serialize(): Record<T, boolean> {
     const serialized: Record<string, boolean> = {};
-    for (const [flag, bit] of Object.entries(this.flags)) serialized[flag] = this.has(bit as bigint);
+    for (const [flag, bit] of Object.entries(this.flags)) {
+      serialized[flag] = this.has(bit as bigint);
+    }
+
     return serialized;
   }
 }

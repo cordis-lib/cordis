@@ -47,7 +47,9 @@ export class Queue<T = void> {
    */
   private _process() {
     // If we're already processing something else the item that summoned this has to wait
-    if (this._processing) return;
+    if (this._processing) {
+      return;
+    }
 
     const item = this._queue.shift();
     if (!item) {

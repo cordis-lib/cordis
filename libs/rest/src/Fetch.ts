@@ -1,8 +1,8 @@
 import fetch, { Headers } from 'node-fetch';
 import FormData from 'form-data';
 import { URLSearchParams } from 'url';
-import { ENDPOINTS } from '@cordis/common';
 import AbortController from 'abort-controller';
+import { RouteBases } from 'discord-api-types/v8';
 
 /**
  * Represents a file that can be sent to Discord
@@ -59,13 +59,19 @@ export const discordFetch = <D, Q>(options: DiscordFetchOptions<D, Q>) => {
     ).toString();
   }
 
-  const url = `${ENDPOINTS.api}/v8/${path}${queryString ? `?${queryString}` : ''}`;
+  const url = `${RouteBases.api}${path}${queryString ? `?${queryString}` : ''}`;
 
   let body: string | FormData;
   if (files?.length) {
     body = new FormData();
-    for (const file of files) body.append(file.name, file.content, file.name);
-    if (data != null) body.append('payload_json', JSON.stringify(data));
+    for (const file of files) {
+      body.append(file.name, file.content, file.name);
+    }
+
+    if (data != null) {
+      body.append('payload_json', JSON.stringify(data));
+    }
+
     headers = Object.assign(headers, body.getHeaders());
   } else if (data != null) {
     body = JSON.stringify(data);

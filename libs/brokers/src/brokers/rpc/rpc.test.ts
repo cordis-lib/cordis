@@ -49,8 +49,12 @@ jest.mock('amqplib', () => {
               consume: jest
                 .fn<Promise<{ consumerTag: string }>, [string, (...args: any) => any]>()
                 .mockImplementation((queue, cb) => {
-                  if (queue === '') clientCb = cb;
-                  else serverCb = cb;
+                  if (queue === '') {
+                    clientCb = cb;
+                  } else {
+                    serverCb = cb;
+                  }
+
                   return Promise.resolve({ consumerTag: 'test' });
                 }),
               bindQueue: jest.fn(),

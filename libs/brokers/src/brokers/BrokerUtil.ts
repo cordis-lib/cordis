@@ -113,7 +113,10 @@ export class BrokerUtil {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async msg => {
         /* istanbul ignore next */
-        if (!msg) return null;
+        if (!msg) {
+          return null;
+        }
+
         try {
           await cb(decode(msg.content) as T, msg);
         } catch (e) {
@@ -164,7 +167,9 @@ export class BrokerUtil {
     const { msg, ...content } = options;
 
     const missing = getMissingProps(msg.properties, ['correlationId', 'replyTo']);
-    if (missing.length) throw new CordisBrokerTypeError('missingProperties', missing);
+    if (missing.length) {
+      throw new CordisBrokerTypeError('missingProperties', missing);
+    }
 
     return this.sendToQueue({
       to: msg.properties.replyTo,

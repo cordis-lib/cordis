@@ -4,13 +4,13 @@ import { CordisGatewayError, CordisGatewayTypeError } from '../error';
 import * as Util from '../util';
 import { halt } from '@cordis/common';
 import { Queue } from '@cordis/queue';
-import { Intents, INTENTS, IntentKeys } from '../Intents';
+import { Intents, IntentKeys } from '../Intents';
 import { stripIndent } from 'common-tags';
 import {
   GatewaySendPayload,
   GatewayReceivePayload,
   GatewayDispatchPayload,
-  GatewayOPCodes,
+  GatewayOpcodes,
   GatewayCloseCodes,
   GatewayDispatchEvents
 } from 'discord-api-types/v8';
@@ -250,7 +250,7 @@ export class WebsocketConnection {
       encoding = Util.defaultEncoding,
       compress = Util.defaultCompress,
       largeThreshold = 250,
-      intents = INTENTS.nonPrivileged
+      intents = 0
     } = options;
 
     this.openTimeout = openTimeout;
@@ -259,7 +259,11 @@ export class WebsocketConnection {
     this.discordReadyTimeout = discordReadyTimeout;
     this.guildTimeout = guildTimeout;
     this.largeThreshold = largeThreshold;
-    if (typeof intents === 'number') intents = BigInt(intents);
+
+    if (typeof intents === 'number') {
+      intents = BigInt(intents);
+    }
+
     this.intents = new Intents(intents).valueOf();
 
     // If the latter is JSON it means erlpack is not present
@@ -276,7 +280,9 @@ export class WebsocketConnection {
 
     this.encoding = encoding;
     this.compress = compress;
-    if (compress) this.inflate = new Util.zlib!.Inflate(WebsocketConnection.infalteOptions);
+    if (compress) {
+      this.inflate = new Util.zlib!.Inflate(WebsocketConnection.infalteOptions);
+    }
   }
 
   /**
@@ -288,7 +294,10 @@ export class WebsocketConnection {
   }
 
   private _wrapResolve(resolve: () => void) {
-    if (this._connectResolve) this.debug('UB: set another _connectResolve without calling the previous one.');
+    if (this._connectResolve) {
+      this.debug('UB: set another _connectResolve without calling the previous one.');
+    }
+
     return () => {
       this._connectResolve = null;
       resolve();
@@ -296,7 +305,10 @@ export class WebsocketConnection {
   }
 
   private _wrapReject(reject: (reason: any) => void) {
-    if (this._connectReject) this.debug('UB: set another _connectReject without calling the previous one.');
+    if (this._connectReject) {
+      this.debug('UB: set another _connectReject without calling the previous one.');
+    }
+
     return (reason: any) => {
       this._connectReject = null;
       reject(reason);
@@ -355,7 +367,9 @@ export class WebsocketConnection {
       this.connection.onerror = ({ error }) => this.cluster.emit('error', error, this.id);
       this.connection.onmessage = ({ data }) => {
         const decompressed = this._decompress(data);
-        if (decompressed) return this._onMessage(Util.unpack(this.encoding, decompressed));
+        if (decompressed) {
+          return this._onMessage(Util.unpack(this.encoding, decompressed));
+        }
       };
     });
   }
@@ -384,14 +398,24 @@ export class WebsocketConnection {
     this.status = WebsocketConnectionStatus.disconnecting;
 
     if (!reason) {
-      if (reconnect) reason = 'Terminating current connection to reconnect.';
-      if (requested) reason = 'User requested termination.';
+      if (reconnect) {
+        reason = 'Terminating current connection to reconnect.';
+      }
+
+      if (requested) {
+        reason = 'User requested termination.';
+      }
     }
 
     code ??= reconnect ? Util.restartingCloseCode : Util.normalCloseCode;
 
-    for (const timeout of Object.keys(this._timeouts)) this._clearTimeout(timeout);
-    for (const interval of Object.keys(this._intervals)) this._clearInterval(interval);
+    for (const timeout of Object.keys(this._timeouts)) {
+      this._clearTimeout(timeout);
+    }
+
+    for (const interval of Object.keys(this._intervals)) {
+      this._clearInterval(interval);
+    }
 
     if (fatal) {
       this._sequence = null;
@@ -422,11 +446,15 @@ export class WebsocketConnection {
       this._registerTimeout('connClose', cb, 15000);
     });
 
-    if (this.compress && Util.zlib?.Inflate) this.inflate = new Util.zlib.Inflate(WebsocketConnection.infalteOptions);
+    if (this.compress && Util.zlib?.Inflate) {
+      this.inflate = new Util.zlib.Inflate(WebsocketConnection.infalteOptions);
+    }
 
     this.status = reconnect ? WebsocketConnectionStatus.reconnecting : WebsocketConnectionStatus.idle;
 
-    if (!reconnect) return;
+    if (!reconnect) {
+      return;
+    }
 
     return this.connect();
   }
@@ -455,16 +483,26 @@ export class WebsocketConnection {
   private _send(payload: GatewaySendPayload): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return new Promise(async (resolve, reject) => {
-      if (this._firstRequest === -1 || this._requests === 0) this._firstRequest = Date.now();
-      if (this._firstRequest + 6e4 >= Date.now()) this._requests = 0;
+      if (this._firstRequest === -1 || this._requests === 0) {
+        this._firstRequest = Date.now();
+      }
+
+      if (this._firstRequest + 6e4 >= Date.now()) {
+        this._requests = 0;
+      }
 
       if (++this._requests === 120) {
         const timeSinceFirst = Date.now() - this._firstRequest;
-        if (timeSinceFirst < 6e4) await halt(6e4 - timeSinceFirst);
+        if (timeSinceFirst < 6e4) {
+          await halt(6e4 - timeSinceFirst);
+        }
       }
 
       this.connection!.send(Util.pack(this.encoding, payload), err => {
-        if (err) return reject(err);
+        if (err) {
+          return reject(err);
+        }
+
         return resolve();
       });
     });
@@ -508,7 +546,10 @@ export class WebsocketConnection {
    */
   private _clearInterval(name: string) {
     const interval = this._intervals[name];
-    if (!interval) return;
+    if (!interval) {
+      return;
+    }
+
     clearInterval(interval);
     this._intervals[name] = null;
   }
@@ -519,7 +560,10 @@ export class WebsocketConnection {
    */
   private _clearTimeout(name: string) {
     const timeout = this._timeouts[name];
-    if (!timeout) return;
+    if (!timeout) {
+      return;
+    }
+
     clearTimeout(timeout);
     this._timeouts[name] = null;
   }
@@ -531,12 +575,19 @@ export class WebsocketConnection {
    */
   private _decompress(data: WS.Data): string | Buffer | Uint8Array | void {
     // Cast safety: if this.inflate is missing that means compression is disabled - this will just be plain text JSON
-    if (!this.inflate) return data as string;
+    if (!this.inflate) {
+      return data as string;
+    }
 
     let decompressable: Uint8Array | string;
-    if (Array.isArray(data)) decompressable = new Uint8Array(Buffer.concat(data));
-    else if (Buffer.isBuffer(data) || data instanceof ArrayBuffer) decompressable = new Uint8Array(data);
-    else decompressable = data;
+
+    if (Array.isArray(data)) {
+      decompressable = new Uint8Array(Buffer.concat(data));
+    } else if (Buffer.isBuffer(data) || data instanceof ArrayBuffer) {
+      decompressable = new Uint8Array(data);
+    } else {
+      decompressable = data;
+    }
 
     const suffix = decompressable.slice(decompressable.length - 4, decompressable.length);
 
@@ -550,8 +601,13 @@ export class WebsocketConnection {
 
     this.inflate.push(Buffer.from(decompressable), flush ? Util.zlib!.Z_SYNC_FLUSH : Util.zlib!.Z_NO_FLUSH);
 
-    if (this.inflate.err) this.cluster.emit('error', `${this.inflate.err}: ${this.inflate.msg}`, this.id);
-    if (!flush) return;
+    if (this.inflate.err) {
+      this.cluster.emit('error', `${this.inflate.err}: ${this.inflate.msg}`, this.id);
+    }
+
+    if (!flush) {
+      return;
+    }
 
     const { result } = this.inflate;
     return Array.isArray(result) ? new Uint8Array(result) : result!;
@@ -569,7 +625,9 @@ export class WebsocketConnection {
       this._connectReject?.(new CordisGatewayError('timeoutHit', 'hello', this.helloTimeout));
     }, this.helloTimeout);
 
-    if (this.status !== WebsocketConnectionStatus.reconnecting) this.status = WebsocketConnectionStatus.open;
+    if (this.status !== WebsocketConnectionStatus.reconnecting) {
+      this.status = WebsocketConnectionStatus.open;
+    }
   };
 
   private readonly _onClose = async ({ code, reason, wasClean }: { code: number; reason: string; wasClean: boolean }) => {
@@ -588,7 +646,7 @@ export class WebsocketConnection {
         return this.destroy({ code, reason, reconnect: true });
       }
 
-      case GatewayCloseCodes.UnknownOpCode: {
+      case GatewayCloseCodes.UnknownOpcode: {
         this.debug('An invalid opcode was sent to Discord.');
         return this.destroy({ code, reason, reconnect: true });
       }
@@ -662,16 +720,16 @@ export class WebsocketConnection {
 
   private readonly _onMessage = async (packet: GatewayReceivePayload) => {
     switch (packet.op) {
-      case GatewayOPCodes.Dispatch: return this._handleDispatch(packet);
-      case GatewayOPCodes.Heartbeat: return this._heartbeat(true);
-      case GatewayOPCodes.Reconnect:
+      case GatewayOpcodes.Dispatch: return this._handleDispatch(packet);
+      case GatewayOpcodes.Heartbeat: return this._heartbeat(true);
+      case GatewayOpcodes.Reconnect:
         return this.destroy({ reason: 'Told to reconnect by Discord', code: Util.restartingCloseCode, reconnect: true });
-      case GatewayOPCodes.InvalidSession: {
+      case GatewayOpcodes.InvalidSession: {
         this.debug(`Invalid session; should resume: ${packet.d}`);
         return this.destroy({ reason: 'The session has become invalid', reconnect: true, fatal: !packet.d });
       }
 
-      case GatewayOPCodes.Hello: {
+      case GatewayOpcodes.Hello: {
         this._clearTimeout('hello');
         this.debug('Clearing HELLO timeout');
 
@@ -692,7 +750,7 @@ export class WebsocketConnection {
 
           if (necessary) {
             await this.send({
-              op: GatewayOPCodes.Resume,
+              op: GatewayOpcodes.Resume,
               d: {
                 token: this.cluster.auth,
                 session_id: this._sessionId!,
@@ -719,7 +777,7 @@ export class WebsocketConnection {
         break;
       }
 
-      case GatewayOPCodes.HeartbeatAck: {
+      case GatewayOpcodes.HeartbeatAck: {
         this._ack = true;
         this._lastAck = Date.now();
         this.debug(`Recieved ACK with a latency of ${this.ping}`);
@@ -780,7 +838,10 @@ export class WebsocketConnection {
       default: break;
     }
 
-    if (this._sequence == null || payload.s > this._sequence) this._sequence = payload.s;
+    if (this._sequence == null || payload.s > this._sequence) {
+      this._sequence = payload.s;
+    }
+
     this.cluster.emit('dispatch', payload, this.id);
   }
 
@@ -790,13 +851,17 @@ export class WebsocketConnection {
   private _checkReady() {
     this.status = WebsocketConnectionStatus.ready;
     this._connectResolve?.();
-    if (this.cluster.ready) this.cluster.emit('ready');
+    if (this.cluster.ready) {
+      this.cluster.emit('ready');
+    }
   }
 
   private readonly _heartbeat = async (force = false) => {
-    if (!this._ack && !force) return this.destroy({ reason: 'Zombie connection', reconnect: true });
+    if (!this._ack && !force) {
+      return this.destroy({ reason: 'Zombie connection', reconnect: true });
+    }
 
-    await this.send({ op: GatewayOPCodes.Heartbeat, d: this._sequence }, true);
+    await this.send({ op: GatewayOpcodes.Heartbeat, d: this._sequence }, true);
     this._lastBeat = Date.now();
     this._ack = false;
 
@@ -809,7 +874,9 @@ export class WebsocketConnection {
   private async _identify() {
     if (this.cluster.lastIdentify !== -1) {
       const time = Date.now() - this.cluster.lastIdentify;
-      if (time < 5000) await halt(5000);
+      if (time < 5000) {
+        await halt(5000);
+      }
     }
 
     this.cluster.lastIdentify = Date.now();
@@ -830,7 +897,7 @@ export class WebsocketConnection {
     `);
 
     return this.send({
-      op: GatewayOPCodes.Identify,
+      op: GatewayOpcodes.Identify,
       d: {
         token: this.cluster.auth,
         properties: Util.CONSTANTS.properties,

@@ -18,7 +18,7 @@ importers:
       babel-plugin-const-enum: ^1.1.0
       babel-plugin-replace-ts-export-assignment: ^0.0.2
       eslint: ^7.31.0
-      eslint-config-marine: ^7.2.0
+      eslint-config-marine: ^9.0.6
       husky: ^4.3.8
       jest: ^26.6.3
       lint-staged: ^10.5.4
@@ -45,7 +45,7 @@ importers:
       babel-plugin-const-enum: 1.1.0_@babel+core@7.14.6
       babel-plugin-replace-ts-export-assignment: 0.0.2
       eslint: 7.31.0
-      eslint-config-marine: 7.2.0
+      eslint-config-marine: 9.0.6
       husky: 4.3.8
       jest: 26.6.3
       lint-staged: 10.5.4
@@ -97,12 +97,12 @@ importers:
       '@cordis/error': workspace:^0.3.0
       '@types/amqplib': ^0.5.17
       '@types/node': ^14.17.5
-      discord-api-types: ^0.20.0
+      discord-api-types: ^0.20.1
       tslib: ^2.3.0
       typescript: ^4.3.5
     dependencies:
       '@cordis/error': link:../error
-      discord-api-types: 0.20.0
+      discord-api-types: 0.20.1
       tslib: 2.3.0
     devDependencies:
       '@types/amqplib': 0.5.17
@@ -131,7 +131,7 @@ importers:
       '@types/node': ^14.17.5
       '@types/ws': ^7.4.7
       common-tags: ^1.8.0
-      discord-api-types: ^0.20.0
+      discord-api-types: ^0.20.1
       erlpack: github:discord/erlpack
       tslib: ^2.3.0
       typescript: ^4.3.5
@@ -144,7 +144,7 @@ importers:
       '@cordis/queue': link:../queue
       '@cordis/rest': link:../rest
       common-tags: 1.8.0
-      discord-api-types: 0.20.0
+      discord-api-types: 0.20.1
       tslib: 2.3.0
       ws: 7.5.3
     devDependencies:
@@ -190,6 +190,7 @@ importers:
       '@types/node': ^14.17.5
       '@types/node-fetch': ^2.5.11
       abort-controller: ^3.0.0
+      discord-api-types: ^0.20.1
       fetch-blob: ^2.1.2
       form-data: ^3.0.1
       node-fetch: ^2.6.1
@@ -205,6 +206,7 @@ importers:
     devDependencies:
       '@types/node': 14.17.5
       '@types/node-fetch': 2.5.11
+      discord-api-types: 0.20.1
       fetch-blob: 2.1.2
       typescript: 4.3.5
 
@@ -226,13 +228,13 @@ importers:
       '@cordis/error': workspace:^0.3.0
       '@cordis/rest': workspace:^0.3.0
       '@types/node': ^14.17.5
-      discord-api-types: ^0.20.0
+      discord-api-types: ^0.20.1
       tslib: ^2.3.0
       typescript: ^4.3.5
     dependencies:
       '@cordis/error': link:../error
       '@cordis/rest': link:../rest
-      discord-api-types: 0.20.0
+      discord-api-types: 0.20.1
       tslib: 2.3.0
     devDependencies:
       '@types/node': 14.17.5
@@ -3125,10 +3127,9 @@ packages:
       path-type: 4.0.0
     dev: true
 
-  /discord-api-types/0.20.0:
-    resolution: {integrity: sha512-kfPllh732ZraLQJKbLeBPE6GrRO0Lrj9Q4KellyqOfM1NeKVREAPH1V3pj75JAKc+qb5EW5IKffntjcZlQ6Q1g==}
+  /discord-api-types/0.20.1:
+    resolution: {integrity: sha512-gnebD6tufUUGVi7T18jOfH09VuZKAwW28mowWovIVzs6Gwppl7uzURfxUWTsa1/QTEWZgEdrvk5UJou2MToiRw==}
     engines: {node: '>=12'}
-    dev: false
 
   /doctrine/3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
@@ -3223,15 +3224,15 @@ packages:
       source-map: 0.6.1
     dev: true
 
-  /eslint-config-aqua/7.3.0:
-    resolution: {integrity: sha512-rSOMrG5fpv/DtITtGKeOwTWYMeLiCaNLIsJlLABp2oeDs4qTaIE4Y3UdWc/10/C7Vuy/aNGiOidb/XAa6veFFg==}
+  /eslint-config-aqua/9.0.2:
+    resolution: {integrity: sha512-WqV4EYX3pXoL0TkUBH9VVHoWjR3eJ0ud1p5OmSfbRoyjDbUJURs78fpeU4H8t88pO8mFB4SHTZM95DJEwKG/MQ==}
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-config-marine/7.2.0:
-    resolution: {integrity: sha512-emIoQpexPl5Of4d/qZ+lf91JObvnJefGdsuNUQWH8p2E7iSSw8nQmOSocVdEUWjZoTzhf1z0x/UP4g9g6S2Kdw==}
+  /eslint-config-marine/9.0.6:
+    resolution: {integrity: sha512-PPx84UDPQrLM5kyGG4kaDCQ2EAfzh3bcFjS9Sqg322z2vzERg8di3D4YSjUHWgXNqgooOUor8qjzM2NnPL0AKw==}
     dependencies:
-      eslint-config-aqua: 7.3.0
+      eslint-config-aqua: 9.0.2
     dev: true
 
   /eslint-scope/5.1.1:

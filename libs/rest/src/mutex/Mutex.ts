@@ -17,7 +17,9 @@ export abstract class Mutex {
     let output = timeout;
 
     if (timeout > 0) {
-      if (!wait) return Promise.reject(new CordisRestError('mutexLock', route));
+      if (!wait) {
+        return Promise.reject(new CordisRestError('mutexLock', route));
+      }
 
       while (timeout > 0) {
         await halt(timeout);

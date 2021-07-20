@@ -18,17 +18,8 @@ export const INTENTS = BitField.makeFlags([
   'guildMessageTyping',
   'directMessages',
   'directMessageReactions',
-  'directMessageTyping',
-  'all',
-  'privileged',
-  'nonPrivileged'
+  'directMessageTyping'
 ]);
-
-INTENTS.privileged = INTENTS.guildMembers | INTENTS.guildPresences;
-/** @internal */
-const _values = Object.values(INTENTS);
-INTENTS.all = _values.reduce((acc, p, index) => index < _values.length - 3 ? acc | p : acc, 0n);
-INTENTS.nonPrivileged = INTENTS.all & ~INTENTS.privileged;
 
 /**
  * Intent keys

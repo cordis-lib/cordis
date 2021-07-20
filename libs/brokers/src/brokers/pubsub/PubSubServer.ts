@@ -47,7 +47,10 @@ export class PubSubServer<T> extends Broker {
    * @param options Message specific options
    */
   public publish(content: T, options?: amqp.Options.Publish) {
-    if (!this.name) throw new CordisBrokerError('brokerNotInit');
+    if (!this.name) {
+      throw new CordisBrokerError('brokerNotInit');
+    }
+
     return this.fanout
       ? this.util.sendToExchange({ to: this.name, content, key: '', options })
       : this.util.sendToQueue({ to: this.name, content, options });

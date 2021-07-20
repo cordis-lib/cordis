@@ -44,7 +44,7 @@
     "@cordis/queue": "workspace:^0.3.0",
     "@cordis/rest": "workspace:^0.3.0",
     "common-tags": "^1.8.0",
-    "discord-api-types": "^0.20.0",
+    "discord-api-types": "^0.20.1",
     "tslib": "^2.3.0",
     "ws": "^7.5.3"
   }

@@ -16,6 +16,7 @@
     "importHelpers": true,
     "declaration": true,
     "esModuleInterop": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true
   }
 }

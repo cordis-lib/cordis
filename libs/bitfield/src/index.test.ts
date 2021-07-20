@@ -21,7 +21,9 @@ test('resolve bit value', () => {
 test('bitfield iterator', () => {
   const instance = makeTestBitfield(['first', 'second']);
   const output = [];
-  for (const flag of instance) output.push(flag);
+  for (const flag of instance) {
+    output.push(flag);
+  }
 
   expect(output).toStrictEqual(['first', 'second']);
 });
