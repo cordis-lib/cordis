@@ -245,28 +245,18 @@ importers:
       '@cordis/gateway': workspace:^0.3.0
       '@types/node': ^14.14.44
       '@types/yargs': ^15.0.13
-      discord-api-types: ^0.12.1
-      erlpack: github:discord/erlpack
-      reflect-metadata: ^0.1.13
       tslib: ^2.2.0
-      tsyringe: ^4.5.0
       typescript: ^4.2.4
       yargs: ^15.4.1
-      zlib-sync: ^0.1.7
     dependencies:
       '@cordis/brokers': link:../../libs/brokers
-      '@cordis/common': link:../../libs/common
       '@cordis/gateway': link:../../libs/gateway
-      erlpack: github.com/discord/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d
-      reflect-metadata: 0.1.13
       tslib: 2.2.0
-      tsyringe: 4.5.0
       yargs: 15.4.1
-      zlib-sync: 0.1.7
     devDependencies:
+      '@cordis/common': link:../../libs/common
       '@types/node': 14.14.44
       '@types/yargs': 15.0.13
-      discord-api-types: 0.12.1
       typescript: 4.2.4
 
 packages:
@@ -2388,6 +2378,7 @@ packages:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
     dependencies:
       file-uri-to-path: 1.0.0
+    dev: true
 
   /bitsyntax/0.1.0:
     resolution: {integrity: sha512-ikAdCnrloKmFOugAfxWws89/fPc+nw0OOG1IzIE72uSOg/A3cYptKCjSUhDTuj7fhsJtzkzlv7l3b8PzRHLN0Q==}
@@ -3080,6 +3071,7 @@ packages:
   /discord-api-types/0.12.1:
     resolution: {integrity: sha512-x8dhQqPZUtIEKjDHMdA6D3aAsZUMoeo58fAgFA5WOAdSh+uVyRsvny4+25b+RIRasG2Zf2UpDUsx8NKO5zk/6g==}
     engines: {node: '>=12'}
+    dev: false
 
   /doctrine/3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
@@ -3469,6 +3461,7 @@ packages:
 
   /file-uri-to-path/1.0.0:
     resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
+    dev: true
 
   /fill-range/4.0.0:
     resolution: {integrity: sha1-1USBHUKPmOsGpj3EAtJAPDKMOPc=}
@@ -5195,6 +5188,7 @@ packages:
 
   /nan/2.14.2:
     resolution: {integrity: sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==}
+    dev: true
 
   /nanomatch/1.2.13:
     resolution: {integrity: sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA==}
@@ -5820,10 +5814,6 @@ packages:
       indent-string: 4.0.0
       strip-indent: 3.0.0
     dev: true
-
-  /reflect-metadata/0.1.13:
-    resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
-    dev: false
 
   /regenerate-unicode-properties/8.2.0:
     resolution: {integrity: sha512-F9DjY1vKLo/tPePDycuH3dn9H1OTPIkVD9Kz4LODu+F2C75mgjAJ7x/gwy6ZcSNRAAkhNlJSOHRe8k3p+K9WhA==}
@@ -6642,6 +6632,7 @@ packages:
 
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+    dev: true
 
   /tslib/2.2.0:
     resolution: {integrity: sha512-gS9GVHRU+RGn5KQM2rllAlR3dU6m7AcpJKdtH8gFvQiC4Otgk98XnmMU+nZenHt/+VhnBPWwgrJsyrdcw6i23w==}
@@ -6656,13 +6647,6 @@ packages:
       tslib: 1.14.1
       typescript: 4.2.4
     dev: true
-
-  /tsyringe/4.5.0:
-    resolution: {integrity: sha512-XvYgdUxkmGQfpCkKyr/ybJx71OLSnNec1SO0xdohMjaS2UOEyKi76YfKx92XUXgc1TocypHENg6y4wCyYyMKag==}
-    engines: {node: '>= 6.0.0'}
-    dependencies:
-      tslib: 1.14.1
-    dev: false
 
   /tunnel-agent/0.6.0:
     resolution: {integrity: sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=}
@@ -7117,6 +7101,7 @@ packages:
     requiresBuild: true
     dependencies:
       nan: 2.14.2
+    dev: true
 
   github.com/discord/erlpack/e27db8f82892bdb9b28a0547cc394d68b5d2242d:
     resolution: {tarball: https://codeload.github.com/discord/erlpack/tar.gz/e27db8f82892bdb9b28a0547cc394d68b5d2242d}
@@ -7126,3 +7111,4 @@ packages:
     dependencies:
       bindings: 1.5.0
       nan: 2.14.2
+    dev: true

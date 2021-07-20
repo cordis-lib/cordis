@@ -1,7 +1,29 @@
 import * as yargs from 'yargs';
+import type { IntentKeys } from '@cordis/gateway';
 
-export default yargs
-  .env('CORDIS')
+export interface GatewayServiceConfig {
+  auth: string;
+  amqpHost: string;
+  debug: boolean;
+  shardCount: number | 'auto';
+  startingShard: number;
+  totalShardCount: number | 'auto';
+  ws: {
+    compress: boolean;
+    encoding: 'json' | 'etf';
+    timeouts: {
+      open: number;
+      hello: number;
+      ready: number;
+      guild: number;
+      reconnect: number;
+    };
+    largeThreshold: number;
+    intents: IntentKeys[];
+  };
+}
+
+const { argv } = yargs
   .option('auth', {
     global: true,
     description: 'The token used to identify to Discord',
@@ -102,5 +124,28 @@ export default yargs
     'demandOption': false,
     'default': ['nonPrivileged']
   })
-  .help()
-  .argv;
+  .help();
+
+const config: GatewayServiceConfig = {
+  auth: argv.auth,
+  amqpHost: argv['amqp-host'],
+  debug: argv.debug,
+  shardCount: argv['shard-count'],
+  startingShard: argv['starting-shard'],
+  totalShardCount: argv['total-shard-count'],
+  ws: {
+    compress: argv['ws-compress'],
+    encoding: argv['ws-encoding'] as 'json' | 'etf',
+    timeouts: {
+      open: argv['ws-open-timeout'],
+      hello: argv['ws-hello-timeout'],
+      ready: argv['ws-ready-timeout'],
+      guild: argv['ws-guild-timeout'],
+      reconnect: argv['ws-reconnect-timeout']
+    },
+    largeThreshold: argv['ws-large-threshold'],
+    intents: argv['ws-intents'] as IntentKeys[]
+  }
+};
+
+export default config;
