@@ -1,4 +1,4 @@
-import type { GatewayDispatchEvents, GatewayDispatchPayload } from 'discord-api-types/v8';
+import type { GatewayDispatchEvents, GatewayDispatchPayload } from 'discord-api-types/v9';
 
 type SanitizedEvents = {
   [K in GatewayDispatchEvents]: GatewayDispatchPayload & { t: K }

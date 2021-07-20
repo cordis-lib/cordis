@@ -1,4 +1,4 @@
-import { APIEmbed, APIEmbedField, EmbedType } from 'discord-api-types/v8';
+import { APIEmbed, APIEmbedField, EmbedType } from 'discord-api-types/v9';
 
 export const buildEmbed = (embedData: Partial<APIEmbed> = {}) => {
   embedData.fields ??= [];

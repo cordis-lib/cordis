@@ -1,5 +1,5 @@
 import { TextDecoder } from 'util';
-import type { GatewayReceivePayload } from 'discord-api-types/v8';
+import type { GatewayReceivePayload } from 'discord-api-types/v9';
 
 const TD = new TextDecoder();
 

@@ -14,7 +14,7 @@ import {
   GatewaySendPayload,
   RESTGetAPIGatewayBotResult,
   Routes
-} from 'discord-api-types/v8';
+} from 'discord-api-types/v9';
 
 /**
  * Options for creating a cluster

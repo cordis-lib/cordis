@@ -13,7 +13,7 @@ import {
   GatewayOpcodes,
   GatewayCloseCodes,
   GatewayDispatchEvents
-} from 'discord-api-types/v8';
+} from 'discord-api-types/v9';
 import type * as zlib from 'zlib-sync';
 
 /**
@@ -361,7 +361,7 @@ export class WebsocketConnection {
 
       this._connectedAt = Date.now();
 
-      this.connection = new WS(`${this._url}?v=8&encoding=${this.encoding}${this.compress ? '&compress=zlib-stream' : ''}`);
+      this.connection = new WS(`${this._url}?v=9&encoding=${this.encoding}${this.compress ? '&compress=zlib-stream' : ''}`);
       this.connection.onopen = this._onOpen;
       this.connection.onclose = this._onClose;
       this.connection.onerror = ({ error }) => this.cluster.emit('error', error, this.id);

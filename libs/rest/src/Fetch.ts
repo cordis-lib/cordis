@@ -2,7 +2,7 @@ import fetch, { Headers } from 'node-fetch';
 import FormData from 'form-data';
 import { URLSearchParams } from 'url';
 import AbortController from 'abort-controller';
-import { RouteBases } from 'discord-api-types/v8';
+import { RouteBases } from 'discord-api-types/v9';
 
 /**
  * Represents a file that can be sent to Discord
