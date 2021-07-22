@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@cordis/error": "workspace:^0.3.0",
-    "discord-api-types": "^0.20.1",
+    "discord-api-types": "^0.20.2",
     "tslib": "^2.3.0"
   }
 }
