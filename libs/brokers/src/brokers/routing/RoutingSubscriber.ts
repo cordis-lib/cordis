@@ -4,7 +4,7 @@ import type * as amqp from 'amqplib';
 /**
  * Options for initializing the routing client
  */
-export interface RoutingClientInitOptions<K extends string> {
+export interface RoutingSubscriberInitOptions<K extends string> {
   /**
    * Name of the exchange to use
    */
@@ -29,7 +29,7 @@ export interface RoutingClientInitOptions<K extends string> {
   maxMessageAge?: number;
 }
 
-export interface RoutingClient<K extends string, T extends Record<K, any>> extends Broker {
+export interface RoutingSubscriber<K extends string, T extends Record<K, any>> extends Broker {
   /**
    * Event used mostly for internal errors
    * @event
@@ -55,7 +55,7 @@ export interface RoutingClient<K extends string, T extends Record<K, any>> exten
 /**
  * Client-side broker for routing packets using keys
  */
-export class RoutingClient<K extends string, T extends Record<K, any>> extends Broker {
+export class RoutingSubscriber<K extends string, T extends Record<K, any>> extends Broker {
   public constructor(channel: amqp.Channel) {
     super(channel);
   }
@@ -64,7 +64,7 @@ export class RoutingClient<K extends string, T extends Record<K, any>> extends B
    * Initializes the client, binding the events you want to the queue
    * @param options Options used for this client
    */
-  public async init(options: RoutingClientInitOptions<K>) {
+  public async init(options: RoutingSubscriberInitOptions<K>) {
     const { name, topicBased = false, keys, queue: rawQueue = '', maxMessageAge = Infinity } = options;
 
     const exchange = await this.channel.assertExchange(name, topicBased ? 'topic' : 'direct', { durable: false }).then(d => d.exchange);

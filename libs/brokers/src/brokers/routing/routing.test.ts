@@ -1,5 +1,5 @@
-import { RoutingClient } from './RoutingClient';
-import { RoutingServer } from './RoutingServer';
+import { RoutingSubscriber } from './RoutingSubscriber';
+import { RoutingPublisher } from './RoutingPublisher';
 import { createAmqp } from '../../amqp';
 import { CordisBrokerError } from '../../error';
 import type * as amqp from 'amqplib';
@@ -58,13 +58,13 @@ interface Data {
 }
 
 const eventCb = jest.fn();
-let client!: RoutingClient<keyof Data, Data>;
-let server!: RoutingServer<keyof Data, Data>;
+let client!: RoutingSubscriber<keyof Data, Data>;
+let server!: RoutingPublisher<keyof Data, Data>;
 
 beforeEach(async () => {
   const { channel } = await createAmqp('boop');
-  client = new RoutingClient(channel);
-  server = new RoutingServer(channel);
+  client = new RoutingSubscriber(channel);
+  server = new RoutingPublisher(channel);
 });
 
 afterEach(() => jest.clearAllMocks());

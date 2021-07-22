@@ -3,9 +3,9 @@ import { Broker } from '../Broker';
 import type * as amqp from 'amqplib';
 
 /**
- * Options for initializing the pub/sub server
+ * Options for initializing the pub/sub publisher
  */
-export interface PubSubServerInitOptions {
+export interface PubSubPublisherInitOptions {
   /**
    * Name of the queue/exchange to use
    */
@@ -17,9 +17,9 @@ export interface PubSubServerInitOptions {
 }
 
 /**
- * Server for simple publish/subscribe lasyout
+ * Publisher for simple publish/subscribe layout
  */
-export class PubSubServer<T> extends Broker {
+export class PubSubPublisher<T> extends Broker {
   public name?: string;
   public fanout?: boolean;
 
@@ -31,7 +31,7 @@ export class PubSubServer<T> extends Broker {
    * Initializes the client, making it ready to publish packets
    * @param options Options to use for the server
    */
-  public async init(options: PubSubServerInitOptions) {
+  public async init(options: PubSubPublisherInitOptions) {
     const { name, fanout = false } = options;
 
     this.name = fanout

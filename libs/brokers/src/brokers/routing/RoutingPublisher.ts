@@ -5,7 +5,7 @@ import type * as amqp from 'amqplib';
 /**
  * Options for initializing the routing server
  */
-export interface RoutingServerInitOptions {
+export interface RoutingPublisherInitOptions {
   /**
    * Name of the exchange to use
    */
@@ -19,7 +19,7 @@ export interface RoutingServerInitOptions {
 /**
  * Server-side broker for routing packets using keys
  */
-export class RoutingServer<K extends string, T extends Record<K, any>> extends Broker {
+export class RoutingPublisher<K extends string, T extends Record<K, any>> extends Broker {
   /**
    * Exchange being used
    */
@@ -33,7 +33,7 @@ export class RoutingServer<K extends string, T extends Record<K, any>> extends B
    * Initializes the server
    * @param options Options used for this server
    */
-  public async init(options: RoutingServerInitOptions) {
+  public async init(options: RoutingPublisherInitOptions) {
     this.exchange = await this.channel
       .assertExchange(options.name, options.topicBased ? 'topic' : 'direct', { durable: false })
       .then(d => d.exchange);

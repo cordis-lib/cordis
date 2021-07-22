@@ -5,7 +5,7 @@ import type * as amqp from 'amqplib';
 /**
  * Options for initializing the RPC client
  */
-export interface RpcClientInitOptions {
+export interface RpcPublisherInitOptions {
   /**
    * Queue the server should be recieving requests on
    */
@@ -20,7 +20,7 @@ export interface RpcClientInitOptions {
  * Client-side broker for a simple RPC layout
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface RpcClient<S, C> extends Broker {
+export interface RpcPublisher<S, C> extends Broker {
   /**
    * Event used mostly for internal errors
    * @event
@@ -45,7 +45,7 @@ export interface RpcClient<S, C> extends Broker {
 /**
  * Client-side broker for a simple RPC layout
  */
-export class RpcClient<S, C> extends Broker {
+export class RpcPublisher<S, C> extends Broker {
   /**
    * Queue used to send requests to the server
    */
@@ -67,7 +67,7 @@ export class RpcClient<S, C> extends Broker {
    * Initializes the client, making it listen for reply packets
    * @param options Options used for this client
    */
-  public async init(options: RpcClientInitOptions) {
+  public async init(options: RpcPublisherInitOptions) {
     const { name, timeout = 1e4 } = options;
 
     this.serverQueue = await this.channel.assertQueue(name, { durable: false }).then(d => d.queue);

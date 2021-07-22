@@ -1,5 +1,5 @@
-import { RpcClient } from './RpcClient';
-import { RpcServer } from './RpcServer';
+import { RpcPublisher } from './RpcPublisher';
+import { RpcSubscriber } from './RpcSubscriber';
 import { createAmqp } from '../../amqp';
 import { CordisBrokerError } from '../../error';
 import type * as amqp from 'amqplib';
@@ -80,13 +80,13 @@ jest.mock('amqplib', () => {
   };
 });
 
-let client!: RpcClient<string, string>;
-let server!: RpcServer<string, string>;
+let client!: RpcPublisher<string, string>;
+let server!: RpcSubscriber<string, string>;
 
 beforeEach(async () => {
   const { channel } = await createAmqp('boop');
-  client = new RpcClient(channel);
-  server = new RpcServer(channel);
+  client = new RpcPublisher(channel);
+  server = new RpcSubscriber(channel);
 });
 
 afterEach(() => jest.clearAllMocks());
