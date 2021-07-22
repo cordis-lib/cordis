@@ -1,4 +1,4 @@
-name: Deploy Docs
+name: Deploy
 on:
   release:
     types:
@@ -39,7 +39,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Publish to NPM & Docker
-        run: pnpm run publish
+        run: pnpm run release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
