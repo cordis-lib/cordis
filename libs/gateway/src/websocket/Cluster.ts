@@ -46,15 +46,10 @@ export interface Cluster {
    */
   on(event: 'open', listener: (id: string | number) => any): this;
   /**
-   * Fired when one of the shards begins reconnecting
+   * Fired when one of the shards is destroyed
    * @event
    */
-  on(event: 'reconnecting', listener: (id: string | number) => any): this;
-  /**
-   * Fired when one of the shards begins disconnecting
-   * @event
-   */
-  on(event: 'disconnecting', listener: (id: string | number) => any): this;
+  on(event: 'destroy', listener: (reconnecting: boolean, fatal: boolean, id: string | number) => any): this;
   /**
    * Provides information useful for debugging
    * @event
@@ -76,18 +71,22 @@ export interface Cluster {
   on(event: 'dispatch', listener: (data: GatewayDispatchPayload, id: string | number) => any): this;
 
   /** @internal */
-  once(event: 'open' | 'reconnecting' | 'disconnecting', listener: (id: string | number) => any): this;
+  once(event: 'open', listener: (id: string | number) => any): this;
   /** @internal */
   once(event: 'debug' | 'error', listener: (info: any, id: string | number) => any): this;
+  /** @internal */
+  once(event: 'destroy', listener: (reconnecting: boolean, fatal: boolean, id: string | number) => any): this;
   /** @internal */
   once(event: 'ready', listener: () => any): this;
   /** @internal */
   once(event: 'dispatch', listener: (data: GatewayDispatchPayload, id: string | number) => any): this;
 
   /** @internal */
-  emit(event: 'open' | 'reconnecting' | 'disconnecting', id: string | number): boolean;
+  emit(event: 'open', id: string | number): boolean;
   /** @internal */
   emit(event: 'debug' | 'error', info: any, id: string | number): boolean;
+  /** @internal */
+  emit(event: 'destroy', reconnecting: boolean, fatal: boolean, id: string | number): boolean;
   /** @internal */
   emit(event: 'ready'): boolean;
   /** @internal */
