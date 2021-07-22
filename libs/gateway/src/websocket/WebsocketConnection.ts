@@ -394,7 +394,7 @@ export class WebsocketConnection {
         code     : ${code}
     `);
 
-    this.cluster.emit(reconnect ? 'reconnecting' : 'disconnecting', this.id);
+    this.cluster.emit('destroy', reconnect, fatal, this.id);
     this.status = WebsocketConnectionStatus.disconnecting;
 
     if (!reason) {

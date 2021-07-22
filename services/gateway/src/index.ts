@@ -16,8 +16,12 @@ const main = async () => {
   const cluster = new Cluster(config.auth, config.ws);
 
   cluster
-    .on('disconnecting', id => console.log(`[DISCONNECTING]: Shard id ${id}`))
-    .on('reconnecting', id => console.log(`[RECONNECTING]: Shard id ${id}`))
+    .on('destroy', (reconnecting, fatal, id) => {
+      console.log(`[DESTROYED]: Shard id ${id}; Fatal: ${fatal}; Reconnecting: ${reconnecting}`);
+      if (!reconnecting) {
+        process.exit(1);
+      }
+    })
     .on('open', id => console.log(`[CONNECTION OPEN]: Shard id ${id}`))
     .on('error', (err, id) => console.error(`[SHARD ERROR]: Shard id ${id}`, err))
     .on('ready', () => console.log('[READY]: All shards have fully connected'))
