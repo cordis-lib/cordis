@@ -1,5 +1,5 @@
-import { PubSubClient } from './PubSubClient';
-import { PubSubServer } from './PubSubServer';
+import { PubSubSubscriber } from './PubSubSubscriber';
+import { PubSubPublisher } from './PubSubPublisher';
 import { createAmqp } from '../../amqp';
 import { CordisBrokerError } from '../../error';
 import type * as amqp from 'amqplib';
@@ -52,13 +52,13 @@ jest.mock('amqplib', () => {
 });
 
 const eventCb = jest.fn(() => Promise.resolve());
-let client!: PubSubClient<string>;
-let server!: PubSubServer<string>;
+let client!: PubSubSubscriber<string>;
+let server!: PubSubPublisher<string>;
 
 beforeEach(async () => {
   const { channel } = await createAmqp('boop');
-  client = new PubSubClient(channel);
-  server = new PubSubServer(channel);
+  client = new PubSubSubscriber(channel);
+  server = new PubSubPublisher(channel);
 });
 
 afterEach(() => jest.clearAllMocks());

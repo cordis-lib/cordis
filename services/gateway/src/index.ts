@@ -1,5 +1,5 @@
 import config from './args';
-import { createAmqp, RoutingServer } from '@cordis/brokers';
+import { createAmqp, RoutingPublisher } from '@cordis/brokers';
 import { Cluster } from '@cordis/gateway';
 import type { DiscordEvents } from '@cordis/common';
 
@@ -12,7 +12,7 @@ const main = async () => {
       process.exit(1);
     });
 
-  const service = new RoutingServer<keyof DiscordEvents, DiscordEvents>(channel);
+  const service = new RoutingPublisher<keyof DiscordEvents, DiscordEvents>(channel);
   const cluster = new Cluster(config.auth, config.ws);
 
   cluster

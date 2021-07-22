@@ -3,9 +3,9 @@ import type { ConsumeQueueCallback } from '../BrokerUtil';
 import type * as amqp from 'amqplib';
 
 /**
- * Options for initializing the pub/sub client
+ * Options for initializing the pub/sub consumer
  */
-export interface PubSubClientInitOptions<T> {
+export interface PubSubSubscriberInitOptions<T> {
   /**
    * Name of the queue/exchange to use
    */
@@ -21,9 +21,9 @@ export interface PubSubClientInitOptions<T> {
 }
 
 /**
- * Client for simple publish/subscribe lasyout
+ * Consumer for simple publish/subscribe layout
  */
-export class PubSubClient<T> extends Broker {
+export class PubSubSubscriber<T> extends Broker {
   public constructor(channel: amqp.Channel) {
     super(channel);
   }
@@ -32,7 +32,7 @@ export class PubSubClient<T> extends Broker {
    * Initializes the server, making it listen to incoming packets
    * @param options Options to use for the client
    */
-  public async init(options: PubSubClientInitOptions<T>) {
+  public async init(options: PubSubSubscriberInitOptions<T>) {
     const { fanout = false, cb } = options;
 
     const name = fanout

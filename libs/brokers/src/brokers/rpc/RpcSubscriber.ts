@@ -4,12 +4,12 @@ import type * as amqp from 'amqplib';
 /**
  * Callback used for generating a server response from the client-given data
  */
-export type RpcServerCallback<C, S> = (content: C) => S | Promise<S>;
+export type RpcSubscriberCallback<C, S> = (content: C) => S | Promise<S>;
 
 /**
  * Options for initializing the RPC server
  */
-export interface RpcServerInitOptions<S, C> {
+export interface RpcSubscriberInitOptions<S, C> {
   /**
    * Queue the server should be recieving requests on
    */
@@ -17,13 +17,13 @@ export interface RpcServerInitOptions<S, C> {
   /**
    * The callback to run for each message
    */
-  cb: RpcServerCallback<C, S>;
+  cb: RpcSubscriberCallback<C, S>;
 }
 
 /**
  * Server-side broker for a simple RPC layout
  */
-export class RpcServer<S, C> extends Broker {
+export class RpcSubscriber<S, C> extends Broker {
   public constructor(channel: amqp.Channel) {
     super(channel);
   }
@@ -32,7 +32,7 @@ export class RpcServer<S, C> extends Broker {
    * Initializes the server, making it listen for packets
    * @param options Options used for this server
    */
-  public async init(options: RpcServerInitOptions<S, C>) {
+  public async init(options: RpcSubscriberInitOptions<S, C>) {
     const { name, cb } = options;
 
     const queue = await this.channel.assertQueue(name, { durable: false }).then(d => d.queue);
