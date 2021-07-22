@@ -78,7 +78,9 @@ export class RoutingClient<K extends string, T extends Record<K, any>> extends B
       queue,
       cb: (content: { type: K; data: T[K] }, { properties: { timestamp } }) => {
         // For whatever reason amqplib types all properties as any ONLY when recieving?
-        if ((timestamp as number) + maxMessageAge < Date.now()) return;
+        if ((timestamp as number) + maxMessageAge < Date.now()) {
+          return;
+        }
 
         this.emit(content.type, content.data);
       },

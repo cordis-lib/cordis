@@ -14,7 +14,7 @@ import {
   GatewaySendPayload,
   RESTGetAPIGatewayBotResult,
   Routes
-} from 'discord-api-types/v8';
+} from 'discord-api-types/v9';
 
 /**
  * Options for creating a cluster
@@ -200,7 +200,9 @@ export class Cluster extends EventEmitter {
    * Broadcasts a payload to every single shard
    */
   public async broadcast(payload: GatewaySendPayload) {
-    for (const shard of this.shards) await shard.send(payload, false);
+    for (const shard of this.shards) {
+      await shard.send(payload, false);
+    }
   }
 
   /**
@@ -209,7 +211,9 @@ export class Cluster extends EventEmitter {
    * @returns Discord gateway information
    */
   public async fetchGateway(ignoreCache = false) {
-    if (this._fetchGatewayCache && !ignoreCache) return this._fetchGatewayCache;
+    if (this._fetchGatewayCache && !ignoreCache) {
+      return this._fetchGatewayCache;
+    }
 
     const data = await this.rest.get<RESTGetAPIGatewayBotResult>(Routes.gatewayBot());
 
@@ -238,8 +242,13 @@ export class Cluster extends EventEmitter {
             Remaining: ${sessionInformation.remaining}
       `);
 
-      if (this.shardCount === 'auto') this.shardCount = recommendedShards;
-      if (this.totalShardCount === 'auto') this.totalShardCount = recommendedShards;
+      if (this.shardCount === 'auto') {
+        this.shardCount = recommendedShards;
+      }
+
+      if (this.totalShardCount === 'auto') {
+        this.totalShardCount = recommendedShards;
+      }
 
       for (let i = this.startingShard; i < this.startingShard + this.shardCount; i++) {
         this.shards.push(new WebsocketConnection(this, i, url, this._shardOptions));

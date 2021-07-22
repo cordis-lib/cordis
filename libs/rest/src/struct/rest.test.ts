@@ -123,7 +123,9 @@ describe('buckets and rate limiting', () => {
 
       const data: Blob = await rest.make(req);
       let final = '';
-      for await (const piece of data.stream()) final += piece;
+      for await (const piece of data.stream()) {
+        final += piece;
+      }
 
       expect(emitter).toBeCalledTimes(5);
       expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {

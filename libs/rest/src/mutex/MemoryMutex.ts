@@ -24,7 +24,9 @@ export class MemoryMutex extends Mutex {
   protected _getTimeout(route: string) {
     const globalExpiration = this.global?.getTime() ?? 0;
     /* istanbul ignore if */
-    if (globalExpiration > Date.now()) return globalExpiration - Date.now();
+    if (globalExpiration > Date.now()) {
+      return globalExpiration - Date.now();
+    }
 
     const ratelimit = this._limits.get(route);
 
@@ -36,7 +38,10 @@ export class MemoryMutex extends Mutex {
 
     if (ratelimit.remaining == null || ratelimit.remaining <= 0) {
       /* istanbul ignore else */
-      if (ratelimit.expiresAt) return Math.max(ratelimit.expiresAt.getTime() - Date.now(), 0);
+      if (ratelimit.expiresAt) {
+        return Math.max(ratelimit.expiresAt.getTime() - Date.now(), 0);
+      }
+
       /* istanbul ignore next */
       return 1e2;
     }
@@ -56,12 +61,17 @@ export class MemoryMutex extends Mutex {
     if (newLimits.timeout != null) {
       const expiresAt = new Date(Date.now() + newLimits.timeout);
       /* istanbul ignore if */
-      if (newLimits.global) this.global = expiresAt;
-      else limit.expiresAt = expiresAt;
+      if (newLimits.global) {
+        this.global = expiresAt;
+      } else {
+        limit.expiresAt = expiresAt;
+      }
     }
 
     limit.limit = newLimits.limit ?? 0;
     /* istanbul ignore next */
-    if (limit.remaining == null || limit.remaining === Infinity) limit.remaining = newLimits.remaining ?? newLimits.limit ?? Infinity;
+    if (limit.remaining == null || limit.remaining === Infinity) {
+      limit.remaining = newLimits.remaining ?? newLimits.limit ?? Infinity;
+    }
   }
 }

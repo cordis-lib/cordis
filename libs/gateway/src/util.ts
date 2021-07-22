@@ -1,5 +1,5 @@
 import { TextDecoder } from 'util';
-import type { GatewayReceivePayload } from 'discord-api-types/v8';
+import type { GatewayReceivePayload } from 'discord-api-types/v9';
 
 const TD = new TextDecoder();
 
@@ -66,11 +66,17 @@ export const pack = (encoding: Encoding, data: unknown) => encoding === 'etf' &&
  */
 export const unpack = (encoding: Encoding, data: string | Buffer | Uint8Array): GatewayReceivePayload => {
   if (encoding === 'json' || !erlpack) {
-    if (typeof data !== 'string') data = TD.decode(data);
+    if (typeof data !== 'string') {
+      data = TD.decode(data);
+    }
+
     return JSON.parse(data);
   }
 
-  if (!Buffer.isBuffer(data)) data = Buffer.from(new Uint8Array(data as Buffer | Uint8Array));
+  if (!Buffer.isBuffer(data)) {
+    data = Buffer.from(new Uint8Array(data as Buffer | Uint8Array));
+  }
+
   return data.length ? erlpack.unpack(data as Buffer) : {};
 };
 

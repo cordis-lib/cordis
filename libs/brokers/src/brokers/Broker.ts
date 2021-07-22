@@ -45,7 +45,8 @@ export class Broker extends EventEmitter {
    */
   public async destroy() {
     try {
-      for (const tag of this.consumers) await this.channel.cancel(tag);
+      const promises = [...this.consumers].map(tag => this.channel.cancel(tag));
+      await Promise.allSettled(promises);
     } catch {}
 
     this.consumers.clear();

@@ -61,33 +61,43 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
     this.emptyEvery = options?.emptyEvery ?? null;
     this.emptyCb = options?.emptyCb ?? null;
 
-    if (this.emptyEvery) this.emptyTimer = setInterval(() => this.emptyCb ? this.empty(this.emptyCb) : this.clear(), this.emptyEvery);
-    else this.emptyTimer = null;
+    if (this.emptyEvery) {
+      this.emptyTimer = setInterval(() => this.emptyCb ? this.empty(this.emptyCb) : this.clear(), this.emptyEvery);
+    } else {
+      this.emptyTimer = null;
+    }
   }
 
   // Documentation purposes
-  public get(key: string) {
+  public override get(key: string) {
     return super.get(key);
   }
 
-  public set(key: string, value: T) {
-    if (this.maxSize && this.size >= this.maxSize) this.clear();
+  public override set(key: string, value: T) {
+    if (this.maxSize && this.size >= this.maxSize) {
+      this.clear();
+    }
+
     return super.set(key, value);
   }
 
-  public delete(key: string) {
+  public override delete(key: string) {
     return super.delete(key);
   }
 
   public findKey(cb: StoreSingleEntryCallback<T>) {
     for (const [key, value] of this) {
-      if (cb(value, key)) return key;
+      if (cb(value, key)) {
+        return key;
+      }
     }
   }
 
   public find(cb: StoreSingleEntryCallback<T>) {
     for (const [key, value] of this) {
-      if (cb(value, key)) return value;
+      if (cb(value, key)) {
+        return value;
+      }
     }
   }
 
@@ -107,7 +117,9 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
     const sorted = this.sort(cb);
 
     this.clear();
-    for (const [key, value] of sorted) this.set(key, value);
+    for (const [key, value] of sorted) {
+      this.set(key, value);
+    }
 
     return this;
   }
@@ -145,7 +157,10 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
 
     if (initial != null) {
       accum = initial;
-      for (const [key, value] of this) accum = cb(accum, value, key);
+      for (const [key, value] of this) {
+        accum = cb(accum, value, key);
+      }
+
       return accum;
     }
 
@@ -160,7 +175,9 @@ export class Store<T> extends Map<string, T> implements IStore<T> {
       accum = cb(accum!, value, key);
     }
 
-    if (first) throw new CordisStoreTypeError('noReduceEmptyStore');
+    if (first) {
+      throw new CordisStoreTypeError('noReduceEmptyStore');
+    }
 
     return accum!;
   }

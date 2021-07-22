@@ -13,10 +13,11 @@
     "one-var": "off",
     "no-eq-null": "off",
     "no-useless-constructor": "off",
-    "no-negated-condition": "off",
-    "promise/prefer-await-to-then": "off",
-    "promise/prefer-await-to-callbacks": "off",
-    "radix": "off",
-    "no-multi-assign": "off"
+    "comma-dangle": "off",
+    "curly": [
+      "error",
+      "all"
+    ],
+    "no-redeclare": "off"
   }
 }

@@ -18,15 +18,3 @@ export const CORDIS_META: {
 } as const;
 
 Object.freeze(CORDIS_META);
-
-/**
- * Root endpoints for Discord
- */
-// TODO: Start using discord-api-types roots once that's released. Already on main branch
-export const ENDPOINTS = {
-  api: 'https://discord.com/api',
-  cdn: 'https://cdn.discordapp.com',
-  invite: 'https://discord.gg'
-} as const;
-
-Object.freeze(ENDPOINTS);

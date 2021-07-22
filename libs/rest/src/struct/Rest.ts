@@ -179,7 +179,9 @@ export class Rest extends EventEmitter {
     options.headers ??= new Headers();
     options.headers.set('Authorization', `Bot ${this.auth}`);
     options.headers.set('User-Agent', USER_AGENT);
-    if (options.reason) options.headers.set('X-Audit-Log-Reason', encodeURIComponent(options.reason));
+    if (options.reason) {
+      options.headers.set('X-Audit-Log-Reason', encodeURIComponent(options.reason));
+    }
 
     let isRetryAfterRatelimit = false;
 
@@ -187,7 +189,8 @@ export class Rest extends EventEmitter {
       try {
         return await bucket.make<T, D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
       } catch (e) {
-        const isRatelimit = isRetryAfterRatelimit = e instanceof CordisRestError && e.code === 'rateLimited';
+        const isRatelimit = e instanceof CordisRestError && e.code === 'rateLimited';
+        isRetryAfterRatelimit = isRatelimit;
 
         if (
           e instanceof HTTPError ||

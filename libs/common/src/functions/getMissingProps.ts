@@ -7,7 +7,9 @@ export const getMissingProps = (data: any, schema: string[]) => {
   const missing: string[] = [];
 
   for (const key of schema) {
-    if (!(key in data)) missing.push(key);
+    if (!(key in data)) {
+      missing.push(key);
+    }
   }
 
   return missing;

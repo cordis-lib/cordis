@@ -1,4 +1,4 @@
-import { APIEmbed, APIEmbedField, EmbedType } from 'discord-api-types/v8';
+import { APIEmbed, APIEmbedField, EmbedType } from 'discord-api-types/v9';
 
 export const buildEmbed = (embedData: Partial<APIEmbed> = {}) => {
   embedData.fields ??= [];
@@ -33,7 +33,10 @@ export const buildEmbed = (embedData: Partial<APIEmbed> = {}) => {
       return buildEmbed({ ...this, url });
     },
     setTimestamp(timestamp: Date | number = new Date()) {
-      if (typeof timestamp === 'number') timestamp = new Date(timestamp);
+      if (typeof timestamp === 'number') {
+        timestamp = new Date(timestamp);
+      }
+
       return buildEmbed({ ...this, timestamp: timestamp.toString() });
     },
     addFields(...data: APIEmbedField[]) {

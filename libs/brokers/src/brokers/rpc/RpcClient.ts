@@ -80,8 +80,11 @@ export class RpcClient<S, C> extends Broker {
         const key = `__${msg.properties.correlationId as string}` as const;
         /* istanbul ignore else */
         if (msg.properties.correlationId) {
-          if (decoded.content) this.emit(key, decoded.content, false);
-          else this.emit(key, null, true);
+          if (decoded.content) {
+            this.emit(key, decoded.content, false);
+          } else {
+            this.emit(key, null, true);
+          }
         }
       },
       autoAck: false
@@ -95,13 +98,18 @@ export class RpcClient<S, C> extends Broker {
    */
   public post(packet: C) {
     return new Promise<S>((resolve, reject) => {
-      if (!this.serverQueue) return reject(new CordisBrokerError('brokerNotInit'));
+      if (!this.serverQueue) {
+        return reject(new CordisBrokerError('brokerNotInit'));
+      }
 
       const correlationId = this.util.generateCorrelationId();
 
       const cb = (res: S | null, isError: boolean) => {
         clearTimeout(timeout);
-        if (isError) return reject(new CordisBrokerError('serverFailure'));
+        if (isError) {
+          return reject(new CordisBrokerError('serverFailure'));
+        }
+
         return resolve(res as S);
       };
 

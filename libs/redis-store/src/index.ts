@@ -68,13 +68,15 @@ export class RedisStore<T> implements IStore<T> {
       let currentKey: string;
 
       for (const element of chunk) {
-        if (seenKeys.has(element)) continue;
+        if (seenKeys.has(element)) {
+          continue;
+        }
 
-        if (!isKey) {
-          yield [currentKey!, this.decode(element)] as [string, T];
-        } else {
+        if (isKey) {
           seenKeys.add(element);
           currentKey = element;
+        } else {
+          yield [currentKey!, this.decode(element)] as [string, T];
         }
 
         isKey = !isKey;
@@ -125,23 +127,32 @@ export class RedisStore<T> implements IStore<T> {
     this.decode = options.decode ?? (data => data);
 
     if (options.entries) {
-      for (const [id, presence] of options.entries) void this.set(id, presence);
+      for (const [id, presence] of options.entries) {
+        void this.set(id, presence);
+      }
     }
 
-    if (this.emptyEvery) this.emptyTimer = setInterval(() => void (this.emptyCb ? this.empty(this.emptyCb) : this.empty()), this.emptyEvery);
-    else this.emptyTimer = null;
+    if (this.emptyEvery) {
+      this.emptyTimer = setInterval(() => void (this.emptyCb ? this.empty(this.emptyCb) : this.empty()), this.emptyEvery);
+    } else {
+      this.emptyTimer = null;
+    }
   }
 
   public async get(key: string) {
     const data = await this.redis.hget(this.hash, key);
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     return this.decode(data);
   }
 
   public async set(key: string, value: T) {
     const size = await this.redis.hlen(this.hash);
-    if (this.maxSize && size >= this.maxSize) await this.empty();
+    if (this.maxSize && size >= this.maxSize) {
+      await this.empty();
+    }
 
     await this.redis.hset(this.hash, key, this.encode(value));
     return this;
@@ -154,13 +165,17 @@ export class RedisStore<T> implements IStore<T> {
 
   public async findKey(cb: StoreSingleEntryCallback<T>) {
     for await (const [key, value] of this) {
-      if (cb(value, key)) return key;
+      if (cb(value, key)) {
+        return key;
+      }
     }
   }
 
   public async find(cb: StoreSingleEntryCallback<T>) {
     for await (const [key, value] of this) {
-      if (cb(value, key)) return value;
+      if (cb(value, key)) {
+        return value;
+      }
     }
   }
 
@@ -168,7 +183,9 @@ export class RedisStore<T> implements IStore<T> {
     const store = new Store<T>();
 
     for await (const [key, value] of this) {
-      if (cb(value, key)) store.set(key, value);
+      if (cb(value, key)) {
+        store.set(key, value);
+      }
     }
 
     return store;
@@ -200,20 +217,26 @@ export class RedisStore<T> implements IStore<T> {
       .sort((a, b) => cb(a[1], b[1], a[0], b[0]));
 
     await this.redis.del(this.hash);
-    for (const [key, value] of entries) await this.redis.hset(this.hash, key, this.encode(value));
+    for (const [key, value] of entries) {
+      await this.redis.hset(this.hash, key, this.encode(value));
+    }
 
     return new Store<T>({ entries });
   }
 
   public async map<V = T>(cb: StoreMapCallback<V, T>) {
     const output: V[] = [];
-    for await (const [key, value] of this) output.push(cb(value, key));
+    for await (const [key, value] of this) {
+      output.push(cb(value, key));
+    }
 
     return output;
   }
 
   public async empty(cb?: StoreSingleEntryCallback<T>) {
-    if (!cb) return this.redis.del(this.hash);
+    if (!cb) {
+      return this.redis.del(this.hash);
+    }
 
     let deletes = 0;
 
@@ -232,7 +255,10 @@ export class RedisStore<T> implements IStore<T> {
 
     if (initial != null) {
       accum = initial;
-      for await (const [key, value] of this) accum = cb(accum, value, key);
+      for await (const [key, value] of this) {
+        accum = cb(accum, value, key);
+      }
+
       return accum;
     }
 
@@ -247,7 +273,9 @@ export class RedisStore<T> implements IStore<T> {
       accum = cb(accum!, value, key);
     }
 
-    if (first) throw new CordisRedisStoreTypeError('noReduceEmptyStore');
+    if (first) {
+      throw new CordisRedisStoreTypeError('noReduceEmptyStore');
+    }
 
     return accum!;
   }

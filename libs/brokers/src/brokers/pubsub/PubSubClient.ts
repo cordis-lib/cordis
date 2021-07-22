@@ -40,7 +40,9 @@ export class PubSubClient<T> extends Broker {
       : await this.channel.assertQueue(options.name, { durable: true }).then(d => d.queue);
 
     const queue = fanout ? await this.channel.assertQueue('', { exclusive: true }).then(d => d.queue) : name;
-    if (fanout) await this.channel.bindQueue(queue, name, '');
+    if (fanout) {
+      await this.channel.bindQueue(queue, name, '');
+    }
 
     await this.util.consumeQueue({
       queue,
