@@ -4,7 +4,7 @@
   "description": "Cordis' REST utilities for the Discord API",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"

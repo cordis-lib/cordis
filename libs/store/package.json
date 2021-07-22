@@ -3,7 +3,7 @@
   "description": "Map-based storage structure",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
