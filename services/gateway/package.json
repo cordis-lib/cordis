@@ -4,7 +4,7 @@
   "description": "Cordis' gateway service",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
@@ -22,14 +22,14 @@
   },
   "homepage": "https://github.com/cordis-lib/cordis#readme",
   "devDependencies": {
-    "@cordis/common": "workspace:^0.3.0",
+    "@cordis/common": "workspace:^1.0.0",
     "@types/node": "^14.17.5",
     "@types/yargs": "^15.0.14",
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@cordis/brokers": "workspace:^0.3.0",
-    "@cordis/gateway": "workspace:^0.3.0",
+    "@cordis/brokers": "workspace:^1.0.0",
+    "@cordis/gateway": "workspace:^1.0.0",
     "tslib": "^2.3.0",
     "yargs": "^15.4.1"
   }

@@ -3,7 +3,7 @@
   "description": "Redis cache implementing the cordis Store",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc"
@@ -35,8 +35,8 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@cordis/error": "workspace:^0.3.0",
-    "@cordis/store": "workspace:^0.3.0",
+    "@cordis/error": "workspace:^1.0.0",
+    "@cordis/store": "workspace:^1.0.0",
     "tslib": "^2.3.0"
   }
 }
