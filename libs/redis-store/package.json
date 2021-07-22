@@ -35,8 +35,8 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@cordis/error": "workspace:^0.3.0",
-    "@cordis/store": "workspace:^0.3.0",
+    "@cordis/error": "workspace:^1.0.0",
+    "@cordis/store": "workspace:^1.0.0",
     "tslib": "^2.3.0"
   }
 }
