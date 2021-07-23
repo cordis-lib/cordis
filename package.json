@@ -12,7 +12,7 @@
     "test:ci": "jest --ci --no-stack-trace --verbose",
     "release:npm": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
     "release:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile . && docker push cordislib/gateway",
-    "release": "pnpm run lint && pnpm run test:ci && rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run release:npm && pnpm run release:docker",
+    "release": "rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run lint && pnpm run test:ci && pnpm run release:npm && pnpm run release:docker",
     "changelog": "standard-version"
   },
   "repository": {
