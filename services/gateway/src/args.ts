@@ -24,6 +24,7 @@ export interface GatewayServiceConfig {
 }
 
 const { argv } = yargs
+  .env()
   .option('auth', {
     global: true,
     description: 'The token used to identify to Discord',
