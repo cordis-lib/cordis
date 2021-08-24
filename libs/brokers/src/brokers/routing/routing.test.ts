@@ -4,54 +4,49 @@ import { createAmqp } from '../../amqp';
 import { CordisBrokerError } from '../../error';
 import type * as amqp from 'amqplib';
 
-jest.mock('amqplib', () => {
-  const actual: typeof import('amqplib') = jest.requireActual('amqplib');
+jest.mock('amqplib', () => ({
+  connect: jest
+    .fn()
+    .mockImplementation(() => {
+      const on = jest
+        .fn()
+        .mockImplementation(() => ({ on }));
 
-  return {
-    ...actual,
-    connect: jest
-      .fn()
-      .mockImplementation(() => {
-        const on = jest
+      let callback: (msg: amqp.ConsumeMessage | null) => void;
+      const props = { properties: { timestamp: Date.now() } } as any;
+
+      return Promise.resolve({
+        on,
+        createChannel: jest
           .fn()
-          .mockImplementation(() => ({ on }));
-
-        let callback: (msg: amqp.ConsumeMessage | null) => void;
-        const props = { properties: { timestamp: Date.now() } } as any;
-
-        return Promise.resolve({
-          on,
-          createChannel: jest
-            .fn()
-            .mockImplementation(() => Promise.resolve({
-              consume: jest
-                .fn<Promise<{ consumerTag: string }>, [string, (...args: any) => any]>()
-                .mockImplementation((_, cb) => {
-                  callback = cb;
-                  return Promise.resolve({ consumerTag: 'test' });
-                }),
-              bindQueue: jest.fn(),
-              bindExchange: jest.fn(),
-              sendToQueue: jest
-                .fn<any, [string, any]>()
-                .mockImplementation((_, data) => callback({ content: data, ...props })),
-              sendToExchange: jest
-                .fn<any, [string, any]>()
-                .mockImplementation((_, data) => callback({ content: data, ...props })),
-              publish: jest
-                .fn<any, [string, string, any]>()
-                .mockImplementation((_, __, data) => callback({ content: data, ...props })),
-              assertQueue: jest
-                .fn<Promise<{ queue: string }>, [string]>()
-                .mockImplementation(queue => Promise.resolve({ queue })),
-              assertExchange: jest
-                .fn<Promise<{ exchange: string }>, [string]>()
-                .mockImplementation(exchange => Promise.resolve({ exchange }))
-            }))
-        });
-      })
-  };
-});
+          .mockImplementation(() => Promise.resolve({
+            consume: jest
+              .fn<Promise<{ consumerTag: string }>, [string, (...args: any) => any]>()
+              .mockImplementation((_, cb) => {
+                callback = cb;
+                return Promise.resolve({ consumerTag: 'test' });
+              }),
+            bindQueue: jest.fn(),
+            bindExchange: jest.fn(),
+            sendToQueue: jest
+              .fn<any, [string, any]>()
+              .mockImplementation((_, data) => callback({ content: data, ...props })),
+            sendToExchange: jest
+              .fn<any, [string, any]>()
+              .mockImplementation((_, data) => callback({ content: data, ...props })),
+            publish: jest
+              .fn<any, [string, string, any]>()
+              .mockImplementation((_, __, data) => callback({ content: data, ...props })),
+            assertQueue: jest
+              .fn<Promise<{ queue: string }>, [string]>()
+              .mockImplementation(queue => Promise.resolve({ queue })),
+            assertExchange: jest
+              .fn<Promise<{ exchange: string }>, [string]>()
+              .mockImplementation(exchange => Promise.resolve({ exchange }))
+          }))
+      });
+    })
+}));
 
 interface Data {
   test: string;

@@ -117,9 +117,9 @@ export class Bucket {
     }
 
     if (res.headers.get('content-type')?.startsWith('application/json')) {
-      return res.json();
+      return res.json() as Promise<T>;
     }
 
-    return res.blob() as unknown as T;
+    return res.blob() as Promise<unknown> as Promise<T>;
   }
 }

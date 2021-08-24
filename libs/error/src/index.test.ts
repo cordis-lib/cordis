@@ -1,4 +1,4 @@
-import makeCordisError from './';
+import makeCordisError from './index';
 
 const CordisTestError = makeCordisError(Error, { test: 'test', test2: (str: string) => str });
 

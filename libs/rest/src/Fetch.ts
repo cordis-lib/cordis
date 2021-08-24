@@ -44,7 +44,7 @@ export interface DiscordFetchOptions<D = RequestBodyData, Q = StringRecord> {
  * Makes the actual HTTP request
  * @param options Options for the request
  */
-export const discordFetch = <D, Q>(options: DiscordFetchOptions<D, Q>) => {
+export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => {
   let { path, method, headers, controller, query, files, data } = options;
 
   let queryString: string | null = null;
@@ -82,6 +82,8 @@ export const discordFetch = <D, Q>(options: DiscordFetchOptions<D, Q>) => {
     method: method,
     headers,
     body: body!,
-    signal: controller.signal
+    signal: controller.signal,
+    // 250KB buffer for the sake of supporting 2 clones of reasonably big responses
+    highWaterMark: 25e4
   });
 };

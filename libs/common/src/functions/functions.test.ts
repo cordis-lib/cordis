@@ -1,4 +1,4 @@
-import { getMissingProps, halt, isPromise, keyMirror } from './';
+import { getMissingProps, halt, isPromise, keyMirror } from './index';
 
 test('get missing props', () => {
   const obj = { one: 1, two: 2 };
@@ -8,7 +8,7 @@ test('get missing props', () => {
 });
 
 test('halt', async () => {
-  jest.useFakeTimers();
+  jest.useFakeTimers('legacy');
 
   const cb = jest.fn();
 

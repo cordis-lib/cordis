@@ -21,7 +21,7 @@ jest.mock('@cordis/common', () => {
   const now = jest.spyOn(Date, 'now').mockReturnValue(start);
 
   return {
-    ...jest.requireActual<typeof import('@cordis/common')>('@cordis/common'),
+    ...jest.requireActual('@cordis/common'),
     halt: jest
       .fn<Promise<void>, [number]>()
       .mockImplementation(timeout => {
@@ -60,8 +60,7 @@ describe('buckets and rate limiting', () => {
           'X-Ratelimit-Limit': '5',
           'X-Ratelimit-Reset-After': '2.5'
         },
-        url: ''
-      });
+      }).clone();
 
       mockedFetch.mockResolvedValue(res.clone());
 
@@ -98,7 +97,6 @@ describe('buckets and rate limiting', () => {
             'Retry-After': '2.5'
           },
           status: 429,
-          url: ''
         }),
         new Response(value, {
           headers: {
@@ -107,9 +105,8 @@ describe('buckets and rate limiting', () => {
             'X-Ratelimit-Reset-After': '2.5'
           },
           status: 200,
-          url: ''
         })
-      ];
+      ].map(res => res.clone());
 
       let calls = 0;
       mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++].clone()));
@@ -153,7 +150,6 @@ describe('non 429 error recovery', () => {
             'Content-Type': 'application/json'
           },
           status: 500,
-          url: ''
         }),
         new Response(value, {
           headers: {
@@ -162,9 +158,8 @@ describe('non 429 error recovery', () => {
             'X-Ratelimit-Reset-After': '2.5'
           },
           status: 200,
-          url: ''
         })
-      ];
+      ].map(res => res.clone());
 
       let calls = 0;
       mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++].clone()));
@@ -196,7 +191,6 @@ describe('non 429 error recovery', () => {
           'Content-Type': 'application/json'
         },
         status: 500,
-        url: ''
       });
 
       const responses = [
@@ -211,9 +205,8 @@ describe('non 429 error recovery', () => {
             'X-Ratelimit-Reset-After': '2.5'
           },
           status: 200,
-          url: ''
         })
-      ];
+      ].map(res => res.clone());
 
       let calls = 0;
       mockedFetch.mockImplementation(() => Promise.resolve(responses[calls++].clone()));
@@ -253,9 +246,8 @@ describe('non 429 error recovery', () => {
           'X-Ratelimit-Limit': '5',
           'X-Ratelimit-Reset-After': '2.5'
         },
-        status: 403,
-        url: ''
-      })
+        status: 403
+      }).clone()
     ];
 
     let calls = 0;

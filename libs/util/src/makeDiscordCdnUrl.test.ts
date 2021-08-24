@@ -1,4 +1,4 @@
-import { makeDiscordCdnUrl } from './';
+import { makeDiscordCdnUrl } from './index';
 import { CordisUtilTypeError, CordisUtilRangeError } from './error';
 
 describe('invalid options handling', () => {

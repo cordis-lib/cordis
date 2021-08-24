@@ -3,61 +3,45 @@ import { createAmqp } from '../amqp';
 import { encode } from '@msgpack/msgpack';
 import { CordisBrokerTypeError } from '../error';
 
-jest.mock('crypto', () => {
-  const actual: typeof import('crypto') = jest.requireActual('crypto');
+jest.mock('crypto', () => ({
+  randomBytes: jest
+    .fn<Buffer, [number]>()
+    // @ts-expect-error
+    .mockImplementation(() => ({
+      toString: () => 'isl9iE2PJd5/hSwK3T8/3uzqWr5UGwZ9zfyM7Ngb/kQ='
+    }))
+}));
 
-  return {
-    ...actual,
-    randomBytes: jest
-      .fn<Buffer, [number]>()
-      // @ts-expect-error Mocked buffer isn't a complete buffer.
-      .mockImplementation(bytes => {
-        if (bytes === 32) {
-          return {
-            toString: () => 'isl9iE2PJd5/hSwK3T8/3uzqWr5UGwZ9zfyM7Ngb/kQ='
-          };
-        }
+jest.mock('amqplib', () => ({
+  connect: jest
+    .fn()
+    .mockImplementation(() => {
+      const on = jest
+        .fn()
+        .mockImplementation(() => ({ on }));
 
-        return actual.randomBytes(bytes);
-      })
-  };
-});
+      const callbacks: any = {};
 
-jest.mock('amqplib', () => {
-  const actual: typeof import('amqplib') = jest.requireActual('amqplib');
-
-  return {
-    ...actual,
-    connect: jest
-      .fn()
-      .mockImplementation(() => {
-        const on = jest
+      return Promise.resolve({
+        on,
+        createChannel: jest
           .fn()
-          .mockImplementation(() => ({ on }));
-
-        const callbacks: any = {};
-
-        return Promise.resolve({
-          on,
-          createChannel: jest
-            .fn()
-            .mockImplementation(() => Promise.resolve({
-              consume: jest
-                .fn<Promise<{ consumerTag: string }>, [string, (...args: any) => any]>()
-                .mockImplementation((queue, cb) => {
-                  callbacks[queue] = cb;
-                  return Promise.resolve({ consumerTag: 'test' });
-                }),
-              sendToQueue: jest
-                .fn<any, [string, any]>()
-                .mockImplementation((queue, data) => callbacks[queue]?.({ content: data })),
-              ack: jest.fn(),
-              reject: jest.fn()
-            }))
-        });
-      })
-  };
-});
+          .mockImplementation(() => Promise.resolve({
+            consume: jest
+              .fn<Promise<{ consumerTag: string }>, [string, (...args: any) => any]>()
+              .mockImplementation((queue, cb) => {
+                callbacks[queue] = cb;
+                return Promise.resolve({ consumerTag: 'test' });
+              }),
+            sendToQueue: jest
+              .fn<any, [string, any]>()
+              .mockImplementation((queue, data) => callbacks[queue]?.({ content: data })),
+            ack: jest.fn(),
+            reject: jest.fn()
+          }))
+      });
+    })
+}));
 
 let broker!: Broker;
 

@@ -5,11 +5,16 @@ module.exports = {
     [
       '@babel/preset-env',
       {
-        targets: { node: 'current' },
-        modules: 'commonjs'
+        modules: 'auto',
+        targets: {
+          node: 'current'
+        }
       }
     ],
     '@babel/preset-typescript'
   ],
-  plugins: ['babel-plugin-replace-ts-export-assignment', 'babel-plugin-const-enum']
+  plugins: [
+    '@babel/plugin-transform-modules-commonjs',
+    'babel-plugin-transform-import-meta'
+  ]
 };

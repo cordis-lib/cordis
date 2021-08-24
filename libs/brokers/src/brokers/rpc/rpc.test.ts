@@ -4,32 +4,19 @@ import { createAmqp } from '../../amqp';
 import { CordisBrokerError } from '../../error';
 import type * as amqp from 'amqplib';
 
-jest.mock('crypto', () => {
-  const actual: typeof import('crypto') = jest.requireActual('crypto');
-
-  return {
-    ...actual,
-    randomBytes: jest
-      .fn<Buffer, [number]>()
-      // @ts-expect-error Mocked buffer isn't a complete buffer.
-      .mockImplementation(bytes => {
-        if (bytes === 32) {
-          return {
-            toString: () => 'test'
-          };
-        }
-
-        return actual.randomBytes(bytes);
-      })
-  };
-});
+jest.mock('crypto', () => ({
+  randomBytes: jest
+    .fn<Buffer, [number]>()
+    // @ts-expect-error
+    .mockImplementation(() => ({
+      toString: () => 'test'
+    }))
+}));
 
 jest.mock('amqplib', () => {
-  const actual: typeof import('amqplib') = jest.requireActual('amqplib');
   const { decode }: typeof import('@msgpack/msgpack') = jest.requireActual('@msgpack/msgpack');
 
   return {
-    ...actual,
     connect: jest
       .fn()
       .mockImplementation(() => {
