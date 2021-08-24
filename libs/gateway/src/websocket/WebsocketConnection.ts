@@ -1,4 +1,4 @@
-import WS = require('ws');
+import WS from 'ws';
 import { Cluster } from './Cluster';
 import { CordisGatewayError, CordisGatewayTypeError } from '../error';
 import * as Util from '../util';
@@ -349,7 +349,7 @@ export class WebsocketConnection {
       this.debug(stripIndent`
         [CONNECT]
           Gateway    : ${this._url}
-          Version    : 8
+          Version    : ${Util.CONSTANTS.gatewayVersion}
           Encoding   : ${this.encoding}
           Compression: ${this.compress ? 'zlib-stream' : 'none'}
       `);
@@ -361,7 +361,7 @@ export class WebsocketConnection {
 
       this._connectedAt = Date.now();
 
-      this.connection = new WS(`${this._url}?v=9&encoding=${this.encoding}${this.compress ? '&compress=zlib-stream' : ''}`);
+      this.connection = new WS(`${this._url}?v=${Util.CONSTANTS.gatewayVersion}&encoding=${this.encoding}${this.compress ? '&compress=zlib-stream' : ''}`);
       this.connection.onopen = this._onOpen;
       this.connection.onclose = this._onClose;
       this.connection.onerror = ({ error }) => this.cluster.emit('error', error, this.id);

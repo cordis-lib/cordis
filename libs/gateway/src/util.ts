@@ -85,7 +85,8 @@ export const CONSTANTS = {
     $os: process.platform,
     $browser: 'cordis',
     $device: 'cordis'
-  }
+  },
+  gatewayVersion: 9
 } as const;
 
 Object.freeze(CONSTANTS);
