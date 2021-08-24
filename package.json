@@ -1,7 +1,7 @@
 {
   "$schema": "http://json.schemastore.org/package",
   "name": "cordis",
-  "version": "1.0.1",
+  "version": "1.0.1-next.78c5f0b.1629791484",
   "description": "A modular, micros-service based Discord API wrapper",
   "scripts": {
     "build": "pnpm recursive run build --filter @cordis/*",
@@ -10,10 +10,15 @@
     "lint:ci": "pnpm lint --parallel --filter @cordis/*",
     "test": "jest",
     "test:ci": "jest --ci --no-stack-trace --verbose",
+    "cleanup": "rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run lint && pnpm run test:ci",
     "release:npm": "pnpm recursive publish --access public --filter @cordis/* --filter=!./services",
-    "release:docker": "docker build -t cordislib/gateway -f ./services/gateway/Dockerfile . && docker push cordislib/gateway",
-    "release": "rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run lint && pnpm run test:ci && pnpm run release:npm && pnpm run release:docker",
-    "changelog": "standard-version"
+    "release:npm-next": "pnpm recursive publish --access public --tag next --filter @cordis/* --filter=!./services",
+    "release:docker": "docker build -t cordislib/gateway:$(jq --raw-output '.version' package.json) && docker push cordislib/gateway:$(jq --raw-output '.version' package.json)",
+    "release:docker-next": "docker build -t cordislib/gateway:next && docker push cordislib/gateway:next",
+    "release": "pnpm run cleanup && pnpm run release:npm && pnpm run release:docker",
+    "release:next": "pnpm run cleanup && pnpm recursive run bump-next && pnpm run release:npm-next && pnpm run release:docker-next",
+    "changelog": "standard-version",
+    "bump-next": "pnpm version --git-tag-version=false $(jq --raw-output '.version' package.json)-next.$(git rev-parse --short HEAD).$(date +%s)"
   },
   "repository": {
     "type": "git",
