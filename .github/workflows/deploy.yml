@@ -38,10 +38,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Export needed env var
+        run: export NODE_AUTH_TOKEN=${{ secrets.NPM_TOKEN }}
+
       - name: Publish to NPM & Docker
         run: pnpm run release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build documentation
         run: pnpm run docs
