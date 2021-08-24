@@ -1,27 +1,22 @@
 import { Broker } from './Broker';
 import { createAmqp } from '../amqp';
 
-jest.mock('amqplib', () => {
-  const actual: typeof import('amqplib') = jest.requireActual('amqplib');
+jest.mock('amqplib', () => ({
+  connect: jest
+    .fn()
+    .mockImplementation(() => {
+      const on = jest
+        .fn()
+        .mockImplementation(() => ({ on }));
 
-  return {
-    ...actual,
-    connect: jest
-      .fn()
-      .mockImplementation(() => {
-        const on = jest
+      return Promise.resolve({
+        on,
+        createChannel: jest
           .fn()
-          .mockImplementation(() => ({ on }));
-
-        return Promise.resolve({
-          on,
-          createChannel: jest
-            .fn()
-            .mockImplementation(() => Promise.resolve({ cancel: jest.fn() }))
-        });
-      })
-  };
-});
+          .mockImplementation(() => Promise.resolve({ cancel: jest.fn() }))
+      });
+    })
+}));
 
 test('destroying a broker', async () => {
   const { channel } = await createAmqp('host');

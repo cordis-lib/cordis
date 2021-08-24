@@ -17,6 +17,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true
+    "noImplicitOverride": true,
+    "allowSyntheticDefaultImports": true
   }
 }

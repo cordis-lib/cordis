@@ -188,7 +188,7 @@ export class Rest extends EventEmitter {
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
         return await bucket.make<T, D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
-      } catch (e) {
+      } catch (e: any) {
         const isRatelimit = e instanceof CordisRestError && e.code === 'rateLimited';
         isRetryAfterRatelimit = isRatelimit;
 
@@ -235,7 +235,7 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string }): Promise<T> {
+  public patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string; files?: File[] }): Promise<T> {
     return this.make<T, D, never>({ path, method: 'patch', ...options });
   }
 

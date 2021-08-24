@@ -1,4 +1,4 @@
-import * as amqp from 'amqplib';
+import amqp from 'amqplib';
 
 /**
  * AMQP connection and channel

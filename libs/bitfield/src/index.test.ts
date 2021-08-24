@@ -1,4 +1,4 @@
-import { BitField, BitfieldRangeError, BitFieldResolvable } from './';
+import { BitField, BitfieldRangeError, BitFieldResolvable } from './index';
 
 const flags = BitField.makeFlags(['first', 'second']);
 type Keys = keyof typeof flags;
