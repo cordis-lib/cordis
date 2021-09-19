@@ -69,9 +69,6 @@ export class MemoryMutex extends Mutex {
     }
 
     limit.limit = newLimits.limit ?? 0;
-    /* istanbul ignore next */
-    if (limit.remaining == null || limit.remaining === Infinity) {
-      limit.remaining = newLimits.remaining ?? newLimits.limit ?? Infinity;
-    }
+    limit.remaining = newLimits.remaining ?? newLimits.limit ?? Infinity;
   }
 }
