@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc",
-    "bump-next": "pnpm version --git-tag-version=false $(jq --raw-output '.version' package.json)-next.$(git rev-parse --short HEAD).$(date +%s)"
+    "bump-next": "pnpm version --git-tag-version=false $(jq --raw-output '.version' package.json)-next.$(git rev-parse --short HEAD).$DATE"
   },
   "repository": {
     "type": "git",

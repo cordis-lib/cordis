@@ -3,7 +3,7 @@
   "name": "cordis",
   "version": "1.0.2",
   "description": "A modular, micros-service based Discord API wrapper",
-    "scripts": {
+  "scripts": {
     "build": "pnpm recursive run build --filter @cordis/*",
     "docs": "typedoc",
     "lint": "pnpm recursive run lint --filter @cordis/*",
@@ -18,7 +18,8 @@
     "release": "pnpm run cleanup && pnpm run release:npm && pnpm run release:docker",
     "release:next": "pnpm run cleanup && pnpm recursive run bump-next && pnpm run release:npm-next && pnpm run release:docker-next",
     "changelog": "standard-version",
-    "bump-next": "pnpm version --git-tag-version=false $(jq --raw-output '.version' package.json)-next.$(git rev-parse --short HEAD).$(date +%s)"
+    "bump-next": "pnpm version --git-tag-version=false $(jq --raw-output '.version' package.json)-next.$(git rev-parse --short HEAD).$DATE",
+    "bump-all-next": "export DATE=$(date +%s); pnpm recursive run bump-next"
   },
   "repository": {
     "type": "git",
