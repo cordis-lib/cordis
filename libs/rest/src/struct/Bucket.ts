@@ -16,6 +16,8 @@ export interface RatelimitData {
  * Represents a rate limiting bucket for Discord's API
  */
 export class Bucket {
+  public static readonly BUCKET_TTL = 1e4;
+
   /**
    * Creates a simple API route representation (e.g. /users/:id), used as an identifier for each bucket.
    *
@@ -35,6 +37,8 @@ export class Bucket {
     return route;
   }
 
+  private readonly _destroyTimeout: NodeJS.Timeout;
+
   /**
    * @param rest The rest manager using this bucket instance
    * @param route The identifier of this bucket
@@ -42,7 +46,9 @@ export class Bucket {
   public constructor(
     public readonly rest: Rest,
     public readonly route: string
-  ) {}
+  ) {
+    this._destroyTimeout = setTimeout(() => this.rest.buckets.delete(this.route), Bucket.BUCKET_TTL).unref();
+  }
 
   /**
    * Shortcut for the manager mutex
@@ -56,6 +62,8 @@ export class Bucket {
    * @param req Request options
    */
   public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
+    this._destroyTimeout.refresh();
+
     this.rest.emit('request', req);
 
     const mutexTimeout = await this.mutex

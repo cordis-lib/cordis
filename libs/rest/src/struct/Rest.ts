@@ -129,7 +129,7 @@ export class Rest extends EventEmitter {
   /**
    * Current active rate limiting Buckets
    */
-  private readonly _buckets = new Map<string, Bucket>();
+  public readonly buckets = new Map<string, Bucket>();
 
   public readonly retries: number;
   public readonly abortAfter: number;
@@ -165,11 +165,11 @@ export class Rest extends EventEmitter {
   public async make<T, D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
     const route = Bucket.makeRoute(options.method, options.path);
 
-    let bucket = this._buckets.get(route);
+    let bucket = this.buckets.get(route);
 
     if (!bucket) {
       bucket = new Bucket(this, route);
-      this._buckets.set(route, bucket);
+      this.buckets.set(route, bucket);
     }
 
     options.implicitAbortBehavior ??= !Boolean(options.controller);
