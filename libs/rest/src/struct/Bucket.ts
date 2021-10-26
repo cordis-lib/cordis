@@ -30,8 +30,15 @@ export class Bucket {
       .replace(/^\/webhooks\/(\d+)\/[A-Za-z0-9-_]{64,}/, '/webhooks/$1/:token')
       .replace(/\?.*$/, '');
 
+    // Message deletes have their own rate limit
     if (method === 'delete' && route.endsWith('/messages/:id')) {
       route = method + route;
+    }
+
+    // In this case, /channels/[idHere]/messages is correct,
+    // however /channels/[idHere] is not. we need "/channels/:id"
+    if (/^\/channels\/[0-9]{17,19}$/.test(route)) {
+      route = route.replace(/[0-9]{17,19}/, ':id');
     }
 
     return route;
