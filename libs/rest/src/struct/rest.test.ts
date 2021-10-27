@@ -49,6 +49,9 @@ describe('buckets and rate limiting', () => {
 
     const first = Bucket.makeRoute('delete', '/channels/12345678910111213/messages/12345678910111213');
     expect(first).toBe('delete/channels/12345678910111213/messages/:id');
+
+    const invite = Bucket.makeRoute('get', '/invites/abcdefgh');
+    expect(invite).toBe('/invites/:code');
   });
 
   describe('make request', () => {

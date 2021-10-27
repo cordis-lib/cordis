@@ -26,6 +26,7 @@ export class Bucket {
   public static makeRoute(method: string, url: string) {
     let route = url
       .replace(/\/([a-z-]+)\/(?:[0-9]{17,19})/g, (match, p) => (['channels', 'guilds', 'webhook'].includes(p) ? match : `/${p}/:id`))
+      .replace(/\/invites\/[\w\d-]{2,}/g, '/invites/:code')
       .replace(/\/reactions\/[^/]+/g, '/reactions/:id')
       .replace(/^\/webhooks\/(\d+)\/[A-Za-z0-9-_]{64,}/, '/webhooks/$1/:token')
       .replace(/\?.*$/, '');
