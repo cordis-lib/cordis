@@ -42,7 +42,7 @@ beforeEach(() => {
 describe('buckets and rate limiting', () => {
   test('create bucket identifiers', () => {
     const general = Bucket.makeRoute('get', '/channels/12345678910111213');
-    expect(general).toBe('/channels/12345678910111213');
+    expect(general).toBe('/channels/:id');
 
     const messages = Bucket.makeRoute('get', '/channels/12345678910111213/messages');
     expect(messages).toBe('/channels/12345678910111213/messages');
