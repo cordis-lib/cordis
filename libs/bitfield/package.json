@@ -3,7 +3,7 @@
   "description": "Data structure for working with bitfields",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc",
@@ -35,7 +35,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "@cordis/error": "workspace:^1.0.2",
+    "@cordis/error": "workspace:^1.2.0",
     "tslib": "^2.3.1"
   }
 }
