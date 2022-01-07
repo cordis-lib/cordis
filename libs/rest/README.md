@@ -15,23 +15,18 @@ Note: Props to https://github.com/spec-tacles/spectacles.js for the Mutex logic.
 
 ## Example Usage
 ```ts
-const { Rest, buildRestRouter } = require('@cordis/rest');
+const { Rest } = require('@cordis/rest');
 
 const main = async () => {
   const rest = new Rest('token');
-  const router = buildRestRouter(rest);
 
-  // using the rest manager itself
   const someUser = await rest.get('/users/223703707118731264');
   const someOtherUser = await rest.make({
     path: '/users/198536269586890752',
     method: 'get'
   });
 
-  // using the router utility
-  const someOtherOtherUser = await router.users["223703707118731264"].get();
-
-  console.log(someUser, someOtherUser, someOtherOtherUser);
+  console.log(someUser, someOtherUser);
 };
 
 main();
