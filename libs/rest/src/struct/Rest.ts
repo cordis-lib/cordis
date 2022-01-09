@@ -247,7 +247,8 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public get<T, Q = StringRecord>(path: string, options: { query?: Q } = {}): Promise<T> {
+
+  public get<T, Q = StringRecord>(path: string, options: { query?: Q; cache?: boolean; cacheTime?: number } = {}): Promise<T> {
     return this.make<T, never, Q>({ path, method: 'get', ...options });
   }
 
