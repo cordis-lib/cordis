@@ -139,7 +139,14 @@ export interface RequestOptions<D, Q> {
  * @noInheritDoc
  */
 export class Rest extends EventEmitter {
+  /**
+   * @internal
+   */
   private readonly cache = new Map<string, any>();
+  /**
+   * @internal
+   */
+  private readonly cacheTimeouts = new Map<string, NodeJS.Timeout>();
 
   /**
    * Current active rate limiting Buckets
@@ -204,7 +211,9 @@ export class Rest extends EventEmitter {
     options.cacheTime ??= this.cacheTime;
 
     let isRetryAfterRatelimit = false;
-    const shouldCache = options.cache && options.method.toLowerCase() === 'get';
+
+    const isGet = options.method.toLowerCase() === 'get';
+    const shouldCache = options.cache && isGet;
 
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
@@ -214,9 +223,18 @@ export class Rest extends EventEmitter {
 
         const data = await bucket.make<T, D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
 
-        if (shouldCache) {
+        if (shouldCache || (isGet && this.cache.has(options.path))) {
           this.cache.set(options.path, data);
-          setTimeout(() => this.cache.delete(options.path), options.cacheTime).unref();
+
+          if (this.cacheTimeouts.has(options.path)) {
+            const timeout = this.cacheTimeouts.get(options.path)!;
+            timeout.refresh();
+          } else {
+            this.cacheTimeouts.set(options.path, setTimeout(() => {
+              this.cache.delete(options.path);
+              this.cacheTimeouts.delete(options.path);
+            }, options.cacheTime));
+          }
         }
 
         return data;
