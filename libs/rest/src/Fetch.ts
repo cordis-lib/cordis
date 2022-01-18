@@ -79,7 +79,7 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
   }
 
   return fetch(url, {
-    method: method,
+    method,
     headers,
     body: body!,
     signal: controller.signal,

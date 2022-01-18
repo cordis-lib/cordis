@@ -30,6 +30,10 @@ export interface RestOptions {
    * @default true
    */
   retryAfterRatelimit?: boolean;
+  /**
+   * Overwrites the default for `{@link RequestOptions.cacheTime}`
+   */
+  cacheTime?: number;
 }
 
 export interface Rest {
@@ -119,6 +123,15 @@ export interface RequestOptions<D, Q> {
    * Wether or not the library should internally set a timeout for the I/O call
    */
   implicitAbortBehavior?: boolean;
+  /**
+   * Wether or not the library should cache the result of this call (ignored for non-GET requests)
+   */
+  cache?: boolean;
+  /**
+   * If `{@link RequestOptions.cache}` is set to `true`, how long should the cache live for?
+   * @default 10000
+   */
+  cacheTime?: number;
 }
 
 /**
@@ -126,6 +139,15 @@ export interface RequestOptions<D, Q> {
  * @noInheritDoc
  */
 export class Rest extends EventEmitter {
+  /**
+   * @internal
+   */
+  private readonly cache = new Map<string, any>();
+  /**
+   * @internal
+   */
+  private readonly cacheTimeouts = new Map<string, NodeJS.Timeout>();
+
   /**
    * Current active rate limiting Buckets
    */
@@ -135,6 +157,7 @@ export class Rest extends EventEmitter {
   public readonly abortAfter: number;
   public readonly mutex: Mutex;
   public readonly retryAfterRatelimit: boolean;
+  public readonly cacheTime: number;
 
   /**
    * @param auth Your bot's Discord token
@@ -149,13 +172,15 @@ export class Rest extends EventEmitter {
       retries = 3,
       abortAfter = 15e3,
       mutex = new MemoryMutex(),
-      retryAfterRatelimit = true
+      retryAfterRatelimit = true,
+      cacheTime = 10000,
     } = options;
 
     this.retries = retries;
     this.abortAfter = abortAfter;
     this.mutex = mutex;
     this.retryAfterRatelimit = retryAfterRatelimit;
+    this.cacheTime = cacheTime;
   }
 
   /**
@@ -183,11 +208,36 @@ export class Rest extends EventEmitter {
       options.headers.set('X-Audit-Log-Reason', encodeURIComponent(options.reason));
     }
 
+    options.cacheTime ??= this.cacheTime;
+
     let isRetryAfterRatelimit = false;
+
+    const isGet = options.method.toLowerCase() === 'get';
+    const shouldCache = options.cache && isGet;
 
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
-        return await bucket.make<T, D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
+        if (shouldCache && this.cache.has(options.path)) {
+          return this.cache.get(options.path);
+        }
+
+        const data = await bucket.make<T, D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
+
+        if (shouldCache || (isGet && this.cache.has(options.path))) {
+          this.cache.set(options.path, data);
+
+          if (this.cacheTimeouts.has(options.path)) {
+            const timeout = this.cacheTimeouts.get(options.path)!;
+            timeout.refresh();
+          } else {
+            this.cacheTimeouts.set(options.path, setTimeout(() => {
+              this.cache.delete(options.path);
+              this.cacheTimeouts.delete(options.path);
+            }, options.cacheTime));
+          }
+        }
+
+        return data;
       } catch (e: any) {
         const isRatelimit = e instanceof CordisRestError && e.code === 'rateLimited';
         isRetryAfterRatelimit = isRatelimit;
@@ -215,7 +265,8 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public get<T, Q = StringRecord>(path: string, options: { query?: Q } = {}): Promise<T> {
+
+  public get<T, Q = StringRecord>(path: string, options: { query?: Q; cache?: boolean; cacheTime?: number } = {}): Promise<T> {
     return this.make<T, never, Q>({ path, method: 'get', ...options });
   }
 
