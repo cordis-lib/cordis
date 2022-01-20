@@ -43,7 +43,7 @@ export class MemoryMutex extends Mutex {
       }
 
       /* istanbul ignore next */
-      return 1e2;
+      return 0;
     }
 
     ratelimit.remaining--;
