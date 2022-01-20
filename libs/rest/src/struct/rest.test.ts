@@ -1,6 +1,6 @@
 import fetch, { Response, Headers } from 'node-fetch';
 import Blob from 'fetch-blob';
-import { Bucket } from './Bucket';
+import { Bucket } from '../fetcher';
 import { CordisRestError, HTTPError } from '../Error';
 import { RequestOptions, Rest } from './Rest';
 import AbortController, { AbortSignal } from 'abort-controller';

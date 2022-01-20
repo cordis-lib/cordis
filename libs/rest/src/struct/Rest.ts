@@ -1,4 +1,13 @@
-import { Bucket, RatelimitData } from './Bucket';
+import {
+  BaseBucket,
+  BucketConstructor,
+  Bucket,
+  RatelimitData,
+  DiscordFetchOptions,
+  File,
+  RequestBodyData,
+  StringRecord
+} from '../fetcher';
 import { USER_AGENT } from '../Constants';
 import { EventEmitter } from 'events';
 import { Headers, Response } from 'node-fetch';
@@ -6,7 +15,8 @@ import { Mutex, MemoryMutex } from '../mutex';
 import AbortController from 'abort-controller';
 import { CordisRestError, HTTPError } from '../Error';
 import { halt } from '@cordis/common';
-import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from '../Fetch';
+import type { Readable } from 'stream';
+import { RouteBases } from 'discord-api-types/v9';
 
 /**
  * Options for constructing a rest manager
@@ -14,6 +24,8 @@ import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from '.
 export interface RestOptions {
   /**
    * How many times to retry making a request before giving up
+   *
+   * Tip: If using ProxyBucket you should probably set this to 1 depending on your proxy server's implementation
    */
   retries?: number;
   /**
@@ -34,6 +46,14 @@ export interface RestOptions {
    * Overwrites the default for `{@link RequestOptions.cacheTime}`
    */
   cacheTime?: number;
+  /**
+   * Bucket constructor to use
+   */
+  bucket?: BucketConstructor;
+  /**
+   * Overwrites the default domain used for every request
+   */
+  domain?: string;
 }
 
 export interface Rest {
@@ -114,7 +134,7 @@ export interface RequestOptions<D, Q> {
   /**
    * Body to send, if any
    */
-  data?: D;
+  data?: D | Readable;
   /**
    * Wether or not this request should be re-attempted after a ratelimit is waited out
    */
@@ -132,6 +152,10 @@ export interface RequestOptions<D, Q> {
    * @default 10000
    */
   cacheTime?: number;
+  /**
+   * Overwrites the domain used for this request - not taking into account the option passed into {@link RestOptions}
+   */
+  domain?: string;
 }
 
 /**
@@ -151,13 +175,15 @@ export class Rest extends EventEmitter {
   /**
    * Current active rate limiting Buckets
    */
-  public readonly buckets = new Map<string, Bucket>();
+  public readonly buckets = new Map<string, BaseBucket>();
 
   public readonly retries: number;
   public readonly abortAfter: number;
   public readonly mutex: Mutex;
   public readonly retryAfterRatelimit: boolean;
   public readonly cacheTime: number;
+  public readonly bucket: BucketConstructor;
+  public readonly domain: string;
 
   /**
    * @param auth Your bot's Discord token
@@ -174,6 +200,8 @@ export class Rest extends EventEmitter {
       mutex = new MemoryMutex(),
       retryAfterRatelimit = true,
       cacheTime = 10000,
+      bucket = Bucket,
+      domain = RouteBases.api
     } = options;
 
     this.retries = retries;
@@ -181,6 +209,8 @@ export class Rest extends EventEmitter {
     this.mutex = mutex;
     this.retryAfterRatelimit = retryAfterRatelimit;
     this.cacheTime = cacheTime;
+    this.bucket = bucket;
+    this.domain = domain;
   }
 
   /**
@@ -188,12 +218,12 @@ export class Rest extends EventEmitter {
    * @param options Options needed for making a request; only the path is required
    */
   public async make<T, D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
-    const route = Bucket.makeRoute(options.method, options.path);
+    const route = this.bucket.makeRoute(options.method, options.path);
 
     let bucket = this.buckets.get(route);
 
     if (!bucket) {
-      bucket = new Bucket(this, route);
+      bucket = new this.bucket(this, route);
       this.buckets.set(route, bucket);
     }
 
@@ -209,6 +239,7 @@ export class Rest extends EventEmitter {
     }
 
     options.cacheTime ??= this.cacheTime;
+    options.domain ??= this.domain;
 
     let isRetryAfterRatelimit = false;
 

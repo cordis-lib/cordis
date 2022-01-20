@@ -3,6 +3,7 @@ import FormData from 'form-data';
 import { URLSearchParams } from 'url';
 import AbortController from 'abort-controller';
 import { RouteBases } from 'discord-api-types/v9';
+import type { Readable } from 'stream';
 
 /**
  * Represents a file that can be sent to Discord
@@ -37,7 +38,8 @@ export interface DiscordFetchOptions<D = RequestBodyData, Q = StringRecord> {
   isRetryAfterRatelimit: boolean;
   query?: Q | string;
   files?: File[];
-  data?: D;
+  data?: D | Readable;
+  domain?: string;
 }
 
 /**
@@ -45,7 +47,7 @@ export interface DiscordFetchOptions<D = RequestBodyData, Q = StringRecord> {
  * @param options Options for the request
  */
 export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => {
-  let { path, method, headers, controller, query, files, data } = options;
+  let { path, method, headers, controller, query, files, data, domain = RouteBases.api } = options;
 
   let queryString: string | null = null;
   if (query) {
@@ -59,7 +61,7 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
     ).toString();
   }
 
-  const url = `${RouteBases.api}${path}${queryString ? `?${queryString}` : ''}`;
+  const url = `${domain}${path}${queryString ? `?${queryString}` : ''}`;
 
   let body: string | FormData;
   if (files?.length) {

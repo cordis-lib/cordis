@@ -1,6 +1,6 @@
-import { discordFetch, DiscordFetchOptions } from '../Fetch';
+import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { CordisRestError, HTTPError } from '../Error';
-import type { Rest } from './Rest';
+import { BaseBucket } from './BaseBucket';
 
 /**
  * Data held to represent ratelimit state for a Bucket
@@ -13,62 +13,9 @@ export interface RatelimitData {
 }
 
 /**
- * Represents a rate limiting bucket for Discord's API
+ * Simple, default sequential bucket
  */
-export class Bucket {
-  public static readonly BUCKET_TTL = 1e4;
-
-  /**
-   * Creates a simple API route representation (e.g. /users/:id), used as an identifier for each bucket.
-   *
-   * Credit to https://github.com/abalabahaha/eris
-   */
-  public static makeRoute(method: string, url: string) {
-    let route = url
-      .replace(/\/([a-z-]+)\/(?:[0-9]{17,19})/g, (match, p) => (['channels', 'guilds', 'webhook'].includes(p) ? match : `/${p}/:id`))
-      .replace(/\/invites\/[\w\d-]{2,}/g, '/invites/:code')
-      .replace(/\/reactions\/[^/]+/g, '/reactions/:id')
-      .replace(/^\/webhooks\/(\d+)\/[A-Za-z0-9-_]{64,}/, '/webhooks/$1/:token')
-      .replace(/\?.*$/, '');
-
-    // Message deletes have their own rate limit
-    if (method === 'delete' && route.endsWith('/messages/:id')) {
-      route = method + route;
-    }
-
-    // In this case, /channels/[idHere]/messages is correct,
-    // however /channels/[idHere] is not. we need "/channels/:id"
-    if (/^\/channels\/[0-9]{17,19}$/.test(route)) {
-      route = route.replace(/[0-9]{17,19}/, ':id');
-    }
-
-    return route;
-  }
-
-  private readonly _destroyTimeout: NodeJS.Timeout;
-
-  /**
-   * @param rest The rest manager using this bucket instance
-   * @param route The identifier of this bucket
-   */
-  public constructor(
-    public readonly rest: Rest,
-    public readonly route: string
-  ) {
-    this._destroyTimeout = setTimeout(() => this.rest.buckets.delete(this.route), Bucket.BUCKET_TTL).unref();
-  }
-
-  /**
-   * Shortcut for the manager mutex
-   */
-  public get mutex() {
-    return this.rest.mutex;
-  }
-
-  /**
-   * Makes a request to Discord
-   * @param req Request options
-   */
+export class Bucket extends BaseBucket {
   public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
     this._destroyTimeout.refresh();
 
