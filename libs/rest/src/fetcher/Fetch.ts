@@ -76,8 +76,10 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
 
     headers = Object.assign(headers, body.getHeaders());
   } else if (data != null) {
-    body = JSON.stringify(data);
-    headers.set('Content-Type', 'application/json');
+    try {
+      body = JSON.stringify(data);
+      headers.set('Content-Type', 'application/json');
+    } catch {}
   }
 
   return fetch(url, {
