@@ -1,6 +1,7 @@
 import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { CordisRestError, HTTPError } from '../Error';
 import { BaseBucket } from './BaseBucket';
+import type { Response } from 'node-fetch';
 
 /**
  * Data held to represent ratelimit state for a Bucket
@@ -16,7 +17,7 @@ export interface RatelimitData {
  * Simple, default sequential bucket
  */
 export class Bucket extends BaseBucket {
-  public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
+  public async make<D, Q>(req: DiscordFetchOptions<D, Q>): Promise<Response> {
     this._destroyTimeout.refresh();
 
     this.rest.emit('request', req);
@@ -79,10 +80,6 @@ export class Bucket extends BaseBucket {
       return Promise.reject(new HTTPError(res.clone(), await res.text()));
     }
 
-    if (res.headers.get('content-type')?.startsWith('application/json')) {
-      return res.json() as Promise<T>;
-    }
-
-    return res.blob() as Promise<unknown> as Promise<T>;
+    return res;
   }
 }

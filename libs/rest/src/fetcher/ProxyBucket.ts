@@ -2,6 +2,7 @@ import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { CordisRestError, HTTPError } from '../Error';
 import { BaseBucket } from './BaseBucket';
 import type { Rest } from '../struct';
+import type { Response } from 'node-fetch';
 
 /**
  * Unconventional Bucket implementation that will hijack all requests (i.e. there is no seperate bucket depending on the route)
@@ -22,7 +23,7 @@ export class ProxyBucket extends BaseBucket {
     clearTimeout(this._destroyTimeout);
   }
 
-  public async make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T> {
+  public async make<D, Q>(req: DiscordFetchOptions<D, Q>): Promise<Response> {
     let timeout: NodeJS.Timeout;
     if (req.implicitAbortBehavior) {
       timeout = setTimeout(() => req.controller.abort(), this.rest.abortAfter);
@@ -38,10 +39,6 @@ export class ProxyBucket extends BaseBucket {
       return Promise.reject(new HTTPError(res.clone(), await res.text()));
     }
 
-    if (res.headers.get('content-type')?.startsWith('application/json')) {
-      return res.json() as Promise<T>;
-    }
-
-    return res.blob() as Promise<unknown> as Promise<T>;
+    return res;
   }
 }

@@ -1,5 +1,4 @@
 import fetch, { Response, Headers } from 'node-fetch';
-import Blob from 'fetch-blob';
 import { Bucket } from '../fetcher';
 import { CordisRestError, HTTPError } from '../Error';
 import { RequestOptions, Rest } from './Rest';
@@ -77,7 +76,7 @@ describe('buckets and rate limiting', () => {
       const data = await rest.make(req);
 
       expect(req.headers).toBeInstanceOf(Headers);
-      expect(data).toStrictEqual(JSON.parse(value));
+      expect(await data.json()).toStrictEqual(JSON.parse(value));
       expect(emitter).toBeCalledTimes(2);
       expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
         implicitAbortBehavior: true,
@@ -103,7 +102,7 @@ describe('buckets and rate limiting', () => {
         }),
         new Response(value, {
           headers: {
-            'Content-Type': 'application/octet-stream',
+            'Content-Type': 'application/json',
             'X-Ratelimit-Limit': '5',
             'X-Ratelimit-Reset-After': '2.5'
           },
@@ -121,11 +120,7 @@ describe('buckets and rate limiting', () => {
         data: { test: '' }
       };
 
-      const data: Blob = await rest.make(req);
-      let final = '';
-      for await (const piece of data.stream()) {
-        final += piece;
-      }
+      const data = await rest.make(req);
 
       expect(emitter).toBeCalledTimes(5);
       expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
@@ -137,7 +132,7 @@ describe('buckets and rate limiting', () => {
       expect(emitter).toHaveBeenNthCalledWith(4, 'request', Object.assign(req, { isRetryAfterRatelimit: true }));
       expect(emitter).toHaveBeenNthCalledWith(5, 'response', req, responses[1], { limit: 5, timeout: 2500 });
 
-      expect(JSON.parse(final)).toStrictEqual(JSON.parse(value));
+      expect(await data.json()).toStrictEqual(JSON.parse(value));
     });
   });
 });
@@ -176,7 +171,7 @@ describe('non 429 error recovery', () => {
 
       const data = await rest.make(req);
 
-      expect(data).toStrictEqual(JSON.parse(value));
+      expect(await data.json()).toStrictEqual(JSON.parse(value));
       expect(emitter).toBeCalledTimes(4);
       expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
         implicitAbortBehavior: true,

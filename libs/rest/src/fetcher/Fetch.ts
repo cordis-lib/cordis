@@ -3,7 +3,7 @@ import FormData from 'form-data';
 import { URLSearchParams } from 'url';
 import AbortController from 'abort-controller';
 import { RouteBases } from 'discord-api-types/v9';
-import type { Readable } from 'stream';
+import { Readable } from 'stream';
 
 /**
  * Represents a file that can be sent to Discord
@@ -63,7 +63,7 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
 
   const url = `${domain}${path}${queryString ? `?${queryString}` : ''}`;
 
-  let body: string | FormData;
+  let body;
   if (files?.length) {
     body = new FormData();
     for (const file of files) {
@@ -75,17 +75,18 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
     }
 
     headers = Object.assign(headers, body.getHeaders());
+  } else if (data instanceof Readable) {
+    // In this case the user is expected to set their own Content-Type - otherwise Discord will complain
+    body = data;
   } else if (data != null) {
-    try {
-      body = JSON.stringify(data);
-      headers.set('Content-Type', 'application/json');
-    } catch {}
+    body = JSON.stringify(data);
+    headers.set('Content-Type', 'application/json');
   }
 
   return fetch(url, {
     method,
     headers,
-    body: body!,
+    body: body,
     signal: controller.signal,
     // 250KB buffer for the sake of supporting 2 clones of reasonably big responses
     highWaterMark: 25e4

@@ -217,7 +217,7 @@ export class Rest extends EventEmitter {
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public async make<T, D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
+  public async make<D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<Response> {
     const route = this.bucket.makeRoute(options.method, options.path);
 
     let bucket = this.buckets.get(route);
@@ -252,7 +252,7 @@ export class Rest extends EventEmitter {
           return this.cache.get(options.path);
         }
 
-        const data = await bucket.make<T, D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
+        const data = await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
 
         if (shouldCache || (isGet && this.cache.has(options.path))) {
           this.cache.set(options.path, data);
@@ -297,8 +297,9 @@ export class Rest extends EventEmitter {
    */
   /* istanbul ignore next */
 
-  public get<T, Q = StringRecord>(path: string, options: { query?: Q; cache?: boolean; cacheTime?: number } = {}): Promise<T> {
-    return this.make<T, never, Q>({ path, method: 'get', ...options });
+  public async get<T, Q = StringRecord>(path: string, options: { query?: Q; cache?: boolean; cacheTime?: number } = {}): Promise<T> {
+    const res = await this.make<never, Q>({ path, method: 'get', ...options });
+    return res.json() as Promise<T>;
   }
 
   /**
@@ -307,8 +308,9 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public delete<T, D = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
-    return this.make<T, D, never>({ path, method: 'delete', ...options });
+  public async delete<T, D = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
+    const res = await this.make<D, never>({ path, method: 'delete', ...options });
+    return res.json() as Promise<T>;
   }
 
   /**
@@ -317,8 +319,9 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string; files?: File[] }): Promise<T> {
-    return this.make<T, D, never>({ path, method: 'patch', ...options });
+  public async patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string; files?: File[] }): Promise<T> {
+    const res = await this.make<D, never>({ path, method: 'patch', ...options });
+    return res.json() as Promise<T>;
   }
 
   /**
@@ -327,8 +330,9 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public put<T, D = RequestBodyData>(path: string, options?: { data?: D; reason?: string }): Promise<T> {
-    return this.make<T, D, never>({ path, method: 'put', ...options });
+  public async put<T, D = RequestBodyData>(path: string, options?: { data?: D; reason?: string }): Promise<T> {
+    const res = await this.make<D, never>({ path, method: 'put', ...options });
+    return res.json() as Promise<T>;
   }
 
   /**
@@ -337,7 +341,8 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public post<T, D = RequestBodyData, Q = StringRecord>(path: string, options: { data: D; reason?: string; files?: File[]; query?: Q }): Promise<T> {
-    return this.make<T, D, Q>({ path, method: 'post', ...options });
+  public async post<T, D = RequestBodyData, Q = StringRecord>(path: string, options: { data: D; reason?: string; files?: File[]; query?: Q }): Promise<T> {
+    const res = await this.make<D, Q>({ path, method: 'post', ...options });
+    return res.json() as Promise<T>;
   }
 }

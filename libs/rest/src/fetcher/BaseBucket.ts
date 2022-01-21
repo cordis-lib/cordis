@@ -1,5 +1,6 @@
 import { DiscordFetchOptions } from './Fetch';
 import type { Rest } from '../struct';
+import type { Response } from 'node-fetch';
 
 export interface BucketConstructor {
   makeRoute(method: string, url: string): string;
@@ -65,5 +66,5 @@ export abstract class BaseBucket {
    * Makes a request to Discord
    * @param req Request options
    */
-  public abstract make<T, D, Q>(req: DiscordFetchOptions<D, Q>): Promise<T>;
+  public abstract make<D, Q>(req: DiscordFetchOptions<D, Q>): Promise<Response>;
 }
