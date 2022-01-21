@@ -74,8 +74,6 @@ export class Bucket extends BaseBucket {
 
       await this.mutex.set(this.route, { timeout: retryAfter });
       return Promise.reject(new CordisRestError('rateLimited', `${req.method.toUpperCase()} ${req.path}`));
-    } else if (res.status >= 500 && res.status < 600) {
-      return Promise.reject(new CordisRestError('internal', `${req.method.toUpperCase()} ${req.path}`));
     } else if (!res.ok) {
       return Promise.reject(new HTTPError(res.clone(), await res.text()));
     }

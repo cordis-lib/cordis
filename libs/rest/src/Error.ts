@@ -7,8 +7,7 @@ export const CordisRestError = makeCordisError(
   {
     retryLimitExceeded: (request: string, attempts: number) => `Tried to "${request}" for ${attempts} times but all of them failed`,
     mutexLock: (route: string) => `A mutex for the "${route}" bucket locked up but was told to not wait`,
-    rateLimited: (request: string) => `A ratelimit was hit/prevented while "${request}"`,
-    internal: (request: string) => `Discord raised an internal error on "${request}"`
+    rateLimited: (request: string) => `A ratelimit was hit/prevented while "${request}"`
   }
 );
 

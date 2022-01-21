@@ -246,6 +246,8 @@ export class Rest extends EventEmitter {
     const isGet = options.method.toLowerCase() === 'get';
     const shouldCache = options.cache && isGet;
 
+    let rejected: Promise<never>;
+
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
         if (shouldCache && this.cache.has(options.path)) {
@@ -273,21 +275,27 @@ export class Rest extends EventEmitter {
         const isRatelimit = e instanceof CordisRestError && e.code === 'rateLimited';
         isRetryAfterRatelimit = isRatelimit;
 
-        if (
-          e instanceof HTTPError ||
-          e.name === 'AbortError' ||
-          (isRatelimit && !options.retryAfterRatelimit)
-        ) {
+        if (e.name === 'AbortError') {
           return Promise.reject(e);
         }
 
-        if (e instanceof CordisRestError && e.code === 'internal') {
-          await halt(1000);
+        if (isRatelimit && !options.retryAfterRatelimit) {
+          return Promise.reject(e);
         }
+
+        if (e instanceof HTTPError) {
+          if (e.response.status >= 500 && e.response.status < 600) {
+            await halt(1000);
+          } else {
+            return Promise.reject(e);
+          }
+        }
+
+        rejected = Promise.reject(e);
       }
     }
 
-    return Promise.reject(new CordisRestError('retryLimitExceeded', `${options.method.toUpperCase()} ${options.path}`, this.retries));
+    return rejected!;
   }
 
   /**
