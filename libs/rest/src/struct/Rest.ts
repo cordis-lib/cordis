@@ -291,11 +291,11 @@ export class Rest extends EventEmitter {
           }
         }
 
-        rejected = Promise.reject(e);
+        rejected = e;
       }
     }
 
-    return rejected!;
+    return Promise.reject(rejected!);
   }
 
   /**

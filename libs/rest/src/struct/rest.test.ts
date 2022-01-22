@@ -1,6 +1,6 @@
 import fetch, { Response, Headers } from 'node-fetch';
 import { Bucket } from '../fetcher';
-import { CordisRestError, HTTPError } from '../Error';
+import { HTTPError } from '../Error';
 import { RequestOptions, Rest } from './Rest';
 import AbortController, { AbortSignal } from 'abort-controller';
 
@@ -218,7 +218,7 @@ describe('non 429 error recovery', () => {
 
       await expect(() => rest.make(req))
         .rejects
-        .toThrow(CordisRestError);
+        .toThrow(HTTPError);
 
       expect(emitter).toBeCalledTimes(8);
       expect(emitter).toHaveBeenNthCalledWith(1, 'request', Object.assign(req, {
