@@ -166,7 +166,7 @@ export class Rest extends EventEmitter {
   /**
    * @internal
    */
-  private readonly cache = new Map<string, any>();
+  private readonly cache = new Map<string, Response>();
   /**
    * @internal
    */
@@ -251,7 +251,7 @@ export class Rest extends EventEmitter {
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
         if (shouldCache && this.cache.has(options.path)) {
-          return Object.assign(this.cache.get(options.path), { cached: true });
+          return Object.assign(this.cache.get(options.path)!.clone(), { cached: true });
         }
 
         const res = await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
