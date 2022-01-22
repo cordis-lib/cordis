@@ -1,7 +1,6 @@
 import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { CordisRestError, HTTPError } from '../Error';
 import { BaseBucket } from './BaseBucket';
-import type { Rest } from '../struct';
 import type { Response } from 'node-fetch';
 
 /**
@@ -12,15 +11,6 @@ import type { Response } from 'node-fetch';
 export class ProxyBucket extends BaseBucket {
   public static override makeRoute() {
     return 'proxy';
-  }
-
-  public constructor(
-    rest: Rest,
-    route: string
-  ) {
-    super(rest, route);
-    // This shouldn't be needed - but for backwards compatibility BaseBucket sets this timeout still
-    clearTimeout(this._destroyTimeout);
   }
 
   public async make<D, Q>(req: DiscordFetchOptions<D, Q>): Promise<Response> {

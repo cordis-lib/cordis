@@ -2,6 +2,7 @@ import { discordFetch, DiscordFetchOptions } from './Fetch';
 import { CordisRestError, HTTPError } from '../Error';
 import { BaseBucket } from './BaseBucket';
 import type { Response } from 'node-fetch';
+import { Rest } from '..';
 
 /**
  * Data held to represent ratelimit state for a Bucket
@@ -17,6 +18,13 @@ export interface RatelimitData {
  * Simple, default sequential bucket
  */
 export class Bucket extends BaseBucket {
+  protected readonly _destroyTimeout: NodeJS.Timeout;
+
+  public constructor(rest: Rest, route: string) {
+    super(rest, route);
+    this._destroyTimeout = setTimeout(() => this.rest.buckets.delete(this.route), this.constructor.BUCKET_TTL).unref();
+  }
+
   public async make<D, Q>(req: DiscordFetchOptions<D, Q>): Promise<Response> {
     this._destroyTimeout.refresh();
 

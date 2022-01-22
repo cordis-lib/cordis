@@ -1,4 +1,4 @@
-export * from './fetcher';
+export * from './bucket';
 export * from './mutex';
 export * from './struct';
 export * from './Constants';

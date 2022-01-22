@@ -43,17 +43,12 @@ export abstract class BaseBucket {
     return route;
   }
 
-  protected readonly _destroyTimeout: NodeJS.Timeout;
-
   public ['constructor']!: typeof BaseBucket;
 
   public constructor(
     public readonly rest: Rest,
     public readonly route: string
-  ) {
-    // This is in the base constructor for backwards compatibility - in the future it'll be only in the Bucket class
-    this._destroyTimeout = setTimeout(() => this.rest.buckets.delete(this.route), this.constructor.BUCKET_TTL).unref();
-  }
+  ) {}
 
   /**
    * Shortcut for the manager mutex

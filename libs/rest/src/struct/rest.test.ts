@@ -1,5 +1,5 @@
 import fetch, { Response, Headers } from 'node-fetch';
-import { Bucket } from '../fetcher';
+import { Bucket } from '../bucket';
 import { HTTPError } from '../Error';
 import { RequestOptions, Rest } from './Rest';
 import AbortController, { AbortSignal } from 'abort-controller';

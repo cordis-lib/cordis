@@ -1,7 +1,7 @@
 // ? Anything ignored from coverage in this file are just weird edge cases - nothing to really cover.
 
 import { Mutex } from './Mutex';
-import type { RatelimitData } from '../fetcher';
+import type { RatelimitData } from '../bucket';
 
 export interface MemoryRatelimitData extends RatelimitData {
   expiresAt: Date;

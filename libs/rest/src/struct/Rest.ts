@@ -7,7 +7,7 @@ import {
   File,
   RequestBodyData,
   StringRecord
-} from '../fetcher';
+} from '../bucket';
 import { USER_AGENT } from '../Constants';
 import { EventEmitter } from 'events';
 import { Headers, Response } from 'node-fetch';
