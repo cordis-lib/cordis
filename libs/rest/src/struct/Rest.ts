@@ -251,7 +251,7 @@ export class Rest extends EventEmitter {
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
         if (shouldCache && this.cache.has(options.path)) {
-          return { ...this.cache.get(options.path), cached: true };
+          return Object.assign(this.cache.get(options.path), { cached: true });
         }
 
         const res = await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
