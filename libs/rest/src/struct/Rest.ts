@@ -217,7 +217,7 @@ export class Rest extends EventEmitter {
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public async make<D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<Response> {
+  public async make<D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<Response & { cached?: boolean }> {
     const route = this.bucket.makeRoute(options.method, options.path);
 
     let bucket = this.buckets.get(route);
@@ -251,13 +251,13 @@ export class Rest extends EventEmitter {
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
         if (shouldCache && this.cache.has(options.path)) {
-          return this.cache.get(options.path);
+          return { ...this.cache.get(options.path), cached: true };
         }
 
-        const data = await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
+        const res = await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
 
         if (shouldCache || (isGet && this.cache.has(options.path))) {
-          this.cache.set(options.path, data);
+          this.cache.set(options.path, res.clone());
 
           if (this.cacheTimeouts.has(options.path)) {
             const timeout = this.cacheTimeouts.get(options.path)!;
@@ -270,7 +270,7 @@ export class Rest extends EventEmitter {
           }
         }
 
-        return data;
+        return res;
       } catch (e: any) {
         const isRatelimit = e instanceof CordisRestError && e.code === 'rateLimited';
         isRetryAfterRatelimit = isRatelimit;
