@@ -43,7 +43,7 @@
     "@cordis/common": "workspace:^1.2.0",
     "@cordis/error": "workspace:^1.2.0",
     "@cordis/queue": "workspace:^1.2.0",
-    "@cordis/rest": "workspace:^1.2.0",
+    "@cordis/rest": "workspace:^2.0.0",
     "common-tags": "^1.8.2",
     "discord-api-types": "^0.24.0",
     "tslib": "^2.3.1",
