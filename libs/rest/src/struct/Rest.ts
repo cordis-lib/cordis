@@ -307,7 +307,12 @@ export class Rest extends EventEmitter {
 
   public async get<T, Q = StringRecord>(path: string, options: { query?: Q; cache?: boolean; cacheTime?: number } = {}): Promise<T> {
     const res = await this.make<never, Q>({ path, method: 'get', ...options });
-    return res.json() as Promise<T>;
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<unknown> as Promise<T>;
   }
 
   /**
@@ -318,7 +323,12 @@ export class Rest extends EventEmitter {
   /* istanbul ignore next */
   public async delete<T, D = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
     const res = await this.make<D, never>({ path, method: 'delete', ...options });
-    return res.json() as Promise<T>;
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<unknown> as Promise<T>;
   }
 
   /**
@@ -329,7 +339,12 @@ export class Rest extends EventEmitter {
   /* istanbul ignore next */
   public async patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string; files?: File[] }): Promise<T> {
     const res = await this.make<D, never>({ path, method: 'patch', ...options });
-    return res.json() as Promise<T>;
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<unknown> as Promise<T>;
   }
 
   /**
@@ -340,7 +355,12 @@ export class Rest extends EventEmitter {
   /* istanbul ignore next */
   public async put<T, D = RequestBodyData>(path: string, options?: { data?: D; reason?: string }): Promise<T> {
     const res = await this.make<D, never>({ path, method: 'put', ...options });
-    return res.json() as Promise<T>;
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<unknown> as Promise<T>;
   }
 
   /**
@@ -351,6 +371,11 @@ export class Rest extends EventEmitter {
   /* istanbul ignore next */
   public async post<T, D = RequestBodyData, Q = StringRecord>(path: string, options: { data: D; reason?: string; files?: File[]; query?: Q }): Promise<T> {
     const res = await this.make<D, Q>({ path, method: 'post', ...options });
-    return res.json() as Promise<T>;
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<unknown> as Promise<T>;
   }
 }
