@@ -16,7 +16,10 @@ export class ProxyBucket extends BaseBucket {
   public async make<D, Q>(req: DiscordFetchOptions<D, Q>): Promise<Response> {
     let timeout: NodeJS.Timeout;
     if (req.implicitAbortBehavior) {
-      timeout = setTimeout(() => req.controller.abort(), this.rest.abortAfter);
+      timeout = setTimeout(() => {
+        req.controller.abort();
+        this.rest.emit('abort', req);
+      }, this.rest.abortAfter);
     }
 
     const res = await discordFetch(req).finally(() => clearTimeout(timeout));

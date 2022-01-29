@@ -75,9 +75,15 @@ export interface Rest {
    * @event
    */
   on(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
+  /**
+   * Fired when a request is aborted
+   * @event
+   */
+  // eslint-disable-next-line @typescript-eslint/unified-signatures
+  on(event: 'abort', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
 
   /** @internal */
-  once(event: 'request', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
+  once(event: 'request' | 'abort', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
   /** @internal */
   once(
     event: 'response',
@@ -87,7 +93,7 @@ export interface Rest {
   once(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
   /** @internal */
-  emit(event: 'request', request: Partial<DiscordFetchOptions<unknown, unknown>>): boolean;
+  emit(event: 'request' | 'abort', request: Partial<DiscordFetchOptions<unknown, unknown>>): boolean;
   /** @internal */
   emit(
     event: 'response',

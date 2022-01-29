@@ -41,7 +41,10 @@ export class Bucket extends BaseBucket {
 
     let timeout: NodeJS.Timeout;
     if (req.implicitAbortBehavior) {
-      timeout = setTimeout(() => req.controller.abort(), this.rest.abortAfter);
+      timeout = setTimeout(() => {
+        req.controller.abort();
+        this.rest.emit('abort', req);
+      }, this.rest.abortAfter);
     }
 
     const res = await discordFetch(req).finally(() => clearTimeout(timeout));
