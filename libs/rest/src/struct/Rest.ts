@@ -17,6 +17,7 @@ import { CordisRestError, HTTPError } from '../Error';
 import { halt } from '@cordis/common';
 import type { Readable } from 'stream';
 import { RouteBases } from 'discord-api-types/v9';
+import { CordisResponse } from '.';
 
 /**
  * Options for constructing a rest manager
@@ -172,7 +173,7 @@ export class Rest extends EventEmitter {
   /**
    * @internal
    */
-  private readonly cache = new Map<string, Response>();
+  private readonly cache = new Map<string, CordisResponse>();
   /**
    * @internal
    */
@@ -223,7 +224,7 @@ export class Rest extends EventEmitter {
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public async make<D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<Response & { cached?: boolean }> {
+  public async make<D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<CordisResponse> {
     const route = this.bucket.makeRoute(options.method, options.path);
 
     let bucket = this.buckets.get(route);
@@ -257,13 +258,13 @@ export class Rest extends EventEmitter {
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
         if (shouldCache && this.cache.has(options.path)) {
-          return Object.assign(this.cache.get(options.path)!.clone(), { cached: true });
+          return this.cache.get(options.path)!;
         }
 
-        const res = await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
+        const res = new CordisResponse(await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>));
 
         if (shouldCache || (isGet && this.cache.has(options.path))) {
-          this.cache.set(options.path, res.clone());
+          this.cache.set(options.path, res);
 
           if (this.cacheTimeouts.has(options.path)) {
             const timeout = this.cacheTimeouts.get(options.path)!;
@@ -318,7 +319,7 @@ export class Rest extends EventEmitter {
       return res.json() as Promise<T>;
     }
 
-    return res.blob() as Promise<unknown> as Promise<T>;
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -334,7 +335,7 @@ export class Rest extends EventEmitter {
       return res.json() as Promise<T>;
     }
 
-    return res.blob() as Promise<unknown> as Promise<T>;
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -350,7 +351,7 @@ export class Rest extends EventEmitter {
       return res.json() as Promise<T>;
     }
 
-    return res.blob() as Promise<unknown> as Promise<T>;
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -366,7 +367,7 @@ export class Rest extends EventEmitter {
       return res.json() as Promise<T>;
     }
 
-    return res.blob() as Promise<unknown> as Promise<T>;
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -382,6 +383,6 @@ export class Rest extends EventEmitter {
       return res.json() as Promise<T>;
     }
 
-    return res.blob() as Promise<unknown> as Promise<T>;
+    return res.blob() as Promise<T>;
   }
 }
