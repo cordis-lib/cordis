@@ -1,26 +1,8 @@
-<div align="center">
-  <img width="300" height="300" style="width: 100%; height: auto;" src="media/cordis_transparent.png">
-  <h4>
-    A fully modular, micro-service based <a href="https://nodejs.org/">Node.js</a> wrapper around the <a href="https://discordapp.com/developers/docs/intro">Discord API</a>
-  </h3>
+# Deprecation
 
-  <p align="center">
-    <br />
-    <h3>
-      <strong>
-        <a href="https://cordis.js.org/">Explore the docs »</a><a href="https://discord.gg/37ysd5dPYk"> Join Our Discord!</a>
-      </strong>
-    </h2>
-  </p>  
-
-  <p>
-      <img src="https://github.com/cordis-lib/cordis/actions/workflows/quality.yml/badge.svg" alt="Quality Check">
-      <img src="https://github.com/cordis-lib/cordis/actions/workflows/docs.yml/badge.svg" alt="Deploy Docs"><br>
-      <a href="https://github.com/cordis-lib/cordis/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-yellow.svg" alt="License: APACHE 2.0"></a>
-      <a href="https://github.com/cordis-lib/cordis/issues"><img src="https://img.shields.io/github/issues-raw/cordis-lib/cordis.svg?maxAge=25000" alt="Issues"></a>
-      <a href="https://github.com/cordis-lib/cordis/pulls"><img src="https://img.shields.io/github/issues-pr/cordis-lib/cordis.svg?style=flat" alt="GitHub pull requests"></a><br>
-  </p>
-</div>
+cordis has been deprecated. I ([DD](https://github.com/didinele)) joined the [discord.js](https://github.com/discordjs)
+team in 2022 Summer when I noticed the project was finally taking a direction I liked. Thanks to the hard work of many people
+and to my experience from building cordis, d.js is an amazing place now building micro-serviced bots thanks to `@discordjs/ws` and `@discordjs/core`.
 
 # Packages
 
