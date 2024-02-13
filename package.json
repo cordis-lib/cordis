@@ -9,6 +9,7 @@
     "lint": "pnpm recursive run lint --filter @cordis/*",
     "lint:ci": "pnpm lint --parallel --filter @cordis/*",
     "test": "jest",
+    "test:debug": "jest --runInBand",
     "test:ci": "jest --ci --no-stack-trace --verbose",
     "cleanup": "rimraf \"*/*/?(dist|types)/**\" && pnpm run build && pnpm run lint && pnpm run test:ci",
     "release:npm": "pnpm recursive publish --no-git-checks --access public --filter @cordis/* --filter=!./services",

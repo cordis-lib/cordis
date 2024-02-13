@@ -1,4 +1,13 @@
-import { Bucket, RatelimitData } from './Bucket';
+import {
+  BaseBucket,
+  BucketConstructor,
+  Bucket,
+  RatelimitData,
+  DiscordFetchOptions,
+  File,
+  RequestBodyData,
+  StringRecord
+} from '../bucket';
 import { USER_AGENT } from '../Constants';
 import { EventEmitter } from 'events';
 import { Headers, Response } from 'node-fetch';
@@ -6,7 +15,9 @@ import { Mutex, MemoryMutex } from '../mutex';
 import AbortController from 'abort-controller';
 import { CordisRestError, HTTPError } from '../Error';
 import { halt } from '@cordis/common';
-import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from '../Fetch';
+import type { Readable } from 'stream';
+import { RouteBases } from 'discord-api-types/v9';
+import { CordisResponse } from '.';
 
 /**
  * Options for constructing a rest manager
@@ -14,6 +25,8 @@ import type { DiscordFetchOptions, File, RequestBodyData, StringRecord } from '.
 export interface RestOptions {
   /**
    * How many times to retry making a request before giving up
+   *
+   * Tip: If using ProxyBucket you should probably set this to 1 depending on your proxy server's implementation
    */
   retries?: number;
   /**
@@ -34,6 +47,14 @@ export interface RestOptions {
    * Overwrites the default for `{@link RequestOptions.cacheTime}`
    */
   cacheTime?: number;
+  /**
+   * Bucket constructor to use
+   */
+  bucket?: BucketConstructor;
+  /**
+   * Overwrites the default domain used for every request
+   */
+  domain?: string;
 }
 
 export interface Rest {
@@ -55,9 +76,15 @@ export interface Rest {
    * @event
    */
   on(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
+  /**
+   * Fired when a request is aborted
+   * @event
+   */
+  // eslint-disable-next-line @typescript-eslint/unified-signatures
+  on(event: 'abort', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
 
   /** @internal */
-  once(event: 'request', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
+  once(event: 'request' | 'abort', listener: (request: Partial<DiscordFetchOptions<unknown, unknown>>) => any): this;
   /** @internal */
   once(
     event: 'response',
@@ -67,7 +94,7 @@ export interface Rest {
   once(event: 'ratelimit', listener: (bucket: string, endpoint: string, prevented: boolean, waitingFor: number) => any): this;
 
   /** @internal */
-  emit(event: 'request', request: Partial<DiscordFetchOptions<unknown, unknown>>): boolean;
+  emit(event: 'request' | 'abort', request: Partial<DiscordFetchOptions<unknown, unknown>>): boolean;
   /** @internal */
   emit(
     event: 'response',
@@ -114,7 +141,7 @@ export interface RequestOptions<D, Q> {
   /**
    * Body to send, if any
    */
-  data?: D;
+  data?: D | Readable;
   /**
    * Wether or not this request should be re-attempted after a ratelimit is waited out
    */
@@ -132,6 +159,10 @@ export interface RequestOptions<D, Q> {
    * @default 10000
    */
   cacheTime?: number;
+  /**
+   * Overwrites the domain used for this request - not taking into account the option passed into {@link RestOptions}
+   */
+  domain?: string;
 }
 
 /**
@@ -142,7 +173,7 @@ export class Rest extends EventEmitter {
   /**
    * @internal
    */
-  private readonly cache = new Map<string, any>();
+  private readonly cache = new Map<string, CordisResponse>();
   /**
    * @internal
    */
@@ -151,13 +182,15 @@ export class Rest extends EventEmitter {
   /**
    * Current active rate limiting Buckets
    */
-  public readonly buckets = new Map<string, Bucket>();
+  public readonly buckets = new Map<string, BaseBucket>();
 
   public readonly retries: number;
   public readonly abortAfter: number;
   public readonly mutex: Mutex;
   public readonly retryAfterRatelimit: boolean;
   public readonly cacheTime: number;
+  public readonly bucket: BucketConstructor;
+  public readonly domain: string;
 
   /**
    * @param auth Your bot's Discord token
@@ -174,6 +207,8 @@ export class Rest extends EventEmitter {
       mutex = new MemoryMutex(),
       retryAfterRatelimit = true,
       cacheTime = 10000,
+      bucket = Bucket,
+      domain = RouteBases.api
     } = options;
 
     this.retries = retries;
@@ -181,19 +216,21 @@ export class Rest extends EventEmitter {
     this.mutex = mutex;
     this.retryAfterRatelimit = retryAfterRatelimit;
     this.cacheTime = cacheTime;
+    this.bucket = bucket;
+    this.domain = domain;
   }
 
   /**
    * Prepares a request to Discord, associating it to the correct Bucket and attempting to prevent rate limits
    * @param options Options needed for making a request; only the path is required
    */
-  public async make<T, D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<T> {
-    const route = Bucket.makeRoute(options.method, options.path);
+  public async make<D = RequestBodyData, Q = StringRecord>(options: RequestOptions<D, Q>): Promise<CordisResponse> {
+    const route = this.bucket.makeRoute(options.method, options.path);
 
     let bucket = this.buckets.get(route);
 
     if (!bucket) {
-      bucket = new Bucket(this, route);
+      bucket = new this.bucket(this, route);
       this.buckets.set(route, bucket);
     }
 
@@ -209,22 +246,25 @@ export class Rest extends EventEmitter {
     }
 
     options.cacheTime ??= this.cacheTime;
+    options.domain ??= this.domain;
 
     let isRetryAfterRatelimit = false;
 
     const isGet = options.method.toLowerCase() === 'get';
     const shouldCache = options.cache && isGet;
 
+    let rejected: Promise<never>;
+
     for (let retries = 0; retries <= this.retries; retries++) {
       try {
         if (shouldCache && this.cache.has(options.path)) {
-          return this.cache.get(options.path);
+          return this.cache.get(options.path)!;
         }
 
-        const data = await bucket.make<T, D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>);
+        const res = new CordisResponse(await bucket.make<D, Q>({ ...options, isRetryAfterRatelimit } as DiscordFetchOptions<D, Q>));
 
         if (shouldCache || (isGet && this.cache.has(options.path))) {
-          this.cache.set(options.path, data);
+          this.cache.set(options.path, res);
 
           if (this.cacheTimeouts.has(options.path)) {
             const timeout = this.cacheTimeouts.get(options.path)!;
@@ -237,26 +277,32 @@ export class Rest extends EventEmitter {
           }
         }
 
-        return data;
+        return res;
       } catch (e: any) {
         const isRatelimit = e instanceof CordisRestError && e.code === 'rateLimited';
         isRetryAfterRatelimit = isRatelimit;
 
-        if (
-          e instanceof HTTPError ||
-          e.name === 'AbortError' ||
-          (isRatelimit && !options.retryAfterRatelimit)
-        ) {
+        if (e.name === 'AbortError') {
           return Promise.reject(e);
         }
 
-        if (e instanceof CordisRestError && e.code === 'internal') {
-          await halt(1000);
+        if (isRatelimit && !options.retryAfterRatelimit) {
+          return Promise.reject(e);
         }
+
+        if (e instanceof HTTPError) {
+          if (e.response.status >= 500 && e.response.status < 600) {
+            await halt(1000);
+          } else {
+            return Promise.reject(e);
+          }
+        }
+
+        rejected = e;
       }
     }
 
-    return Promise.reject(new CordisRestError('retryLimitExceeded', `${options.method.toUpperCase()} ${options.path}`, this.retries));
+    return Promise.reject(rejected!);
   }
 
   /**
@@ -266,8 +312,14 @@ export class Rest extends EventEmitter {
    */
   /* istanbul ignore next */
 
-  public get<T, Q = StringRecord>(path: string, options: { query?: Q; cache?: boolean; cacheTime?: number } = {}): Promise<T> {
-    return this.make<T, never, Q>({ path, method: 'get', ...options });
+  public async get<T, Q = StringRecord>(path: string, options: { query?: Q; cache?: boolean; cacheTime?: number } = {}): Promise<T> {
+    const res = await this.make<never, Q>({ path, method: 'get', ...options });
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -276,8 +328,14 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public delete<T, D = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
-    return this.make<T, D, never>({ path, method: 'delete', ...options });
+  public async delete<T, D = RequestBodyData>(path: string, options: { data?: D; reason?: string } = {}): Promise<T> {
+    const res = await this.make<D, never>({ path, method: 'delete', ...options });
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -286,8 +344,14 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string; files?: File[] }): Promise<T> {
-    return this.make<T, D, never>({ path, method: 'patch', ...options });
+  public async patch<T, D = RequestBodyData>(path: string, options: { data: D; reason?: string; files?: File[] }): Promise<T> {
+    const res = await this.make<D, never>({ path, method: 'patch', ...options });
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -296,8 +360,14 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public put<T, D = RequestBodyData>(path: string, options?: { data?: D; reason?: string }): Promise<T> {
-    return this.make<T, D, never>({ path, method: 'put', ...options });
+  public async put<T, D = RequestBodyData>(path: string, options?: { data?: D; reason?: string }): Promise<T> {
+    const res = await this.make<D, never>({ path, method: 'put', ...options });
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<T>;
   }
 
   /**
@@ -306,7 +376,13 @@ export class Rest extends EventEmitter {
    * @param options Other options for the request
    */
   /* istanbul ignore next */
-  public post<T, D = RequestBodyData, Q = StringRecord>(path: string, options: { data: D; reason?: string; files?: File[]; query?: Q }): Promise<T> {
-    return this.make<T, D, Q>({ path, method: 'post', ...options });
+  public async post<T, D = RequestBodyData, Q = StringRecord>(path: string, options: { data: D; reason?: string; files?: File[]; query?: Q }): Promise<T> {
+    const res = await this.make<D, Q>({ path, method: 'post', ...options });
+
+    if (res.headers.get('content-type')?.startsWith('application/json')) {
+      return res.json() as Promise<T>;
+    }
+
+    return res.blob() as Promise<T>;
   }
 }

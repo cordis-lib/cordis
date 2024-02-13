@@ -1,2 +1,2 @@
-export * from './Bucket';
+export * from './CordisResponse';
 export * from './Rest';

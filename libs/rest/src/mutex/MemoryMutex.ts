@@ -1,7 +1,7 @@
 // ? Anything ignored from coverage in this file are just weird edge cases - nothing to really cover.
 
 import { Mutex } from './Mutex';
-import type { RatelimitData } from '../struct';
+import type { RatelimitData } from '../bucket';
 
 export interface MemoryRatelimitData extends RatelimitData {
   expiresAt: Date;
@@ -43,7 +43,7 @@ export class MemoryMutex extends Mutex {
       }
 
       /* istanbul ignore next */
-      return 1e2;
+      return 0;
     }
 
     ratelimit.remaining--;

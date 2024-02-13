@@ -3,6 +3,7 @@ import FormData from 'form-data';
 import { URLSearchParams } from 'url';
 import AbortController from 'abort-controller';
 import { RouteBases } from 'discord-api-types/v9';
+import { Readable } from 'stream';
 
 /**
  * Represents a file that can be sent to Discord
@@ -37,7 +38,8 @@ export interface DiscordFetchOptions<D = RequestBodyData, Q = StringRecord> {
   isRetryAfterRatelimit: boolean;
   query?: Q | string;
   files?: File[];
-  data?: D;
+  data?: D | Readable;
+  domain?: string;
 }
 
 /**
@@ -45,7 +47,7 @@ export interface DiscordFetchOptions<D = RequestBodyData, Q = StringRecord> {
  * @param options Options for the request
  */
 export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => {
-  let { path, method, headers, controller, query, files, data } = options;
+  let { path, method, headers, controller, query, files, data, domain = RouteBases.api } = options;
 
   let queryString: string | null = null;
   if (query) {
@@ -59,9 +61,9 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
     ).toString();
   }
 
-  const url = `${RouteBases.api}${path}${queryString ? `?${queryString}` : ''}`;
+  const url = `${domain}${path}${queryString ? `?${queryString}` : ''}`;
 
-  let body: string | FormData;
+  let body;
   if (files?.length) {
     body = new FormData();
     for (const file of files) {
@@ -73,6 +75,9 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
     }
 
     headers = Object.assign(headers, body.getHeaders());
+  } else if (data instanceof Readable) {
+    // In this case the user is expected to set their own Content-Type - otherwise Discord will complain
+    body = data;
   } else if (data != null) {
     body = JSON.stringify(data);
     headers.set('Content-Type', 'application/json');
@@ -81,7 +86,7 @@ export const discordFetch = async <D, Q>(options: DiscordFetchOptions<D, Q>) => 
   return fetch(url, {
     method,
     headers,
-    body: body!,
+    body: body,
     signal: controller.signal,
     // 250KB buffer for the sake of supporting 2 clones of reasonably big responses
     highWaterMark: 25e4

@@ -1,6 +1,6 @@
 import { halt } from '@cordis/common';
 import { CordisRestError } from '../Error';
-import type { RatelimitData } from '../struct';
+import type { RatelimitData } from '../bucket';
 
 /**
  * "Mutex" used to ensure requests don't go through when a ratelimit is about to happen
